@@ -526,11 +526,6 @@ int parse_sdf(O3Data *od, int options, char *name_list)
       alloc_array(molecule_num, sizeof(MolInfo)))) {
       return OUT_OF_MEMORY;
     }
-    free_array(od->al.cosmo_list);
-    if (!(od->al.cosmo_list = (COSMOData **)alloc_array
-      (molecule_num, sizeof(COSMOData)))) {
-      return OUT_OF_MEMORY;
-    }
     for (i = 0; i < molecule_num; ++i) {
       od->al.mol_info[i]->object_id = i + 1;
       od->al.mol_info[i]->struct_num = i;

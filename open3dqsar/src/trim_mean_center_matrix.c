@@ -77,8 +77,7 @@ void trim_mean_center_matrix(O3Data *od, DoubleMat *large_mat, DoubleMat **mat,
     sumweight = 0.0;
     while (object_num < od->object_num) {
       struct_num = od->al.mol_info[object_num]->struct_num;
-      conf_num = ((od->valid & COSMOTHERM_BIT)
-        ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+      conf_num = 1;
       /*
       if it is a CV model some compounds shall be left out
       */
@@ -112,8 +111,7 @@ void trim_mean_center_matrix(O3Data *od, DoubleMat *large_mat, DoubleMat **mat,
     y = 0;
     while (object_num < od->object_num) {
       struct_num = od->al.mol_info[object_num]->struct_num;
-      conf_num = ((od->valid & COSMOTHERM_BIT)
-        ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+      conf_num = 1;
       /*
       if it is a CV model some compounds shall be left out
       */
@@ -192,8 +190,7 @@ void trim_mean_center_x_matrix_hp(O3Data *od, int model_type, int active_object_
       y = 0;
       while (object_num < od->object_num) {
         struct_num = od->al.mol_info[object_num]->struct_num;
-        conf_num = ((od->valid & COSMOTHERM_BIT)
-          ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+        conf_num = 1;
         if (n < od->pel.out_structs->size) {
           if (struct_num == od->pel.out_structs->pe[n]) {
             ++n;
@@ -276,8 +273,7 @@ void trim_mean_center_y_matrix_hp(O3Data *od, int active_object_num, int run)
     y = 0;
     while (object_num < od->object_num) {
       struct_num = od->al.mol_info[object_num]->struct_num;
-      conf_num = ((od->valid & COSMOTHERM_BIT)
-        ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+      conf_num = 1;
       if (n < od->pel.out_structs->size) {
         if (struct_num == od->pel.out_structs->pe[n]) {
           ++n;

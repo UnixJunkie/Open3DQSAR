@@ -105,15 +105,12 @@ void update_field_object_attr(O3Data *od, int verbose)
     tee_printf(od,
       "\n"
       "-----------------------------------------------------------------------------------");
-    for (i = 0; i < (od->y_vars + ((od->valid & COSMOTHERM_BIT) ? 1 : 0)); ++i) {
+    for (i = 0; i < od->y_vars; ++i) {
       tee_printf(od, "------------");
     }
     tee_printf(od,
       "\n"
       "%5s%5s%5s    %-36s%-16s%12s", "", "", "", "", "", "");
-    if (od->valid & COSMOTHERM_BIT) {
-      tee_printf(od, "%12s", "dG_wat");
-    }
     for (i = 0; i < od->y_vars; ++i) {
       sprintf(buffer, "y%d", i + 1);
       tee_printf(od, "%12s", buffer);
@@ -121,9 +118,6 @@ void update_field_object_attr(O3Data *od, int verbose)
     tee_printf(od,
       "\n"
       "%5s%5s%5s    %-36s%-16s%12s", "N", "ID", "Str", "Object name", "Attribute", "Weight");
-    if (od->valid & COSMOTHERM_BIT) {
-      tee_printf(od, "%12s", "(kcal/mol)");
-    }
     for (i = 0; i < od->y_vars; ++i) {
       strcpy(buffer, od->cimal.y_var_name->me[i]);
       if (strlen(buffer) > 11) {
@@ -134,7 +128,7 @@ void update_field_object_attr(O3Data *od, int verbose)
     tee_printf(od,
       "\n"
       "-----------------------------------------------------------------------------------");
-    for (i = 0; i < (od->y_vars + ((od->valid & COSMOTHERM_BIT) ? 1 : 0)); ++i) {
+    for (i = 0; i < od->y_vars; ++i) {
       tee_printf(od, "------------");
     }
     tee_printf(od, "\n");
@@ -165,17 +159,6 @@ void update_field_object_attr(O3Data *od, int verbose)
       else {
         tee_printf(od, "%12s", "-");
       }
-      if (od->valid & COSMOTHERM_BIT) {
-        if (get_object_attr(od, i, ACTIVE_BIT | PREDICT_BIT)) {
-          value = od->al.regex_list[BOUND][i]->rel_g * R_KCAL_K_MOL * 298.15;
-          sprintf(buffer, "%lf", value);
-          strcpy(format, ((strlen(buffer) > 11) ? "%12.4le" : "%12.4lf"));
-          tee_printf(od, format, value);
-        }
-        else {
-          tee_printf(od, "%12s", "-");
-        }
-      }
       for (j = 0; j < od->y_vars; ++j) {
         value = get_y_value(od, i, j, 0);
         sprintf(buffer, "%lf", value);
@@ -186,9 +169,6 @@ void update_field_object_attr(O3Data *od, int verbose)
     }
   }
   tee_flush(od);
-  if (od->valid & COSMOTHERM_BIT) {
-    calc_conf_energies(od);
-  }
   od->active_field_num = active_field_num;
   od->active_object_num = active_object_num;
   od->ext_pred_object_num = ext_pred_object_num;

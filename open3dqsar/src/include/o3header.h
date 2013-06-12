@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2012 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -271,7 +271,6 @@ E-mail: paolo.tosco@unito.it
 #define WRONG_DATA_FORMAT    520
 #define WRONG_PARAMETER_NAME    530
 #define DUPLICATE_PARAMETER_NAME  531
-#define CANNOT_OPEN_COSMOTHERM_FILE  540
 #define CANNOT_OPEN_DIRECTORY    550
 #define CANNOT_CREATE_DIRECTORY    560
 #define CS3D_ERROR      570
@@ -316,7 +315,6 @@ E-mail: paolo.tosco@unito.it
 #define MAX_DB        3
 #define BOUND        0
 #define WATER        1
-#define MAX_COSMOTHERM_STATES    2
 #define TEMPLATE_OBJECT_NUM    0
 #define TEMPLATE_CONF_NUM    1
 #define MOVED_OBJECT_NUM    2
@@ -539,8 +537,6 @@ E-mail: paolo.tosco@unito.it
 #define PLS_CONV_THRESHOLD    1.0e-04
 #define MSD_THRESHOLD      1.0e-07
 #define ENERGY_THRESHOLD    1.0e-12
-#define DEFAULT_LN_K_RMSD_THRESHOLD  1.0e-03
-#define DEFAULT_MAX_ITER_COSMOPLS  200
 #define DEFAULT_MAX_ITER_ALIGN    200
 #define MIN_IMPROVEMENT_ITER_ALIGN  0.001
 #define DEFAULT_RMSD_ITER_ALIGN    0.001
@@ -624,7 +620,6 @@ E-mail: paolo.tosco@unito.it
 #define FOUR_LEVEL_BIT      (1<<12)
 #define SCRAMBLE_BIT      (1<<13)
 #define SDF_BIT        (1<<14)
-#define COSMOTHERM_BIT      (1<<15)
 #define QMD_KEEP_INITIAL    (1<<0)
 #define QMD_GBSA      (1<<1)
 #define QMD_REMOVE_FOLDER    (1<<2)
@@ -792,7 +787,6 @@ typedef struct FileDescriptor FileDescriptor;
 typedef struct XData XData;
 typedef struct YData YData;
 typedef struct RegexData RegexData;
-typedef struct COSMOData COSMOData;
 typedef struct SeedDistMat SeedDistMat;
 typedef struct TaskInfo TaskInfo;
 typedef struct FieldInfo FieldInfo;
@@ -891,17 +885,6 @@ struct YData {
 struct RegexData {
   int struct_num;
   int conf_num;
-  double g;
-  double rel_g;
-};
-
-struct COSMOData {
-  int n_conf[MAX_COSMOTHERM_STATES];
-  double z_water;
-  double z_bound;
-  double thermo_ln_k;
-  double orig_y;
-  double delta;
 };
 
 struct SeedDistMat {
@@ -1294,8 +1277,7 @@ struct ArrayList {
   PharConfInfo **phar_conf_list;
   TaskInfo **task_list;
   RotoTransList **rt_list;
-  RegexData **regex_list[MAX_COSMOTHERM_STATES];
-  COSMOData **cosmo_list;
+  RegexData **regex_list[MAX_STATES];
 };
 
 struct CIMatList {
@@ -1441,7 +1423,6 @@ struct O3Data {
   int object_num;
   int active_object_num;
   int ext_pred_object_num;
-  int cosmotherm_object_num[MAX_COSMOTHERM_STATES];
   int field_num;
   int active_field_num;
   int voronoi_num;
@@ -1552,9 +1533,6 @@ int break_sdf_to_mol(O3Data *od, TaskInfo *task, FileDescriptor *from_fd, char *
 int break_sdf_to_sdf(O3Data *od, TaskInfo *task, FileDescriptor *from_fd, char *to_dir);
 int calc_active_vars(O3Data *od, int model_type);
 void calc_conf_centroid(ConfInfo *conf, double *centroid);
-void calc_conf_energies(O3Data *od);
-void calc_conf_weights_training_set(O3Data *od);
-void calc_conf_weights_test_set(O3Data *od, int pc_num);
 double calc_delta_ij(O3Data *od, DoubleMat *dispersion_mat, int i, int j);
 double calc_dxi(O3Data *od, DoubleMat *dispersion_mat, DoubleMat *candidates_mat, int i);
 double calc_dxixj(O3Data *od, DoubleMat *dispersion_mat, int i, int j);
@@ -1734,7 +1712,6 @@ unsigned short get_y_var_attr(O3Data *od, int y_var, unsigned short attr);
 double get_y_var_buf(O3Data *od, int y_var, int buf_num);
 char *get_y_var_name(char *buffer, char *y_name);
 int grid_write(O3Data *od, char *filename, int pc_num, int type, int sign, int format, int label, int interpolate, int requested_endianness);
-int import_cosmotherm(O3Data *od, char regex_name[MAX_COSMOTHERM_STATES][BUF_LEN], int *state);
 int import_dependent(O3Data *od, char *name_list);
 int import_free_format(O3Data *od, char *name_list, int skip_header, int *n_values);
 int import_grid_ascii(O3Data *od, char *regex_name);

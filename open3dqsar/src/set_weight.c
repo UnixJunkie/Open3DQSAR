@@ -69,8 +69,7 @@ int set_object_weight(O3Data *od, double weight, int list_type, int options)
   if (!(list_type & (1 << FROM_FILE))) {
     for (object_num = 0; object_num < od->object_num; ++object_num) {
       struct_num = od->al.mol_info[object_num]->struct_num;
-      conf_num = ((od->valid & COSMOTHERM_BIT)
-        ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+      conf_num = 1;
       if (get_object_attr(od, object_num, OPERATE_BIT)) {
         switch (options) {
           case RANDOM_WEIGHTS:

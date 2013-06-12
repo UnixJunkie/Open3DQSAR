@@ -65,21 +65,13 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
     "GRID_ASCII",
     "COSMO"
   };
-  char *cosmotherm_regex_parameter[] = {
-    "bound",
-    "water"
-  };
-  char *cosmotherm_regex_errmsg[] = {
-    "the bound state",
-    "water"
-  };
   char prompt[TITLE_LEN];
   char grid_fill[MAX_NAME_LEN];
   char history_file[BUF_LEN];
   char line_orig[BUF_LEN];
   char last_line[BUF_LEN];
   char whole_line[BUF_LEN];
-  char regex_name[MAX_COSMOTHERM_STATES][BUF_LEN];
+  char regex_name[MAX_STATES][BUF_LEN];
   char file_basename[BUF_LEN];
   char name_list[BUF_LEN];
   char comma_hyphen_list[BUF_LEN];
@@ -130,9 +122,6 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
   int skip_header;
   int options;
   int n_values;
-  int v;
-  int max_iter = 0;
-  int conv_method = 0;
   int label = 0;
   int *max_vary[MAX_FREE_FORMAT_PARAMETERS + 1];
   int *vary[MAX_FREE_FORMAT_PARAMETERS + 1];
@@ -142,10 +131,6 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
   double level;
   double weight;
   double outgap = 0.0;
-  double ln_k_rmsd = 0.0;
-  double prev_ln_k_rmsd = 0.0;
-  double ln_k_rmsd_threshold;
-  double grad;
   double trans[3];
   double rot[3];
   CharMat *arg;
@@ -1414,87 +1399,6 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
             tee_flush(od);
           }
         }
-      }
-      else if (!strcasecmp(parameter, "cosmotherm")) {
-        /*
-        user wants to IMPORT COSMOtherm data
-        */
-        for (i = 0; i < MAX_COSMOTHERM_STATES; ++i) {
-          memset(regex_name[i], 0, BUF_LEN);
-          if ((parameter = get_args(od, cosmotherm_regex_parameter[i]))) {
-            strncpy(regex_name[i], parameter, BUF_LEN - 1);
-            regex_name[i][BUF_LEN - 1] = '\0';
-          }
-          else if (i == BOUND) {
-            tee_error(od, run_type, overall_line_num,
-              E_COSMOTHERM_REGEX, cosmotherm_regex_errmsg[i],
-              IMPORT_FAILED);
-            fail = !(run_type & INTERACTIVE_RUN);
-            continue;
-          }
-          if (check_regex_name(regex_name[i], 2)) {
-            tee_error(od, run_type, overall_line_num,
-              E_TWO_WILDCARDS, IMPORT_FAILED);
-            fail = !(run_type & INTERACTIVE_RUN);
-            continue;
-          }
-        }
-        if (!(od->valid & SDF_BIT)) {
-          tee_error(od, run_type, overall_line_num,
-            E_IMPORT_MOLFILE_FIRST, IMPORT_FAILED);
-          fail = !(run_type & INTERACTIVE_RUN);
-          continue;
-        }
-        if (!(run_type & DRY_RUN)) {
-          gettimeofday(&start, NULL);
-          ++command;
-          tee_printf(od, M_TOOL_INVOKE, nesting, command,
-            "IMPORT COSMOTHERM", line_orig);
-          tee_flush(od);
-          result = import_cosmotherm(od, regex_name, &i);
-          gettimeofday(&end, NULL);
-          elapsed_time(od, &start, &end);
-          /*
-          check for errors
-          */
-          switch (result) {
-            case CANNOT_OPEN_COSMOTHERM_FILE:
-            tee_error(od, run_type, overall_line_num,
-              E_FILE_CANNOT_BE_OPENED_FOR_READING,
-              od->file[ASCII_IN]->name, IMPORT_FAILED);
-            return PARSE_INPUT_ERROR;
-            
-            case CANNOT_OPEN_DIRECTORY:
-            strcpy(buffer, regex_name[i]);
-            get_dirname(buffer);
-            tee_error(od, run_type, overall_line_num,
-              E_DIR_NOT_EXISTING, buffer, IMPORT_FAILED);
-            return PARSE_INPUT_ERROR;
-            
-            case NOT_ENOUGH_OBJECTS:
-            case TOO_MANY_OBJECTS:
-            tee_error(od, run_type, overall_line_num,
-              E_NOT_ENOUGH_OBJECTS,
-              od->grid.object_num, regex_name[i],
-              IMPORT_FAILED);
-            return PARSE_INPUT_ERROR;
-
-            case PREMATURE_EOF:
-            tee_error(od, run_type, overall_line_num,
-              E_FILE_CORRUPTED_OR_IN_WRONG_FORMAT, "ASCII",
-              od->file[ASCII_IN]->name, IMPORT_FAILED);
-            return PARSE_INPUT_ERROR;
-
-            default:
-            if (!regex_name[WATER][0]) {
-              tee_printf(od, "No free energies in water were imported.\n\n");
-            }
-            tee_printf(od, M_TOOL_SUCCESS, nesting, command, "IMPORT COSMOTHERM");
-            tee_flush(od);
-          }
-          calc_conf_energies(od);
-        }
-        od->valid |= COSMOTHERM_BIT;
       }
       else if ((!strcasecmp(parameter, "gamess_cube"))
         || (!strcasecmp(parameter, "formatted_cube"))) {
@@ -4471,14 +4375,6 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
       else {
         if ((parameter = get_args(od, "attribute"))) {
           if (!strncasecmp(parameter, "training", 8)) {
-            if ((list_type & (1 << OBJECT_LIST))
-              && (od->valid & COSMOTHERM_BIT)) {
-              tee_error(od, run_type, overall_line_num,
-                E_STRUCT_ATTRIBUTE_ONLY, "TRAINING",
-                SET_FAILED);
-              fail = !(run_type & INTERACTIVE_RUN);
-              continue;
-            }
             attr = ACTIVE_BIT;
             state = 1;
           }
@@ -4487,14 +4383,6 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
             state = 0;
           }
           else if (!strncasecmp(parameter, "test", 4)) {
-            if ((list_type & (1 << OBJECT_LIST))
-              && (od->valid & COSMOTHERM_BIT)) {
-              tee_error(od, run_type, overall_line_num,
-                E_STRUCT_ATTRIBUTE_ONLY, "TEST",
-                SET_FAILED);
-              fail = !(run_type & INTERACTIVE_RUN);
-              continue;
-            }
             attr = PREDICT_BIT;
             state = 1;
           }
@@ -5362,7 +5250,7 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
         }
       }
       else {
-        od->valid &= (SDF_BIT | COSMOTHERM_BIT);
+        od->valid &= SDF_BIT;
       }
     }  
     else if (!strcasecmp(arg->me[0], "remove_field")) {
@@ -5439,7 +5327,7 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
         }
       }
       else {
-        od->valid &= (SDF_BIT | COSMOTHERM_BIT);
+        od->valid &= SDF_BIT;
       }
     }  
     else if (!strcasecmp(arg->me[0], "remove_object")) {
@@ -5491,7 +5379,7 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
         }
       }
       else {
-        od->valid &= (SDF_BIT | COSMOTHERM_BIT);
+        od->valid &= SDF_BIT;
       }
     }  
     else if (!strcasecmp(arg->me[0], "remove_y_vars")) {
@@ -6484,384 +6372,6 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
           print_pls_scores(od, options);
         }
         tee_printf(od, M_TOOL_SUCCESS, nesting, command, "PLS");
-        tee_flush(od);
-        od->valid |= PLS_BIT;
-      }
-      else {
-        od->valid |= PLS_BIT;
-      }
-      if (od->file[ASCII_IN]->handle) {
-        fclose(od->file[ASCII_IN]->handle);
-        od->file[ASCII_IN]->handle = NULL;
-      }
-    }
-    else if (!strcasecmp(arg->me[0], "cosmopls")) {
-      if (!(od->valid & COSMOTHERM_BIT)) {
-        tee_error(od, run_type, overall_line_num,
-          E_IMPORT_COSMOTHERM_FIRST, COSMOPLS_FAILED);
-        fail = !(run_type & INTERACTIVE_RUN);
-        continue;
-      }
-      ln_k_rmsd_threshold = DEFAULT_LN_K_RMSD_THRESHOLD;
-      if ((parameter = get_args(od, "grad"))) {
-        sscanf(parameter, "%lf", &ln_k_rmsd_threshold);
-        ln_k_rmsd_threshold = fabs(ln_k_rmsd_threshold);
-      }
-      max_iter = DEFAULT_MAX_ITER_COSMOPLS;
-      if ((parameter = get_args(od, "max_iter"))) {
-        sscanf(parameter, "%d", &max_iter);
-        if (max_iter <= 0) {
-          tee_error(od, run_type, overall_line_num,
-            E_POSITIVE_NUMBER, "max_iter parameter",
-            COSMOPLS_FAILED);
-          fail = !(run_type & INTERACTIVE_RUN);
-          continue;
-        }
-      }
-      if (!(run_type & DRY_RUN)) {
-        type = FULL_MODEL;
-        if ((parameter = get_args(od, "type"))) {
-          if (!strncasecmp(parameter, "loo", 3)) {
-            type = LEAVE_ONE_OUT;
-          }
-          else if (!strncasecmp(parameter, "lto", 3)) {
-            type = LEAVE_TWO_OUT;
-          }
-          else if (!strncasecmp(parameter, "lmo", 3)) {
-            type = LEAVE_MANY_OUT;
-            result = check_lmo_parameters(od, COSMOPLS_FAILED,
-              &groups, &runs, run_type, overall_line_num);
-            if (result) {
-              fail = !(run_type & INTERACTIVE_RUN);
-              continue;
-            }
-          }
-          else if (strncasecmp(parameter, "full", 4)) {
-            tee_error(od, run_type, overall_line_num,
-              E_ONLY_FULL_LOO_LTO_LMO_ALLOWED,
-              COSMOPLS_FAILED);
-            fail = !(run_type & INTERACTIVE_RUN);
-            continue;
-          }
-        }
-        gettimeofday(&start, NULL);
-        /*
-        user wants to accomplish
-        PLS analysis
-        */
-        if (!(od->field_num)) {
-          tee_error(od, run_type, overall_line_num,
-            E_NO_FIELDS_PRESENT, COSMOPLS_FAILED);
-          fail = !(run_type & INTERACTIVE_RUN);
-          continue;
-        }
-        pc = (od->pc_num ? od->pc_num : 5);
-        if ((parameter = get_args(od, "pc"))) {
-          sscanf(parameter, "%d", &pc);
-        }
-        if (pc > od->overall_active_x_vars) {
-          tee_error(od, run_type, overall_line_num,
-            E_TOO_FEW_MANY_FOR_AVAILABLE_DATA, "many PCs",
-            COSMOPLS_FAILED);
-          fail = !(run_type & INTERACTIVE_RUN);
-          continue;
-        }
-        if (pc < 1) {
-          tee_error(od, run_type, overall_line_num,
-            E_AT_LEAST_ONE_PC, COSMOPLS_FAILED);
-          fail = !(run_type & INTERACTIVE_RUN);
-          continue;
-        }
-        if (!(od->y_vars)) {
-          tee_error(od, run_type, overall_line_num,
-            E_NO_Y_VARS_PRESENT, COSMOPLS_FAILED);
-          fail = !(run_type & INTERACTIVE_RUN);
-          continue;
-        }
-        if (od->y_vars > 1) {
-          tee_error(od, run_type, overall_line_num,
-            "COSMOPLS may be invoked only with a "
-            "single Y variable, corresponding to "
-            "-log10(K_bind).\n%s", COSMOPLS_FAILED);
-          fail = !(run_type & INTERACTIVE_RUN);
-          continue;
-        }
-        od->cv.pc_num = pc;
-        ++command;
-        tee_printf(od, M_TOOL_INVOKE, nesting, command, "COSMOPLS", line_orig);
-        tee_flush(od);
-        od->mal.press = double_mat_resize
-          (od->mal.press, pc + 1, od->y_vars);
-        if (!(od->mal.press)) {
-          tee_error(od, run_type, overall_line_num,
-            E_OUT_OF_MEMORY, COSMOPLS_FAILED);
-          return PARSE_INPUT_ERROR;
-        }
-        memset(od->mal.press->base, 0,
-          od->mal.press->m * od->mal.press->n * sizeof(double));
-        v = 0;
-        ln_k_rmsd = 0.0;
-        conv_method = 0;
-        replace_orig_y(od);
-        set_random_seed(od, od->random_seed);
-        while ((!v) || ((v < max_iter) && (ln_k_rmsd > ln_k_rmsd_threshold))) {
-          ++v;
-          calc_conf_weights_training_set(od);
-          /*
-          for (i = 0; i < od->grid.object_num; ++i) {
-            tee_printf(od, "%4d%12.4lf%12.4lf\n", i + 1, od->mel.object_weight[i], od->al.mol_info[i]->ln_k);
-            tee_flush(od);
-          }
-          */
-          result = calc_active_vars(od, SILENT_PLS);
-          switch (result) {
-            case CANNOT_READ_TEMP_FILE:
-            tee_error(od, run_type, overall_line_num,
-              E_ERROR_IN_READING_TEMP_FILE, "TEMP_FIELD", COSMOPLS_FAILED);
-            return PARSE_INPUT_ERROR;
-
-            case Y_VAR_LOW_SD:
-            tee_error(od, run_type, overall_line_num,
-              E_Y_VAR_LOW_SD, COSMOPLS_FAILED);
-            return PARSE_INPUT_ERROR;
-          }
-          result = alloc_pls(od, od->overall_active_x_vars,
-            pc, SILENT_PLS);
-          if (result) {
-            tee_error(od, run_type, overall_line_num,
-              E_OUT_OF_MEMORY, COSMOPLS_FAILED);
-            return PARSE_INPUT_ERROR;
-          }
-          result = fill_x_matrix(od, SILENT_PLS, 0);
-          switch (result) {
-            case OUT_OF_MEMORY:
-            tee_error(od, run_type, overall_line_num,
-              E_OUT_OF_MEMORY, COSMOPLS_FAILED);
-            return PARSE_INPUT_ERROR;
-          }
-          result = fill_y_matrix(od);
-          if (result) {
-            tee_error(od, run_type, overall_line_num,
-              E_OUT_OF_MEMORY, COSMOPLS_FAILED);
-            return PARSE_INPUT_ERROR;
-          }
-          if (type == FULL_MODEL) {
-            trim_mean_center_matrix(od, od->mal.large_e_mat,
-              &(od->mal.e_mat), &(od->vel.e_mat_ave),
-              FULL_MODEL, od->active_object_num);
-            trim_mean_center_matrix(od, od->mal.large_f_mat,
-              &(od->mal.f_mat), &(od->vel.f_mat_ave),
-              FULL_MODEL, od->active_object_num);
-            pls(od, pc, SILENT_PLS);
-          }
-          else {
-            result = alloc_cv_sdep(od, pc, runs);
-            if (result) {
-              tee_error(od, run_type, overall_line_num,
-                E_OUT_OF_MEMORY, COSMOPLS_FAILED);
-              return PARSE_INPUT_ERROR;
-            }
-            result = prepare_cv(od, pc, type, groups, runs);
-            switch (result) {
-              case OUT_OF_MEMORY:
-              tee_error(od, run_type, overall_line_num,
-                E_OUT_OF_MEMORY, COSMOPLS_FAILED);
-              return PARSE_INPUT_ERROR;
-
-              case NOT_ENOUGH_OBJECTS:
-              tee_error(od, run_type, overall_line_num,
-                E_TOO_FEW_STRUCTURES_FOR_CV,
-                COSMOPLS_FAILED);
-              return PARSE_INPUT_ERROR;
-            }
-            if (od->n_proc > 1) {
-              result = parallel_cv(od, od->overall_active_x_vars,
-                 pc, PARALLEL_CV | SILENT_PLS, type, groups, runs);
-              free_parallel_cv(od, od->mel.thread_info, SILENT_PLS, type, runs);
-            }
-            else {
-              if (open_temp_file(od, od->file[TEMP_PRED], "pred_y")) {
-                tee_error(od, run_type, overall_line_num,
-                  E_TEMP_FILE_CANNOT_BE_OPENED_FOR_WRITING,
-                  od->file[TEMP_PRED]->name, COSMOPLS_FAILED);
-                return PARSE_INPUT_ERROR;
-              }
-              result = cv(od, pc, SILENT_PLS, type, groups, runs);
-              if (type == LEAVE_MANY_OUT) {
-                free_cv_groups(od, runs);
-              }
-              switch (result) {
-                case OUT_OF_MEMORY:
-                tee_error(od, run_type, overall_line_num,
-                  E_OUT_OF_MEMORY, COSMOPLS_FAILED);
-                return PARSE_INPUT_ERROR;
-
-                case CANNOT_WRITE_TEMP_FILE:
-                tee_error(od, run_type, overall_line_num,
-                  E_ERROR_IN_WRITING_TEMP_FILE,
-                  "TEMP_FIELD", COSMOPLS_FAILED);
-                return PARSE_INPUT_ERROR;
-
-                case CANNOT_READ_TEMP_FILE:
-                tee_error(od, run_type, overall_line_num,
-                  E_ERROR_IN_READING_TEMP_FILE,
-                  "TEMP_FIELD", COSMOPLS_FAILED);
-                return PARSE_INPUT_ERROR;
-
-                case CANNOT_CREATE_THREAD:
-                tee_error(od, run_type, overall_line_num,
-                  E_THREAD_ERROR, "create",
-                  od->error_code, COSMOPLS_FAILED);
-                return PARSE_INPUT_ERROR;
-
-                case CANNOT_JOIN_THREAD:
-                tee_error(od, run_type, overall_line_num,
-                  E_THREAD_ERROR, "join",
-                  od->error_code, COSMOPLS_FAILED);
-                return PARSE_INPUT_ERROR;
-              }
-            }
-          }
-          prev_ln_k_rmsd = ln_k_rmsd;
-          if (od->file[TEMP_PRED]->handle) {
-            rewind(od->file[TEMP_PRED]->handle);
-          }
-          result = update_conf_ln_k(od, type, pc, &ln_k_rmsd, conv_method);
-          switch (result) {
-            case OUT_OF_MEMORY:
-            tee_error(od, run_type, overall_line_num,
-              E_OUT_OF_MEMORY, COSMOPLS_FAILED);
-            return PARSE_INPUT_ERROR;
-
-            case CANNOT_READ_TEMP_FILE:
-            tee_error(od, run_type, overall_line_num,
-              E_ERROR_IN_READING_TEMP_FILE,
-              "TEMP_PRED", COSMOPLS_FAILED);
-            return PARSE_INPUT_ERROR;
-          }
-          if (od->file[TEMP_PRED]->handle) {
-            fclose(od->file[TEMP_PRED]->handle);
-            od->file[TEMP_PRED]->handle = NULL;
-            remove(od->file[TEMP_PRED]->name);
-          }
-          grad = fabs(ln_k_rmsd - prev_ln_k_rmsd);
-          if ((grad < 1.0e-02) && (ln_k_rmsd > ln_k_rmsd_threshold)) {
-            tee_printf(od, "switching to conv_method = 1\n");
-            conv_method = 1;
-          }
-          tee_printf(od, "iteration %d, grad = %.4lf, ln_k_rmsd = %.4lf\n", v, grad, ln_k_rmsd);
-          tee_flush(od);
-        }
-        if (ln_k_rmsd < ln_k_rmsd_threshold) {
-          tee_printf(od, "Convergence was reached after %d iterations.\n\n", v);
-        }
-        else {
-          tee_printf(od, "Convergence was not reached, last gradient was %.4le\n"
-            "COSMOPLS quit after %d iterations.\n\n", grad, max_iter);
-        }
-        if (type != FULL_MODEL) {
-          trim_mean_center_matrix(od, od->mal.large_e_mat,
-            &(od->mal.e_mat), &(od->vel.e_mat_ave),
-            FULL_MODEL, od->active_object_num);
-          trim_mean_center_matrix(od, od->mal.large_f_mat,
-            &(od->mal.f_mat), &(od->vel.f_mat_ave),
-            FULL_MODEL, od->active_object_num);
-          pls(od, pc, SILENT_PLS);
-        }
-        if (od->ext_pred_object_num) {
-          calc_conf_weights_test_set(od, pc);
-        }
-        restore_orig_y(od);
-        result = calc_active_vars(od, SILENT_PLS);
-        switch (result) {
-          case CANNOT_READ_TEMP_FILE:
-          tee_error(od, run_type, overall_line_num,
-            E_ERROR_IN_READING_TEMP_FILE, "TEMP_FIELD", COSMOPLS_FAILED);
-          return PARSE_INPUT_ERROR;
-
-          case Y_VAR_LOW_SD:
-          tee_error(od, run_type, overall_line_num,
-            E_Y_VAR_LOW_SD, COSMOPLS_FAILED);
-          return PARSE_INPUT_ERROR;
-        }
-        result = alloc_pls(od, od->overall_active_x_vars,
-          pc, FULL_MODEL);
-        if (result) {
-          tee_error(od, run_type, overall_line_num,
-            E_OUT_OF_MEMORY, COSMOPLS_FAILED);
-          return PARSE_INPUT_ERROR;
-        }
-        result = fill_x_matrix(od, FULL_MODEL, 0);
-        switch (result) {
-          case OUT_OF_MEMORY:
-          tee_error(od, run_type, overall_line_num,
-            E_OUT_OF_MEMORY, COSMOPLS_FAILED);
-          return PARSE_INPUT_ERROR;
-        }
-        result = fill_y_matrix(od);
-        if (result) {
-          tee_error(od, run_type, overall_line_num,
-            E_OUT_OF_MEMORY, COSMOPLS_FAILED);
-          return PARSE_INPUT_ERROR;
-        }
-        trim_mean_center_matrix(od, od->mal.large_e_mat,
-          &(od->mal.e_mat), &(od->vel.e_mat_ave),
-          FULL_MODEL, od->active_object_num);
-        trim_mean_center_matrix(od, od->mal.large_f_mat,
-          &(od->mal.f_mat), &(od->vel.f_mat_ave),
-          FULL_MODEL, od->active_object_num);
-        pls(od, pc, SILENT_PLS);
-        gettimeofday(&end, NULL);
-        elapsed_time(od, &start, &end);
-        tee_flush(od);
-        result = store_weights_loadings(od);
-        if (result) {
-          tee_error(od, run_type, overall_line_num,
-            E_ERROR_IN_WRITING_TEMP_FILE, "TEMP_FIELD", COSMOPLS_FAILED);
-          return PARSE_INPUT_ERROR;
-        }
-        result = open_temp_file(od, od->file[TEMP_CALC], "calc_y");
-        if (result) {
-          tee_error(od, run_type, overall_line_num,
-            E_TEMP_FILE_CANNOT_BE_OPENED_FOR_WRITING,
-            od->file[TEMP_CALC]->name, COSMOPLS_FAILED);
-          return PARSE_INPUT_ERROR;
-        }
-        result = open_temp_file(od, od->file[TEMP_PLS_COEFF], "x_coefficients");
-        if (result) {
-          tee_error(od, run_type, overall_line_num,
-            E_TEMP_FILE_CANNOT_BE_OPENED_FOR_WRITING,
-            od->file[TEMP_PLS_COEFF]->name, COSMOPLS_FAILED);
-          return PARSE_INPUT_ERROR;
-        }
-        result = calc_y_values(od);
-        if (od->file[TEMP_PLS_COEFF]->handle) {
-          fclose(od->file[TEMP_PLS_COEFF]->handle);
-          od->file[TEMP_PLS_COEFF]->handle = NULL;
-        }
-        switch (result) {
-          case CANNOT_WRITE_TEMP_FILE:
-          tee_error(od, run_type, overall_line_num,
-            E_ERROR_IN_WRITING_TEMP_FILE, "TEMP_FIELD", COSMOPLS_FAILED);
-          return PARSE_INPUT_ERROR;
-
-          case CANNOT_READ_TEMP_FILE:
-          tee_error(od, run_type, overall_line_num,
-            E_ERROR_IN_READING_TEMP_FILE, "TEMP_FIELD", COSMOPLS_FAILED);
-          return PARSE_INPUT_ERROR;
-        }
-        result = print_calc_values(od);
-        switch (result) {
-          case CANNOT_READ_TEMP_FILE:
-          tee_error(od, run_type, overall_line_num,
-            E_ERROR_IN_READING_TEMP_FILE, "TEMP_FIELD", COSMOPLS_FAILED);
-          return PARSE_INPUT_ERROR;
-        }
-        if (od->file[TEMP_CALC]->handle) {
-          fclose(od->file[TEMP_CALC]->handle);
-          od->file[TEMP_CALC]->handle = NULL;
-        }
-        tee_printf(od, M_TOOL_SUCCESS, nesting, command, "COSMOPLS");
         tee_flush(od);
         od->valid |= PLS_BIT;
       }

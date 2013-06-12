@@ -229,8 +229,7 @@ int print_calc_values(O3Data *od)
     actual_value = 0.0;
     while (object_num < od->object_num) {
       struct_num = od->al.mol_info[object_num]->struct_num;
-      conf_num = ((od->valid & COSMOTHERM_BIT)
-        ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+      conf_num = 1;
       for (n_conf = 0, active_found = 0, predict_found = 0; n_conf < conf_num; ++n_conf) {
         if (get_object_attr(od, object_num + n_conf, ACTIVE_BIT)) {
           if (!active_found) {
@@ -328,8 +327,7 @@ int print_calc_values(O3Data *od)
     object_num = 0;
     while (object_num < od->object_num) {
       struct_num = od->al.mol_info[object_num]->struct_num;
-      conf_num = ((od->valid & COSMOTHERM_BIT)
-        ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+      conf_num = 1;
       for (n_conf = 0, active_found = 0; n_conf < conf_num; ++n_conf, ++object_num) {
         if (get_object_attr(od, object_num, ACTIVE_BIT)) {
           if (!active_found) {
@@ -509,8 +507,7 @@ int print_ext_pred_values(O3Data *od)
     actual_value = 0.0;
     while (object_num < od->object_num) {
       struct_num = od->al.mol_info[object_num]->struct_num;
-      conf_num = ((od->valid & COSMOTHERM_BIT)
-        ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+      conf_num = 1;
       for (n_conf = 0, active_found = 0, predict_found = 0; n_conf < conf_num; ++n_conf) {
         if (get_object_attr(od, object_num + n_conf, ACTIVE_BIT)) {
           if (!active_found) {
@@ -613,8 +610,7 @@ int print_ext_pred_values(O3Data *od)
     object_num = 0;
     while (object_num < od->object_num) {
       struct_num = od->al.mol_info[object_num]->struct_num;
-      conf_num = ((od->valid & COSMOTHERM_BIT)
-        ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+      conf_num = 1;
       for (n_conf = 0, predict_found = 0; n_conf < conf_num; ++n_conf, ++object_num) {
         if (!get_object_attr(od, object_num, ACTIVE_BIT | PREDICT_BIT)) {
           continue;
@@ -760,8 +756,7 @@ int print_pred_values(O3Data *od)
     actual_value = 0.0;
     while (object_num < od->object_num) {
       struct_num = od->al.mol_info[object_num]->struct_num;
-      conf_num = ((od->valid & COSMOTHERM_BIT)
-        ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+      conf_num = 1;
       for (n_conf = 0, active_found = 0, predict_found = 0; n_conf < conf_num; ++n_conf) {
         if (get_object_attr(od, object_num + n_conf, ACTIVE_BIT)) {
           actual_value = get_y_value(od, object_num + n_conf, x, WEIGHT_BIT);

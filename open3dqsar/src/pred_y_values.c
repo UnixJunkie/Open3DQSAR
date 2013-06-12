@@ -80,8 +80,7 @@ int pred_y_values(O3Data *od, ThreadInfo *ti, int pc_num, int model_type, int cv
   while ((object_num < od->object_num)
     && (i < od->pel.out_structs->size)) {
     struct_num = od->al.mol_info[object_num]->struct_num;
-    conf_num = ((od->valid & COSMOTHERM_BIT)
-      ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+    conf_num = 1;
     if (struct_num != od->pel.out_structs->pe[i]) {
       object_num += conf_num;
       continue;
@@ -134,8 +133,7 @@ int pred_y_values(O3Data *od, ThreadInfo *ti, int pc_num, int model_type, int cv
     while ((object_num < od->object_num)
       && (i < od->pel.out_structs->size)) {
       struct_num = od->al.mol_info[object_num]->struct_num;
-      conf_num = ((od->valid & COSMOTHERM_BIT)
-        ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+      conf_num = 1;
       if (struct_num != od->pel.out_structs->pe[i]) {
         object_num += conf_num;
         continue;
@@ -313,8 +311,7 @@ int pred_y_values(O3Data *od, ThreadInfo *ti, int pc_num, int model_type, int cv
       while ((object_num < od->object_num)
         && (j < od->pel.out_structs->size)) {
         struct_num = od->al.mol_info[object_num]->struct_num;
-        conf_num = ((od->valid & COSMOTHERM_BIT)
-          ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+        conf_num = 1;
         if (struct_num != od->pel.out_structs->pe[j]) {
           object_num += conf_num;
           continue;
@@ -543,8 +540,7 @@ int pred_ext_y_values(O3Data *od, int pc_num, int model_type)
       y = 0;
       while (object_num < od->object_num) {
         struct_num = od->al.mol_info[object_num]->struct_num;
-        conf_num = ((od->valid & COSMOTHERM_BIT)
-          ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+        conf_num = 1;
         for (n_conf = 0, sumweight = 0.0, ave_res = 0.0;
           n_conf < conf_num; ++n_conf, ++object_num) {
           if (!get_object_attr(od, object_num, PREDICT_BIT)) {

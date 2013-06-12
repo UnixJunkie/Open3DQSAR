@@ -61,8 +61,6 @@ char E_DIR_NOT_EXISTING[] =
   "cannot be accessed.\n%s";
 char E_IMPORT_MOLFILE_FIRST[] =
   "Please import some molecule structures first.\n%s";
-char E_IMPORT_COSMOTHERM_FIRST[] =
-  "Please import COSMOtherm data first.\n%s";
 char E_DEFINE_SPACED_PATH[] =
   "The \"define\" program in your TURBOMOLE installation "
   "seems to be outdated; please contact COSMOlogic to get an "
@@ -227,10 +225,6 @@ char E_STRUCT_ATTRIBUTE_ONLY[] =
 char E_ONLY_ONE_WILDCARD[] =
   "The basename should contain only one regex "
   "in the format %%(0n)d (n = 1-9).\n%s";
-char E_COSMOTHERM_REGEX[] =
-  "Please specify a regex name identifying the files "
-  "from which you wish to import COSMOtherm data "
-  "for ligands in %s.\n%s";
 char E_TWO_WILDCARDS[] =
   "The basename should contain two regex "
   "in the format %%(0n)d (n = 1-9).\n%s";
@@ -288,9 +282,6 @@ char E_TOO_FEW_MANY_FOR_CURRENT_PLS_MODEL[] =
 char E_ONLY_LOO_LTO_LMO_CV_ALLOWED[] =
   "Only \"LOO\", \"LTO\", \"LMO\" CV types "
   "are allowed.\n%s";
-char E_ONLY_FULL_LOO_LTO_LMO_ALLOWED[] =
-  "Only \"FULL\", \"LOO\", \"LTO\", \"LMO\" "
-  "COSMOPLS types are allowed.\n%s";
 char E_RELOAD_WEIGHTS_LOADINGS[] =
   "An error occurred trying to restore "
   "PLS weights/loadings.\n%s";
@@ -361,8 +352,6 @@ char CHANGE_DIR_FAILED[] =
   "CHANGE_DIR failed.\n";
 char SOURCE_FAILED[] =
   "SOURCE failed.\n";
-char COSMOPLS_FAILED[] =
-  "COSMOPLS failed.\n";
 char PLS_FAILED[] =
   "PLS failed.\n";
 char CV_FAILED[] =
