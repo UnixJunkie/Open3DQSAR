@@ -92,8 +92,7 @@ void get_attr_struct_ave(O3Data *od, int y_var, unsigned short attr, int *attr_s
   }
   while (object_num < od->object_num) {
     struct_num = od->al.mol_info[object_num]->struct_num;
-    conf_num = ((od->valid & COSMOTHERM_BIT)
-      ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+    conf_num = 1;
     for (n_conf = 0, sumweight = 0.0, y = 0;
       n_conf < conf_num; ++n_conf, ++object_num) {
       if (get_object_attr(od, object_num, attr)) {

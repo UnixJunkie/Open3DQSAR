@@ -178,11 +178,6 @@ int load_dat(O3Data *od, int file_id, int options)
     alloc_array(od->grid.object_num, sizeof(MolInfo)))) {
     return OUT_OF_MEMORY;
   }
-  free_array(od->al.cosmo_list);
-  if (!(od->al.cosmo_list = (COSMOData **)alloc_array
-    (od->grid.struct_num, sizeof(COSMOData)))) {
-    return OUT_OF_MEMORY;
-  }
   od->y_vars = fields_objects_x_y_vars[Y_VARS_NUM];
   if (alloc_object_attr(od)) {
     return OUT_OF_MEMORY;

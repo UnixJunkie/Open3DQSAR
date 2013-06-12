@@ -80,8 +80,7 @@ int prepare_cv(O3Data *od, int pc_num, int cv_type, int groups, int runs)
       i = 0;
       while (object_num < od->object_num) {
         struct_num = od->al.mol_info[object_num]->struct_num;
-        conf_num = ((od->valid & COSMOTHERM_BIT)
-          ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+        conf_num = 1;
         for (n_conf = 0, sumweight = 0.0;
           n_conf < conf_num; ++n_conf, ++object_num) {
           if (get_object_attr(od, object_num, ACTIVE_BIT)) {
@@ -110,8 +109,7 @@ int prepare_cv(O3Data *od, int pc_num, int cv_type, int groups, int runs)
       object_num = 0;
       while (object_num < od->object_num) {
         struct_num = od->al.mol_info[object_num]->struct_num;
-        conf_num = ((od->valid & COSMOTHERM_BIT)
-          ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+        conf_num = 1;
         for (n_conf = 0, sumweight = 0.0;
           n_conf < conf_num; ++n_conf, ++object_num) {
           if (get_object_attr(od, object_num, ACTIVE_BIT)) {
@@ -122,8 +120,7 @@ int prepare_cv(O3Data *od, int pc_num, int cv_type, int groups, int runs)
           object_num2 = object_num;
           while (object_num2 < od->object_num) {
             struct_num2 = od->al.mol_info[object_num2]->struct_num;
-            conf_num2 = ((od->valid & COSMOTHERM_BIT)
-              ? od->al.cosmo_list[struct_num2]->n_conf[BOUND] : 1);
+            conf_num2 = 1;
             for (n_conf = 0, sumweight = 0.0;
               n_conf < conf_num2; ++n_conf, ++object_num2) {
               if (get_object_attr(od, object_num2, ACTIVE_BIT)) {
@@ -189,8 +186,7 @@ int prepare_cv(O3Data *od, int pc_num, int cv_type, int groups, int runs)
       n = 0;
       while (object_num < od->object_num) {
         struct_num = od->al.mol_info[object_num]->struct_num;
-        conf_num = ((od->valid & COSMOTHERM_BIT)
-          ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+        conf_num = 1;
         for (n_conf = 0, sumweight = 0.0;
           n_conf < conf_num; ++n_conf, ++object_num) {
           if (get_object_attr(od, object_num, ACTIVE_BIT)) {
@@ -212,8 +208,7 @@ int prepare_cv(O3Data *od, int pc_num, int cv_type, int groups, int runs)
           if (struct_num == random_struct) {
             break;
           }
-          conf_num = ((od->valid & COSMOTHERM_BIT)
-            ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+          conf_num = 1;
           for (n_conf = 0;
             n_conf < conf_num; ++n_conf, ++object_num) {
             if (!get_object_attr(od, object_num, ACTIVE_BIT | PREDICT_BIT)) {

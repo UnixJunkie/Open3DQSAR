@@ -83,8 +83,7 @@ DWORD lmo_cv_thread(void *pointer)
         ti->od.pel.out_structs->pe[struct_count] =
           ti->od.cimal.group_composition_list[j]
           ->me[group_num][struct_count];
-        object_count += ((ti->od.valid & COSMOTHERM_BIT) ? ti->od.al.cosmo_list
-          [ti->od.pel.out_structs->pe[struct_count]]->n_conf[BOUND] : 1);
+        ++object_count;
       }
       qsort(ti->od.pel.out_structs->pe,
         ti->od.pel.out_structs->size, sizeof(int), compare_integers);
@@ -173,8 +172,7 @@ DWORD loo_cv_thread(void *pointer)
     int_perm_resize(ti->od.pel.out_structs, 1);
     ti->od.pel.out_structs->pe[0] =
       ti->od.mel.struct_list[i];
-    object_count = ((ti->od.valid & COSMOTHERM_BIT) ? ti->od.al.cosmo_list
-      [ti->od.pel.out_structs->pe[0]]->n_conf[BOUND] : 1);
+    object_count = 1;
     if (ti->model_type & UVEPLS_CV_MODEL) {
       trim_mean_center_x_matrix_hp(&(ti->od), ti->model_type,
         ti->od.active_object_num - object_count, i);
@@ -233,10 +231,7 @@ DWORD lto_cv_thread(void *pointer)
       ti->od.mel.struct_list[i];
     ti->od.pel.out_structs->pe[1] =
       ti->od.mel.struct_list[i + 1];
-    object_count = ((ti->od.valid & COSMOTHERM_BIT) ? ti->od.al.cosmo_list
-      [ti->od.pel.out_structs->pe[0]]->n_conf[BOUND] : 1)
-      + ((ti->od.valid & COSMOTHERM_BIT) ? ti->od.al.cosmo_list
-      [ti->od.pel.out_structs->pe[1]]->n_conf[BOUND] : 1);
+    object_count = 2;
     if (ti->model_type & UVEPLS_CV_MODEL) {
       trim_mean_center_x_matrix_hp(&(ti->od), ti->model_type,
         ti->od.active_object_num - object_count, i / 2);

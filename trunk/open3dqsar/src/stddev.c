@@ -92,8 +92,7 @@ int stddev_x_var(O3Data *od, int field_num)
     j = 0;
     while (j < od->object_num) {
       struct_num = od->al.mol_info[j]->struct_num;
-      conf_num = ((od->valid & COSMOTHERM_BIT)
-        ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+      conf_num = 1;
       for (n_conf = 0, sumweight = 0.0, weighted_value = 0.0;
         n_conf < conf_num; ++n_conf, ++j) {
         if (!get_object_attr(od, j, ACTIVE_BIT)) {
@@ -178,8 +177,7 @@ void stddev_y_var(O3Data *od)
     j = 0;
     while (j < od->grid.object_num) {
       struct_num = od->al.mol_info[j]->struct_num;
-      conf_num = ((od->valid & COSMOTHERM_BIT)
-        ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+      conf_num = 1;
       for (n_conf = 0, sumweight = 0.0, weighted_value = 0.0;
         n_conf < conf_num; ++n_conf, ++j) {
         if (!get_object_attr(od, j, ACTIVE_BIT)) {

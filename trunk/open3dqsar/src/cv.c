@@ -78,8 +78,7 @@ int cv(O3Data *od, int suggested_pc_num,
     int_perm_resize(od->pel.out_structs, 1);
     while (object_num < od->object_num) {
       struct_num = od->al.mol_info[object_num]->struct_num;
-      conf_num = ((od->valid & COSMOTHERM_BIT)
-        ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+      conf_num = 1;
       for (n_conf = 0, sumweight = 0.0, y = 0;
         n_conf < conf_num; ++n_conf, ++object_num) {
         if (get_object_attr(od, object_num, ACTIVE_BIT)) {
@@ -162,8 +161,7 @@ int cv(O3Data *od, int suggested_pc_num,
     get_attr_struct_ave(od, 0, ACTIVE_BIT, &active_struct_num, NULL);
     while (object_num < od->object_num) {
       struct_num = od->al.mol_info[object_num]->struct_num;
-      conf_num = ((od->valid & COSMOTHERM_BIT)
-        ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+      conf_num = 1;
       for (n_conf = 0, sumweight = 0.0, y = 0;
         n_conf < conf_num; ++n_conf, ++object_num) {
         if (get_object_attr(od, object_num, ACTIVE_BIT)) {
@@ -175,8 +173,7 @@ int cv(O3Data *od, int suggested_pc_num,
         object_num2 = object_num;
         while (object_num2 < od->object_num) {
           struct_num2 = od->al.mol_info[object_num2]->struct_num;
-          conf_num2 = ((od->valid & COSMOTHERM_BIT)
-            ? od->al.cosmo_list[struct_num2]->n_conf[BOUND] : 1);
+          conf_num2 = 1;
           for (n_conf = 0, sumweight = 0.0, y2 = 0;
             n_conf < conf_num2; ++n_conf, ++object_num2) {
             if (get_object_attr(od, object_num2, ACTIVE_BIT)) {
@@ -271,9 +268,7 @@ int cv(O3Data *od, int suggested_pc_num,
           < od->mel.struct_per_group[group_num]; ++struct_count) {
           od->pel.out_structs->pe[struct_count] =
             group_composition->me[group_num][struct_count];
-          object_count += ((od->valid & COSMOTHERM_BIT)
-            ? od->al.cosmo_list[od->pel.out_structs->
-            pe[struct_count]]->n_conf[BOUND] : 1);
+          ++object_count;
         }
         qsort(od->pel.out_structs->pe,
           od->pel.out_structs->size, sizeof(int),

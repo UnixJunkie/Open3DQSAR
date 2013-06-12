@@ -89,8 +89,7 @@ int set(O3Data *od, int type,
     i = 0;
     while ((object_num < od->grid.object_num) && (i < len)) {
       struct_num = od->al.mol_info[object_num]->struct_num;
-      conf_num = ((od->valid & COSMOTHERM_BIT)
-        ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+      conf_num = 1;
       if (numberlist->pe[i] == (struct_num + 1)) {
         overall_conf_num += conf_num;
         ++i;
@@ -111,8 +110,7 @@ int set(O3Data *od, int type,
         found = 0;
         while ((!found) && (object_num < od->grid.object_num)) {
           struct_num = od->al.mol_info[object_num]->struct_num;
-          conf_num = ((od->valid & COSMOTHERM_BIT)
-            ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+          conf_num = 1;
           if (numberlist->pe[i] == (struct_num + 1)) {
             while (conf_num) {
               od->pel.numberlist[OBJECT_LIST]->pe[j] = object_num + 1;

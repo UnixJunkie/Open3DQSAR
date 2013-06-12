@@ -328,7 +328,7 @@ int alloc_x_var_array(O3Data *od, int num_fields)
   
   memset(buffer, 0, LARGE_BUF_LEN);
   memset(field_dir_name, 0, BUF_LEN);
-  od->valid &= (SDF_BIT | COSMOTHERM_BIT);
+  od->valid &= SDF_BIT;
   od->mel.x_var_array = (float ***)
     realloc(od->mel.x_var_array,
     sizeof(float *) * (od->field_num + num_fields));
@@ -613,8 +613,7 @@ int alloc_average_mat(O3Data *od, int model_type,
     int_perm_resize(od->pel.out_structs, 1);
     while (object_num < od->object_num) {
       struct_num = od->al.mol_info[object_num]->struct_num;
-      conf_num = ((od->valid & COSMOTHERM_BIT)
-        ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+      conf_num = 1;
       for (n_conf = 0, sumweight = 0.0;
         n_conf < conf_num; ++n_conf, ++object_num) {
         if (get_object_attr(od, object_num, ACTIVE_BIT)) {
@@ -646,8 +645,7 @@ int alloc_average_mat(O3Data *od, int model_type,
     get_attr_struct_ave(od, 0, ACTIVE_BIT, &active_struct_num, NULL);
     while (object_num < od->object_num) {
       struct_num = od->al.mol_info[object_num]->struct_num;
-      conf_num = ((od->valid & COSMOTHERM_BIT)
-        ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+      conf_num = 1;
       for (n_conf = 0, sumweight = 0.0;
         n_conf < conf_num; ++n_conf, ++object_num) {
         if (get_object_attr(od, object_num, ACTIVE_BIT)) {
@@ -658,8 +656,7 @@ int alloc_average_mat(O3Data *od, int model_type,
         object_num2 = object_num;
         while (object_num2 < od->object_num) {
           struct_num2 = od->al.mol_info[object_num2]->struct_num;
-          conf_num2 = ((od->valid & COSMOTHERM_BIT)
-            ? od->al.cosmo_list[struct_num2]->n_conf[BOUND] : 1);
+          conf_num2 = 1;
           for (n_conf = 0, sumweight = 0.0;
             n_conf < conf_num2; ++n_conf, ++object_num2) {
             if (get_object_attr(od, object_num2, ACTIVE_BIT)) {

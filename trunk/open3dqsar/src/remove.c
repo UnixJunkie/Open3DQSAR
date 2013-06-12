@@ -66,7 +66,7 @@ int remove_field(O3Data *od)
       }
     }
   }
-  od->valid &= (SDF_BIT | COSMOTHERM_BIT);
+  od->valid &= SDF_BIT;
   if (deleted_fields < od->field_num) {
     result = open_temp_dir(od, NULL, "temp_dat", buffer);
     if (result) {
@@ -145,7 +145,7 @@ int remove_object(O3Data *od)
       }
     }
   }
-  od->valid &= (SDF_BIT | COSMOTHERM_BIT);
+  od->valid &= SDF_BIT;
   if (deleted_objects < od->grid.object_num) {
     result = open_temp_dir(od, NULL, "temp_dat", buffer);
     if (result) {
@@ -414,7 +414,7 @@ int remove_x_vars(O3Data *od, unsigned short attr)
       | FOUR_LEVEL_BIT | FFDSEL_BIT | D_OPTIMAL_BIT | UVEPLS_BIT, 0);
     }
   }
-  od->valid &= (SDF_BIT | COSMOTHERM_BIT);
+  od->valid &= SDF_BIT;
   od->ffdsel.use_srd_groups = 0;
   od->uvepls.use_srd_groups = 0;
   od->voronoi_num = 0;

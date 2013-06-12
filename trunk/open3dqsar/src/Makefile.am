@@ -73,7 +73,6 @@ get_system_information.c \
 get_value.c \
 grid_box.c \
 grid_write.c \
-import_cosmotherm.c \
 import_dependent.c \
 import_free_format.c \
 import_grid_ascii.c \

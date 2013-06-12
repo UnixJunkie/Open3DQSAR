@@ -439,8 +439,7 @@ int fill_x_matrix_scrambled(O3Data *od)
         found = 0;
         while ((!found) && (object_num < od->object_num)) {
           struct_num = od->al.mol_info[object_num]->struct_num;
-          conf_num = ((od->valid & COSMOTHERM_BIT)
-            ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+          conf_num = 1;
           for (n_conf = 0, found = 0, y = 0; n_conf < conf_num; ++n_conf, ++object_num) {
             if (get_object_attr(od, object_num, ACTIVE_BIT)) {
               if (active_struct_count == od->pel.scrambling_order->pe[n]) {
@@ -578,8 +577,7 @@ int fill_y_matrix_scrambled(O3Data *od)
       found = 0;
       while ((!found) && (object_num < od->object_num)) {
         struct_num = od->al.mol_info[object_num]->struct_num;
-        conf_num = ((od->valid & COSMOTHERM_BIT)
-          ? od->al.cosmo_list[struct_num]->n_conf[BOUND] : 1);
+        conf_num = 1;
         for (n_conf = 0, found = 0, y = 0; n_conf < conf_num; ++n_conf, ++object_num) {
           if (get_object_attr(od, object_num, ACTIVE_BIT)) {
             if (active_struct_count == od->pel.scrambling_temp->pe[n]) {
