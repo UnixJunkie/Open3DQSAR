@@ -604,7 +604,7 @@ int main(int argc, char **argv)
     #ifdef O3Q
     "Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle\n"
     #else
-    "Copyright (C) 2010-2012 Paolo Tosco, Thomas Balle\n"
+    "Copyright (C) 2010-2013 Paolo Tosco, Thomas Balle\n"
     #endif
     "Licensed under the terms of GPLv3\n"
     "Report bugs to " PACKAGE_BUGREPORT "\n"
@@ -631,7 +631,7 @@ int main(int argc, char **argv)
     #ifdef O3Q
     "Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle\n"
     #else
-    "Copyright (C) 2010-2012 Paolo Tosco, Thomas Balle\n"
+    "Copyright (C) 2010-2013 Paolo Tosco, Thomas Balle\n"
     #endif
     "\n"
     "\n"
