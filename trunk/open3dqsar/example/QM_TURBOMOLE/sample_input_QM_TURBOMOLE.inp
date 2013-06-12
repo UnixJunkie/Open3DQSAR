@@ -1,0 +1,186 @@
+#The following command imports a SDF dataset
+import type=sdf file=ref_e2.sdf
+
+#The following removes from the dataset
+#the specified compound numbers, i.e.
+#1, 6, 8, 13, 14, 16, 17, 20, 21, 27, 30,
+#31, 32, 33, 34, 35, 39, 52, 53, 54
+remove_object object_list=1,6,8,13,14,16,17,20,21,27,30,31,32,33,34,35,39,52,53,54
+
+#The following command sets a grid box with a 2.0
+#angstrom step size and a 5.0 angstrom outgap
+#around the molecules
+box step=2.0
+
+#The following command computes a steric field
+calc_field type=vdw
+
+#The following command computes a QM electrostatic field
+#using TURBOMOLE; change env according to the path to
+#the dscf binary on your system
+env qm_engine=/usr/local/COSMOlogic/TmoleX12/TURBOMOLE/bin/em64t-unknown-linux-gnu/dscf
+calc_field type=qm_ele basis_set=EMSL_3-21G
+
+#Once field have been computed, one may just import the
+#already computed fields for other chemometric analyses
+#commenting the "calc_field" command and uncommenting
+#the following:
+#import type=formatted_cube file=/path/to/qm_dir/O3Q_qm_dir_YYYYMMDD_HHMMSS_XXXXXX/dscf_????.dat
+
+#The following command transforms eV into kcal/mol in the
+#QM_ELE field
+transform field_list=2 type=x operation=mul value=23.06035
+
+#The following commands set min/max cutoffs on the VdW field
+cutoff field_list=1 type=max level=50.0
+cutoff field_list=1 type=min level=-50.0
+
+#The following command excludes points close to nuclei
+#from the QM_ELE field
+exclude field_list=2 ref_field=1 type=match
+
+#The following commands set final min/max cutoffs on both
+#VdW and QM_ELE fields
+cutoff type=max level=30.0
+cutoff type=min level=-30.0
+
+#The following command imports a text file with activities
+#the first line must be a label with the variable name
+#(e.g., affinity, or activity)
+#a multi-column file can be read
+#to perform regression over multiple
+#dependent variables
+import type=dependent file=binding_data_36_compounds.txt
+
+#Saves the file after having imported
+#both independent and dependent variables
+save file=binding.dat
+
+#The following zeroes both negative and positive values
+#below a threshold of 0.05 for both probes
+zero type=all level=0.05
+
+#The following extracts compounds having ID
+#7, 10, 15, 25, 37, 40, 42, 46, 55
+#to use them as an external test set
+set id_list=7,10,15,25,37,40,42,46,55 attribute=testset
+
+#The following removes X variables with a SD
+#below a threshold of 0.1
+sdcut level=0.1
+
+#The following removes n-level variables
+#of 2nd, 3rd and 4th level from both fields
+nlevel
+remove_x_vars type=nlevel
+
+#The following command performs
+#Block Unscaled Weighting
+scale_x_vars type=buw
+
+#The following command performs
+#PLS analysis extracting 5 PCs
+pls pc=5 file=pls_results.sdf
+
+#The following command performs
+#external prediction on the 9-compound
+#test set previously extracted using 5 PCs
+predict pc=5 file=ext_pred_results.sdf
+
+#The following commands performs
+#leave-one-out, leave-two-out,
+#leave-many-out cross-validation
+#with 5 PCs
+cv pc=5 type=loo file=loo_results.sdf
+cv pc=5 type=lto file=lto_results.sdf
+cv pc=5 type=lmo runs=20 groups=5 file=lmo_results.sdf
+
+#The following commands performs
+#Smart Region Definition (SRD) variable grouping
+srd pc=5 collapse=yes critical_distance=1.0 \
+	collapse_distance=2.0 type=weights
+	
+#Now we save an intermediate file
+#after SRD
+save file=binding_after_srd.dat
+
+#The following commands performs
+#FFD variable selection
+ffdsel pc=5 type=lmo runs=20 \
+	percent_dummies=20 use_srd_groups=yes \
+	combination_variable_ratio=1.0 fold_over=no
+
+#Now we save an intermediate file
+#after FFD variable selection
+save file=binding_after_ffdsel.dat
+
+#The following commands removes
+#variable selected as unimportant
+#by FFDSEL
+remove_x_vars type=ffdsel
+
+#Now let's recalculate a model
+#after variable reduction
+pls pc=5
+
+#And let's challenge its performance
+#through LOO, LTO, LMO cross-validation
+cv pc=5 type=loo
+cv pc=5 type=lto
+cv pc=5 type=lmo groups=5 runs=20
+
+#And also through external prediction
+predict pc=5
+
+#Now we save a grid file
+#with PLS pseudo-coefficients
+#for visualization in MOE, PyMOL
+#and Maestro
+export type=coefficients pc=3 file=ffdsel_coefficients \
+	format=insight interpolate=3
+export type=coefficients pc=3 file=ffdsel_coefficients \
+	format=moe interpolate=3
+export type=coefficients pc=3 file=ffdsel_coefficients \
+	format=maestro  interpolate=3
+
+#Now we reload the data file
+#before we carried out FFDSEL
+load file=binding_after_srd.dat
+pls pc=5
+
+#And we attempt a different variable selection
+#procedure, namely IVE-PLS
+uvepls pc=5 type=lmo \
+	use_srd_groups=no \
+	uve_alpha=90 uve_m=y ive=y \
+	save_ram=n ive_percent_limit=50
+
+#Now we save an intermediate file
+#after IVE-PLS variable selection
+save file=binding_after_uvepls.dat
+
+remove_x_vars type=uvepls
+
+#Now let's recalculate a model
+#after variable reduction
+pls pc=5
+
+#And let's challenge its performance
+#through LOO, LTO, LMO cross-validation
+cv pc=5 type=loo
+cv pc=5 type=lto
+cv pc=5 type=lmo groups=5 runs=20
+
+#And also through external prediction
+predict pc=5
+
+#Now we save a grid file
+#with PLS pseudo-coefficients
+#for visualization in MOE, PyMOL
+#and Maestro
+export type=coefficients pc=3 file=uvepls_coefficients \
+	format=insight interpolate=3
+export type=coefficients pc=3 file=uvepls_coefficients \
+	format=moe interpolate=3
+export type=coefficients pc=3 file=uvepls_coefficients \
+	format=maestro interpolate=3

@@ -1,0 +1,23 @@
+; MinGWEditLine library
+EXPORTS
+source_editrc
+readline
+rl_completion_matches
+rl_filename_completion_function
+using_history
+free_history
+free_history_entry
+clear_history
+add_history
+remove_history
+replace_history_entry
+history_list
+where_history
+history_length
+current_history
+history_get
+history_set_pos
+previous_history
+next_history
+read_history
+write_history

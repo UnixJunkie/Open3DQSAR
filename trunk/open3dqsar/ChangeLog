@@ -1,0 +1,409 @@
+Open3DQSAR's ChangeLog
+----------------------
+
+*** July 16, 2012: release of Open3DQSAR 2.108 ***
+
+  Changes with respect to the previous version include:
+
+  - Fixed a bug which might trigger a false grid mismatch error when
+    importing formatted/unformatted grid cube files
+
+
+*** February 28, 2012: release of Open3DQSAR 2.107 ***
+
+  Changes with respect to the previous version include:
+
+  - Added the "scores" parameter to the "predict" keyword to allow
+    printing predicted PLS X scores 
+
+
+*** February 24, 2012: release of Open3DQSAR 2.106 ***
+
+  Changes with respect to the previous version include:
+
+  - Added the "scores" parameter to the "pls" keyword to allow printing
+    PLS X and Y scores 
+
+
+*** February 17, 2012: release of Open3DQSAR 2.105 ***
+
+  Changes with respect to the previous version include:
+
+  - Support for formatted/unformatted cube files containing MOs was added
+    to the "import type=GAUSSIAN_CUBE/GAMESS_CUBE" keywords through the
+    "mo" parameter
+  - The "box" keyword now supports also "[x,y,z]_nodes" parameters as
+    alternative to "[x,y,z]_end"
+  - The GAMESS-US "ericfmt.dat" file is now expected to be in the
+    "auxdata" folder inside the main GAMESS folder
+  - Fixed a couple of bugs which might trigger divisions by zero in the
+    "zero" and "scale_x_vars" keywords under certain circumstances
+  - Fixed a bug in the "import type=GRID_ASCII" keyword which prevented it
+    from working
+  - Fixed a bug which might prevent certain GAUSSIAN versions from being
+    correctly launched from within Open3DQSAR
+
+
+*** January 12, 2012: release of Open3DQSAR 2.104 ***
+
+  Changes with respect to the previous version include:
+
+  - Open3DQSAR was linked with the updated versions of ATLAS (3.8.4) and
+    LAPACK (3.4.0) libraries
+  - Fixed a bug which might cause issues in case the training set/test set/
+    excluded compound composition of the dataset was changed multiple times
+    during a job
+  - Fixed a bug concerning the "skip_header" option in the "import
+    type=FREE_FORMAT" keyword
+
+
+*** October 22, 2011: release of Open3DQSAR 2.103 ***
+
+  Changes with respect to the previous version include:
+
+  - Fixed a regression introduced in version 2.1 regarding QM computations
+    failing with "Cannot write QM .inp file "..."; please check permissions
+    on your QM folder"
+  - Fixed a bug connected with different CR/LF handling on the Windows
+    platform
+
+
+*** October 15, 2011: release of Open3DQSAR 2.102 ***
+
+  Changes with respect to the previous version include:
+
+  - Fixed a bug which prevented restoring the default terminal color on
+    exit on *NIX platforms
+  - Added the "--term" command line switch to toggle terminal mode; this
+    results in default terminal colors to be used for text and, on Windows,
+    in preventing a new CMD window from being spawned on start
+
+
+*** September 19, 2011: release of Open3DQSAR 2.101 ***
+
+  Changes with respect to the previous version include:
+
+  - Replaced the dependency from the obsolete termcap library with the one
+    from the ubiquitous curses library on Linux, Solaris, Mac OS X and
+    FreeBSD platforms
+
+
+*** September 1, 2011: release of Open3DQSAR 2.1 ***
+
+  Changes with respect to the previous version include:
+
+  - Added support to TURBOMOLE for QM calculations to the "calc_field" an
+    "prepare" commands
+
+
+*** August 30, 2011: release of Open3DQSAR 2.043 ***
+
+  Changes with respect to the previous version include:
+
+  - Better implementation of the "scale_object" command (thanks to Andreas
+    Klamt for the helpful discussion)
+
+
+*** August 26, 2011: release of Open3DQSAR 2.042 ***
+
+  Changes with respect to the previous version include:
+
+  - Minor reorganization of the code tree
+
+
+*** August 23, 2011: release of Open3DQSAR 2.041 ***
+
+  Changes with respect to the previous version include:
+
+  - The possibility to read per-object weight coefficients from an ASCII
+    file was added to the "scale_object" command
+
+
+*** August 20, 2011: release of Open3DQSAR 2.04 ***
+
+  Changes with respect to the previous version include:
+
+  - A bug which caused a crash in the Windows version upon resizing the
+    program window on start followed by pressing "arrow up" was fixed
+  - A bug which caused duplicate command-line history entries to disappear
+    in the Windows version was fixed
+  - A bug which might cause the Windows version to crash when using
+    multiple CPUs was fixed
+  - More robust error handling was implemented
+  - The possibility to introduce a per-object weight coefficient via the
+    "scale_object" keyword was added (see documentation for details)
+
+
+*** August 2, 2011: release of Open3DQSAR 2.03 ***
+
+  Changes with respect to the previous version include:
+
+  - The "remove_y_vars" keyword was added
+  - The "import type=FREE_FORMAT" keyword was added
+  - The implementation of the SRD procedure has been revised; now the group
+    collapsing algorithm yields exactly the same results as the original
+    GOLPE implementation
+
+
+*** July 24, 2011: release of Open3DQSAR 2.02 ***
+
+  Changes with respect to the previous version include:
+
+  - Implementation of a more robust Y variable import procedure both in the
+    "import type=SDF" and in the "import type=DEPENDENT" modules; for this
+    purpose, the "y_var_list" parameter was replaced by the "y_var_name"
+    parameter
+  - Fixed a bug which caused sudden logout from the interactive program
+    shell under particular conditions
+
+
+*** June 29, 2011: release of Open3DQSAR 2.01 ***
+
+  Changes with respect to the previous version include:
+
+  - Implementation of a more robust check of OpenBabel functionality
+    on program start
+
+
+*** June 20, 2011: release of Open3DQSAR 2.0 ***
+
+  Changes with respect to the previous version include:
+
+  - A regression introduced in version 1.54 which prevented running
+    QM calculations using external QM engines was fixed
+
+
+*** June 4, 2011: release of Open3DQSAR 1.54 ***
+
+  Changes with respect to the previous version include:
+
+  - "n_cpus" is not a parameter to parallel-enabled computations anymore;
+    instead, a new "O3_N_CPUS" environment variable (as well as a new
+    "n_cpus" parameter to the "env" keyword) has been added which is valid
+    for all parallel-enabled computations
+  - Binary grids can now also be exported in the native MOE grid format,
+    which is easily readable in MOE with the "fread_GRID" SVL function;
+    the ReadMOEGRID.svl script provides an example of how this can be
+    accomplished
+  - A bug which under certain conditions might cause a segmentation fault
+    on start due to buffer overflow was fixed
+  - Minor bugfixes all over
+
+
+*** April 9, 2011: release of Open3DQSAR 1.53 ***
+
+  Changes with respect to the previous version include:
+
+  - More robust error-checking was implemented concerning the availability
+    of external software
+  - A bug which under certain conditions might cause a segmentation fault
+    on start due to buffer overflow was fixed
+  - A bug concerning object numbers vs object IDs was fixed
+  - Minor bugfixes all over
+    robust fashion
+
+
+*** March 7, 2011: release of Open3DQSAR 1.52 ***
+
+  Changes with respect to the previous version include:
+
+  - Fixed a regression on the "remove_object" keyword introduced with
+    version 1.51
+  - The code of the "load" and "save" keywords was written in a much more
+    robust fashion
+
+
+*** February 16, 2011: release of Open3DQSAR 1.51 ***
+
+  Changes with respect to the previous version include:
+
+  - More efficient integration with OpenBabel, which results in faster
+    loading and visualization in PyMOL of imported molecules, particularly
+    on Windows
+  - Added the "XYZ" format to the "export" keyword; the "XYZ" format is
+    like "ASCII", but with explicit indication of the Cartesian coordinates
+    of the grid point the energy value refers to
+
+
+*** January 31, 2011: release of Open3DQSAR 1.5 ***
+
+  Changes with respect to the previous version include:
+
+  - Better integration with OpenBabel, gnuplot, QM software, Molecular
+    Discovery GRID, which are searched for in the executable path.
+    Additionally, pre-built binary distributions now include OpenBabel
+  - Better support for GAMESS/Firefly CUBE files. MOLDEN is not needed
+    anymore when using GAMESS
+  - Added support for V3000 SDF files in addition to V2000, making it
+    possible to run Open3DQSAR on structures with >999 atoms, such as
+    proteins
+  - The "GRID" keyword has been renamed to "EXPORT". The "zero_inactive"
+    option to "type=OBJECT_FIELD" has been renamed to "inactive" and its
+    behaviour slightly modified; the "missing" option has been added
+  - Major code cleanups
+  - The prefix on environment variables controlling Open3DQSAR was
+    shortened from "O3Q_" to "O3_"
+  - Many small bugfixes all over
+
+
+*** September 9, 2010: release of Open3DQSAR 1.304 ***
+
+  Changes with respect to the previous version include:
+
+  - Added the "remove_box" keyword
+  - Added the "y_var_list" parameter to the "import type=SDF" and
+    "import type=DEPENDENT" keywords
+  - Added FreeBSD to supported operating systems
+
+
+*** August 26, 2010: release of Open3DQSAR 1.303 ***
+
+  Changes with respect to the previous version include:
+
+  - Fixed an issue which is occasionally raised when running several GRID
+    jobs at once on a multi-CPU machine; since GRID appears to read/write
+    on a file with a hardcoded path and name, a data race by the different
+    jobs may take place, leading to failures; a workaround has been
+    implemented which solves the problem
+
+
+*** August 24, 2010: release of Open3DQSAR 1.302 ***
+
+  Changes with respect to the previous version include:
+
+  - New layout for the output of results obtained through FFDSEL and
+    UVE-PLS variable selection
+
+  - Fixed two bugs resulting in the inability by the "calc_field" keyword
+    to assign GRID force-field atom types in some particular cases
+
+
+*** August 17, 2010: release of Open3DQSAR 1.301 ***
+
+  Changes with respect to the previous version include:
+
+  - Fixed a bug which might cause QM computations with GAUSSIAN to fail
+    under particular conditions due to incorrect setting of environment
+    variables
+
+
+*** August 16, 2010: release of Open3DQSAR 1.3 ***
+
+  Changes with respect to the previous version include:
+
+  - The possibility to import multi-MOL2 files was removed. It was verified
+    that OpenBabel is not always able to assign correct atom types to MOL2
+    files, since they lack explicit formal charges, which instead are
+    included in MOL/SDF files. Please note that this is definitely not a
+    failure in OpenBabel: simply, in the absence of explicit formal
+    charges, some structures carry an intrinsic ambiguity which cannot be
+    univocally solved. Instead, OpenBabel makes an outstanding job in
+    assigning atom types to SDF/MOL files. Therefore, since correct atom
+    typing is of the utmost importance in force-field-based computations,
+    we decided to stick to SDF format for structure importation. Since the
+    majority of 3D structure building tools available (MOE, Maestro, ecc.)
+    can export structures in SDF/MOL format, we believe this does not
+    represent an issue.
+    As a consequence of this choice, also the internal format used by
+    Open3DQSAR to deal with 3D molecular coordinates has been changed from
+    MOL2 to MOL. This means that .DAT files saved with Open3DQSAR 1.3 (and
+    upper) cannot be read by previous versions. On the contrary, .DAT files
+    saved with previous versions can be read by Open3DQSAR 1.3
+
+  - The "calc_field" keyword now supports an additional MIF type, namely
+    "md_grid". This allows to calculate MIFs with Molecular Discovery GRID
+    program (http://www.moldiscovery.com/soft_grid.php) from inside
+    Open3DQSAR, so that integration of GRID fields with other MM or QM
+    fields computed in Open3DQSAR is even more straightforward.
+    In particular, Open3DQSAR is able to automatically carry out proper
+    atom typing according to the GRID force field specifications;
+    subsequently the GRIN and GRID programs are called automatically, so
+    that the user only needs to choose the probe type and the dielectric
+    constant.
+    Before version 1.3, Open3DQSAR users had to assign proper atom types
+    and compute MIFs outside Open3DQSAR using the GREATER program, then
+    import MIFs with the "import type=gridkont" keyword. The need for an
+    interactive step somehow hampered Open3DQSAR's main goal, that is
+    high-throughput automated generation of 3D-QSAR models
+
+  - The subroutine which imports GRIDKONT binary files has been completely
+    rewritten in order to be much more robust. As a consequence of the new
+    implementation, when using the "import type=GRIDKONT" keyword it is not
+    necessary to import the "grid.lont" file anymore. For consistency with
+    other "import" types, the GRIDKONT file, if different from the
+    "grid.kont" default, should be specified through the "file" parameter
+    (until version 1.2 the same parameter was called "kont"; it is
+    therefore necessary to update previously written scripts accordingly)
+
+  - Added the "md_grid_path=<path to Molecular Discovery GRID binaries>"
+    parameter to the "env" keyword, as well as the O3Q_MD_GRID_PATH
+    environment variable. On the occasion, the "babel_dir" parameter of the
+    "env" keyword was renamed "babel_path"; accordingly, also the
+    O3Q_BABEL_DIR environment variable was renamed to O3Q_BABEL_PATH.
+    Even if this change will require to update previous scripts, we
+    believe it is worth to undertake this small effort since the "_dir"
+    suffix could become confusing in the presence of the "qm_dir" and
+    "md_grid_dir" parameters pertaining to the "calc_field" keyword.
+    Therefore, from now on the "_path" suffix will be consistently used to
+    indicate the path to directories containing programs to be called by
+    Open3DQSAR
+
+  - The EMSL_6-311G** basis set (see "basis_set" parameter in "calc_field"
+    when "type=QM_ELE/QM_DEN") has been renamed to EMSL_6-311Gxx to avoid
+    using non-alphanumeric characters which might have caused problems
+
+  - The prefix for temporary files and directories has been changed from
+    "Open3DQSAR" to "O3Q"
+
+  - Fixed a bug which caused a harmless, though annoying, crash upon exit
+    from Open3DQSAR when using the "-o" command line option
+
+  - Fixed a bug which prevented from using the EMSL basis sets with
+    GAUSSIAN (see "calc_field" keyword with "type=QM_ELE/QM_DEN")
+
+  - Fixed a bug which prevented a temporary file generated by the "srd"
+    keyword from being removed from the temporary directory. On the
+    occasion, a more efficient cleaning procedure has been implemented
+    to clean up the temporary directory upon abrupt termination of
+    Open3DQSAR (e.g., pressing CTRL+C or closing the interactive window)
+
+  - Fixed a regression introduced in version 1.2 causing a data race
+    condition when using multiple CPUs
+
+  - Minor bugfixes all over
+
+
+*** June 14, 2010: release of Open3DQSAR 1.2 ***
+
+  Changes with respect to the previous version include:
+
+  - Use of OpenBabel for format interconversion, atom typing and charge
+    assignment (MMFF94 and GAFF force-fields supported)
+  - Possibility to import datasets as MOL2/SDF files with the "import
+    type=mol2 and "import type=sdf" keywords; no need for prior atom typing
+    with Antechamber
+  - Possibility to export PLS, PCA, CV, external prediction statistics
+    as SDF files for visualization with third-party tools
+  - Multi-threaded computation of MIFs
+  - QM electron density and electrostatic potential fields can be
+    directly computed from within Open3DQSAR; GAUSSIAN 03 and 09, FIREFLY
+    7.1G, GAMESS-US 25 March 2010 and MOLDEN 4.9 are supported
+  - The "calc_field" and "prepare" keywords were substantially improved
+    adding many options for QM and MM MIF computation. Support for native
+    JAGUAR input file preparation was dropped; however, JAGUAR is still
+    supported through MOLDEN
+  - Improved implementation of the "exclude" keyword
+  - Addition of the "box" keyword to build a grid box around ligands
+    instead of the cumbersome "import type=grid_def" keyword, which has
+    been suppressed
+  - Addition of the "dataset" keyword to show statistics about the
+    currently loaded dataset
+  - The prefix on environment variables controlling Open3DQSAR was
+    shortened from "OPEN3DQSAR" to "O3Q"; some additional environment
+    variables have been added, as well as "env" parameters
+  - Windows version: the dependency from the Win32-Pthreads library was
+    dropped in favour of native Windows Threads
+  - Minor bugfixes all over
+
+
+*** April 13, 2010: release of Open3DQSAR 1.0 ***

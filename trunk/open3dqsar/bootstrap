@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+rm -rf \
+Makefile.in \
+aclocal.m4 \
+m4/* \
+autom4te.cache \
+autoscan.log \
+.config* \
+config.cache \
+config.guess \
+config.h \
+config.h.in \
+config.h.in~ \
+config.log \
+config.status \
+config.sub \
+configure \
+configure.scan \
+depcomp.lnk \
+install-sh.lnk \
+missing.lnk \
+depcomp \
+install-sh \
+libtool \
+ltmain.sh \
+missing \
+mkinstalldirs \
+stamp-h1 \
+Makefile \
+src/test.* \
+src/test \
+src/*.la \
+src/*.lo \
+src/*.a \
+src/*.o \
+src/open3dqsar \
+src/open3dqsar.exe \
+src/Makefile \
+src/Makefile.in \
+src/.deps \
+src/.libs \
+doc/Makefile \
+doc/Makefile.in
+if [ `which libtoolize | awk '{print $1}' | grep -c libtoolize` != 0 ]; then
+	libtoolize
+else
+	glibtoolize
+fi
+aclocal -I m4
+autoheader
+autoconf
+automake --add-missing

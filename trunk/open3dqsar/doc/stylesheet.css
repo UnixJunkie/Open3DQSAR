@@ -1,0 +1,103 @@
+@import url("atocstyles/advancedtoc.css");
+img {
+	border-top-width: 0px;
+	border-right-width: 0px;
+	border-bottom-width: 0px;
+	border-left-width: 0px;
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+}
+a:link,a:visited {
+	color: #632423;
+	text-decoration: none;
+}
+a:active,a:hover {
+	color: #d99694;
+	text-decoration: underline;
+}
+#complete {
+	background-color: #FFFFFF;
+}
+html body {
+	margin: 16;
+	padding: 0;
+	color: #1f497d;
+	font-family: Verdana, Helvetica, Arial, sans-serif;
+	background-color: #FFFFFF;
+}
+
+body#complete div#content {
+	background-color: #FFFFFF;
+	color: #1f497d;
+	padding: 20px;
+	margin-top: 10px;
+	margin-right: 40px;
+	margin-bottom: 30px;
+	margin-left: 15em;
+}
+
+body>div#fixedmenue, body>div#header {
+	position: fixed;
+}
+
+body#complete div#fixedmenue {
+	padding-top: 0px;
+	height: 100%;
+	/*width: 14.7em;*/
+	width: 234px;
+}
+
+div#fixedmenue {
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: #dbe5f1;
+	color: #1f497d;
+	padding-left: 10px;
+	overflow: scroll;
+	overflow-x: hidden; 
+	width: 218px;
+	/*clip: rect(auto,218px,auto,auto);*/
+}
+
+/* ================ */
+div#content p {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 95%;
+}
+
+/* ================ */
+h1,h2,h3 {
+	font-size: 120%;
+	background-color: transparent;
+	color: #632423;
+}
+
+.invis {
+display: none;
+}
+
+#searchbox .submit {
+	background-image: url(images/submit.png);
+	border: 1px solid #0f243e;
+	height: 20px;
+	font-size: 11px;
+}
+#searchbox .text {
+	background-image: url(images/text.jpg);
+	border: 1px solid #1f497d;
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 110px;
+	padding-left: 16px;
+}
+
+#option {
+	font-size: 11px;
+}
+#logo {
+	position: relative;
+	left: -10px;
+}

@@ -1,0 +1,13 @@
+prefix=
+exec_prefix=
+libdir=/c/build/mingweditline/mingweditline-2.07/src/../lib64
+sharedlibdir=/c/build/mingweditline/mingweditline-2.07/src/../bin64
+includedir=/c/build/mingweditline/mingweditline-2.07/src/../include
+
+Name: libedit
+Description: A BSD-licensed EditLine API implementation for the native Windows Console.
+Version: 2.07
+Requires:
+Libs: -L${libdir} -L${sharedlibdir} -ledit @LIBS@
+Cflags: -I${includedir} -I${includedir}/editline
+
