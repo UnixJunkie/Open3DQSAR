@@ -1,0 +1,12 @@
+prefix=/build
+exec_prefix=${prefix}
+libdir=/build/lib64
+includedir=${prefix}/include
+
+Name: libedit
+Description: command line editor library provides generic line editing, history, and tokenization functions.
+Version: 3.0
+Requires:
+Libs: -L${libdir} -ledit -ltinfo 
+Cflags: -I${includedir} -I${includedir}/editline
+

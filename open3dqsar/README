@@ -1,0 +1,80 @@
+Open3DQSAR
+----------
+
+An open-source software aimed at high-throughput
+chemometric analysis of molecular interaction fields
+
+Paolo Tosco (a,*), Thomas Balle (b)
+
+a) Department of Drug Science and Technology,
+   University of Turin, via Pietro Giuria 9, 10125 Torino, Italy;
+   e-mail: paolo.tosco@unito.it
+
+b) Department of Medicinal Chemistry,
+   The Faculty of Pharmaceutical Sciences, University of Copenhagen,
+   2 Universitetsparken, 2100 Copenhagen, Denmark
+
+http://open3dqsar.org
+
+
+
+
+Open3DQSAR is an open-source tool aimed at pharmacophore exploration by
+high-throughput chemometric analysis of molecular interaction fields
+(MIFs). Open3DQSAR can generate steric potential, electron density and
+MM/QM electrostatic potential fields; furthermore, it can import GRIDKONT
+binary files produced by GRID and CoMFA/CoMSIA fields (exported from SYBYL
+with the aid of a small SPL script).
+
+Subsequently, Open3DQSAR performs fast, automated PLS chemometric analysis
+of MIFs allowing to quickly generate and challenge the predictivity of many
+3D-QSAR models using different training/test set combinations,
+superposition schemes, variable selection and data scrambling procedures,
+etc. High computational performance is attained through implementation of
+parallelized algorithms for MIF generation, PLS model building and
+validation, variable selection.
+
+Prominent features in Open3DQSAR include:
+
+    * Seamless integration with OpenBabel, PyMOL, gnuplot
+
+    * Multi-threaded computation of MIFs (both MM and QM); support for
+      MMFF94 and GAFF force-fields with automated assignment of atom types
+      to the imported molecular structures
+
+    * Comprehensive output, including SDF molecular databases, 3D maps and
+      many different plots to ease immediate evaluation of results in
+      PyMOL, MOE, Maestro, SYBYL and gnuplot
+
+    * User-friendly interface to all major QM packages (e.g. GAUSSIAN,
+      FIREFLY or GAMESS-US), which allows calculation of QM electron
+      density and electrostatic potential 3D maps from within Open3DQSAR
+
+    * User-friendly interface to Molecular Discovery GRID to compute GRID
+      MIFs from within Open3DQSAR
+    
+Open3DQSAR is aimed at fast, automated exploration of a large number
+of models originated by different training/test set combinations,
+superposition schemes, variable selection procedures, etc. High
+computational performance is attained through implementation of
+parallelized algorithms for PLS model building and validation, exploiting
+the full power of multi-processor machines.
+Open3DQSAR is controlled through a command line interface; commands can
+be either entered interactively from a command prompt or read from a
+batch script. If PyMOL is installed on the system while Open3DQSAR is
+being operated interactively, the setup of 3D grid computations can be
+followed in real time on PyMOL's viewport, allowing to tweak grid size
+and training/test set composition very easily (take a look at the gallery
+for some examples) .
+The main output is arranged as human-readable plain ASCII text, while
+a number of additional files are generated to store data and to export
+the results of computations for further analysis and visualization with
+third party tools. In particular, Open3DQSAR can export 3D maps for
+visualization in PyMOL, MOE, Maestro, SYBYL, and can generate graphical
+statistic output ready to be imported into gnuplot.
+Open3DQSAR is written in C; while pre-built binaries are available for
+mainstream operating systems (Windows 32/64-bit, Linux 32/64-bit, Solaris
+x86 32/64-bit, Intel Mac OS X 32/64-bit), source code is portable and
+can be compiled under any platform supporting POSIX threads. The modular
+nature of the code allows for easy implementation of new features,
+so that the core application can be customized to meet individual needs.

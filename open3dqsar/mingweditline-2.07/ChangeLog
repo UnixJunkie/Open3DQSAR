@@ -1,0 +1,66 @@
+MinGWEditLine's ChangeLog
+-------------------------
+
+*** June 20, 2012: release of MinGWEditLine 2.07 ***
+
+  Changes with respect to the previous version include:
+
+  - A blank line is not introduced anymore at the bottom of the
+    console window
+
+
+*** June 19, 2012: release of MinGWEditLine 2.06 ***
+
+  Changes with respect to the previous version include:
+
+  - Improved redraw performance when dealing with large command
+    lines
+  - Fixed a potential buffer overflow issue in displaying long
+    history lines
+  - Fixed an issue which might arise in certain cases when using
+    CTRL+W (delete-word)
+  - Switched from autotools to standard makefiles for 32/64-bit
+    platforms
+  - Added test programs which can be built by "make test"
+  - In addition to the static library now a DLL is also built
+    (thanks to Tim Hudson at CryptSoft for the useful discussion)
+  - Most common emacs key bindings are now supported (again, thanks
+    to Tim Hudson for the suggestion)
+
+
+*** June 13, 2012: release of MinGWEditLine 2.04 ***
+
+  Changes with respect to the previous version include:
+
+  - Fixed a number of issues which might arise using console windows
+    with different screen buffer sizes
+  - Fixed an issue connected with pasting UNIX-encoded clipboard
+    contents
+
+
+*** June 4, 2012: release of MinGWEditLine 2.02 ***
+
+  Changes with respect to the previous version include:
+
+  - Added synchronization between wide-char and multibyte strings in
+    _el_insert_char() and _el_delete_char() to avoid potential issues
+    with custom completing functions or signal handling functions
+
+
+*** June 2, 2012: release of MinGWEditLine 2.01 ***
+
+  Changes with respect to the previous version include:
+
+  - Support for rl_basic_word_break_characters[] and
+    rl_completer_word_break_characters[] variables
+  - Better handling of CTRL+C events (if the current line is not
+    empty the function returns an empty string, otherwise CTRL+C is
+    not intercepted)
+  - MinGWEditLine does not crash anymore if a program omits calling
+    using_history() before calling history-related functions
+  - The prototype of readline() has been corrected to match
+    GNU Readline's and EditLine's readline() prototypes
+  - Minor bugfixes
+
+
+*** May 21, 2012: release of MinGWEditLine 2.0 ***

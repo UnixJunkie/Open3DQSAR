@@ -1,0 +1,89 @@
+Dependencies
+============
+
+- OpenBabel
+  You should download and install OpenBabel 2.3.2 or newer.
+  
+  cd in the openbabel root folder and issue the commands:
+  
+  $ rm -rf build
+  $ mkdir build
+  $ cd build
+  
+  then, if you wish to install libraries in
+  /path/to/install/location/lib64:
+  
+  $ cmake -DCMAKE_INSTALL_PREFIX=/path/to/install/location \
+      -DLIB_SUFFIX=64 -DEIGEN3_INCLUDE_DIR=/path/to/eigen3 ..
+      
+  or, if you wish to install in /path/to/install/location/lib:
+  
+  $ cmake -DCMAKE_INSTALL_PREFIX=/path/to/install/location \
+      -DEIGEN3_INCLUDE_DIR=/path/to/eigen3 ..
+      
+  Finally:
+  
+  $ make && make install
+  
+  Alternatively, you may download and install the binary
+  openbabel_for_open3dtools package for your system from the
+  Open3DQSAR website (http://open3dqsar.org)
+  
+- libedit
+  Your system might already include libedit. However, a version which
+  includes a few bug fixes is shipped with Open3DQSAR.
+  You may build a static version to be used only for Open3DQSAR cd'ing
+  into the libedit folder and issuing the commands:
+  
+  $ ./configure --disable-shared && make && make install
+  
+  If you are running on Windows, you will need MinGWEditLine, which
+  is shipped with Open3DQSAR. Pre-built 32 and 64-bit DLLs can be
+  found in the bin32, bin64 folders, respectively. Makefiles for 32 and
+  64-bit gcc are also included in the src folder.
+  
+- libz/libminizip
+  Your system might already include libz/libminizip. However, for your
+  convenience it is also shipped with Open3DQSAR.
+  You may build a static version to be used only for Open3DQSAR cd'ing
+  into the zlib folder and issuing the commands:
+  
+  $ ./configure --static && make && make install
+  
+  Then cd into the contrib/minizip folder and issue the commands:
+  
+  $ ./bootstrap
+  $ ./configure --disable-shared && make && make install
+
+- A CBLAS/LAPACK math library such as the Intel MKL or libatlas.
+  Please refer to the respective documentations for installation
+  instructions.
+
+
+Open3DQSAR Installation
+=======================
+
+Once you have built/installed all dependencies, you may build Open3DQSAR
+cd'ing into its root directory and typing:
+
+$ ./bootstrap
+
+Then, to build with gcc and link against libatlas:
+
+$ ./configure --with-atlas && make && make install
+
+Alternatively, you may use icc and link against Intel MKL:
+
+$ ./configure CC=icc --with-intel-mkl && make && make install
+
+Or you may use Oracle Solaris Studio compilers and link against
+libsunperf:
+
+$ ./configure CC=suncc --with-sunperf && make && make install
+
+
+Other detailed installation instructions can be found in
+doc/Open3DQSAR.html.
+The most updated version of the documentation can always be found at
+http://open3dqsar.org. Please check often also for new Open3DQSAR
+releases.

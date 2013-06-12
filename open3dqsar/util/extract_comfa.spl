@@ -1,0 +1,85 @@
+#
+# extract_comfa.spl
+#
+# is part of
+# 
+# Open3DQSAR
+# ----------
+# 
+# An open-source software aimed at high-throughput
+# chemometric analysis of molecular interaction fields
+# 
+# Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+# 
+# For further information, please contact:
+# 
+# Paolo Tosco, PhD
+# Dipartimento di Scienza e Tecnologia del Farmaco
+# Universita' degli Studi di Torino
+# Via Pietro Giuria, 9
+# 10125 Torino (Italy)
+# Phone:  +39 011 670 7680
+# Mobile: +39 348 553 7206
+# Fax:    +39 011 670 7687
+# E-mail: paolo.tosco@unito.it
+#
+#
+#
+# extract_comfa script
+#
+# This script can be loaded into SYBYL and used
+# to export the CoMFA column from a SYBYL table
+# as a folder containing a collection of text files
+# (one for each molecule included in the table)
+# which can be conveniently imported in Open3DQSAR
+# with the import keyword (see documentation
+# for details). A region file, identified by the
+# .rgn extension, is also saved; the latter
+# allows to specify the grid size and mesh
+# in Open3DQSAR. A list of molecule names is also
+# saved in a file identified by the .obj extension.
+# The table should bear the CoMFA data
+# as the first column; obviously the script
+# can be modified according to everyone's needs
+#
+#
+# Usage:
+#
+# take <path/to/SPL/script>/extract_comfa.spl
+#
+
+
+
+setvar n_rows %table_get_attribute(NROWS)
+setvar base %basename(%table_get_attribute(FILENAME) .tbl)
+setvar temp_dir %cat($base "_temp")
+setvar temp_dir %find_temp_filename($temp_dir)
+dcl mkdir $temp_dir
+for i in %range(1 $n_rows)
+	setvar curr_file %cat($temp_dir "/" $i)
+	setvar efs_bin %cat($curr_file ".efs")
+	setvar efs_txt %cat($efs_bin ".txt")
+	qsar comfa field extract $i 1 steric $efs_bin |
+	qsar comfa field list $efs_bin > $efs_txt |
+	setvar efe_bin %cat($curr_file ".efe")
+	setvar efe_txt %cat($efe_bin ".txt")
+	qsar comfa field extract $i 1 electrostatic $efe_bin |
+	qsar comfa field list $efe_bin > $efe_txt |
+endfor
+setvar rgn_name %cat($temp_dir "/" $base ".rgn")
+setvar obj_name %cat($temp_dir "/" $base ".obj")
+dcl cp %qsar_comfa_region(1) $rgn_name
+echo %table() > $obj_name
