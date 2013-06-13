@@ -101,7 +101,7 @@ int update_pymol(O3Data *od)
       return OUT_OF_MEMORY;
     }
     od->pymol.proc_env = prog_exe_info.proc_env;
-    prog_exe_info.need_stdin = 1;
+    prog_exe_info.need_stdin = NEED_STDIN_LEAVE_READ_PIPE_OPEN;
     prog_exe_info.stdout_fd = 0;
     prog_exe_info.stderr_fd = 0;
     prog_exe_info.exedir = buffer;

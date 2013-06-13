@@ -411,7 +411,8 @@ int ext_program_exe(ProgExeInfo *prog_exe_info, int *error)
     exit(0);
   }
   else if (pid > 0) {
-    if (prog_exe_info->need_stdin) {
+    if (prog_exe_info->need_stdin
+      && (prog_exe_info->need_stdin & NEED_STDIN_NORMAL)) {
       /*
       close the read end of the pipe
       */

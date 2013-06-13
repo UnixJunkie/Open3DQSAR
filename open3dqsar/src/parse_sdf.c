@@ -321,7 +321,7 @@ int convert_mol(O3Data *od, char *from_filename, char *to_filename, char *from_e
   if (!(prog_exe_info.proc_env)) {
     return OUT_OF_MEMORY;
   }
-  prog_exe_info.need_stdin = 0;
+  prog_exe_info.need_stdin = NEED_STDIN_NORMAL;
   prog_exe_info.stdout_fd = 0;
   prog_exe_info.stderr_fd = od->file[TEMP_LOG];
   prog_exe_info.exedir = od->field.babel_exe_path;
@@ -2286,7 +2286,7 @@ int prep_cosmo_input(O3Data *od, TaskInfo *task, AtomInfo **atom, int object_num
     O3_ERROR_LOCATE(task);
     return FL_OUT_OF_MEMORY;
   }
-  prog_exe_info.need_stdin = 1;
+  prog_exe_info.need_stdin = NEED_STDIN_NORMAL;
   prog_exe_info.stdout_fd = &log_fd;
   prog_exe_info.stderr_fd = &log_fd;
   prog_exe_info.exedir = input_dir;
@@ -3006,7 +3006,7 @@ int prep_qm_input(O3Data *od, TaskInfo *task, AtomInfo **atom, int object_num)
       O3_ERROR_LOCATE(task);
       return FL_OUT_OF_MEMORY;
     }
-    prog_exe_info.need_stdin = 1;
+    prog_exe_info.need_stdin = NEED_STDIN_NORMAL;
     prog_exe_info.stdout_fd = &log_fd;
     prog_exe_info.stderr_fd = &log_fd;
     prog_exe_info.exedir = input_dir;

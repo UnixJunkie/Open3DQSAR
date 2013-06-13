@@ -308,7 +308,7 @@ int check_define(O3Data *od, char *bin)
     O3_ERROR_LOCATE(&(od->task));
     return FL_OUT_OF_MEMORY;
   }
-  prog_exe_info.need_stdin = 1;
+  prog_exe_info.need_stdin = NEED_STDIN_NORMAL;
   prog_exe_info.stdout_fd = &log_fd;
   prog_exe_info.stderr_fd = &log_fd;
   prog_exe_info.exedir = define_dir;
