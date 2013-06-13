@@ -30,21 +30,30 @@ Dependencies
   Open3DQSAR website (http://open3dqsar.org)
   
 - libedit
-  Your system might already include libedit. However, a version which
-  includes a few bug fixes is shipped with Open3DQSAR.
+  Your system might already include libedit. In case it doesn't, a
+  version which includes a few bug fixes and is known to work nicely
+  with Open3DQSAR can be downloaded here:
+  http://open3dqsar.org/downloads/editline-3.0.tar.bz2
+  
   You may build a static version to be used only for Open3DQSAR cd'ing
   into the libedit folder and issuing the commands:
   
   $ ./configure --disable-shared && make && make install
   
-  If you are running on Windows, you will need MinGWEditLine, which
-  is shipped with Open3DQSAR. Pre-built 32 and 64-bit DLLs can be
+  If you are running on Windows, you are encouraged to download and
+  install MinGWEditLine:
+  
+  http://mingweditline.sourceforge.net
+  
+  Pre-built 32 and 64-bit DLLs can be
   found in the bin32, bin64 folders, respectively. Makefiles for 32 and
   64-bit gcc are also included in the src folder.
   
 - libz/libminizip
-  Your system might already include libz/libminizip. However, for your
-  convenience it is also shipped with Open3DQSAR.
+  Your system might already include libz/libminizip. In case it doesn't,
+  for your convenience you may find an autotooled/libtoolized version
+  here:  http://open3dqsar.org/downloads/zlib-1.2.8.tar.bz2
+  
   You may build a static version to be used only for Open3DQSAR cd'ing
   into the zlib folder and issuing the commands:
   
@@ -54,6 +63,9 @@ Dependencies
   
   $ ./bootstrap
   $ ./configure --disable-shared && make && make install
+  
+  Open3DQSAR requires libz, while libminizip is optional. If you do not
+  link against libminizip, support for ZIP files will not be available.
 
 - A CBLAS/LAPACK math library such as the Intel MKL or libatlas.
   Please refer to the respective documentations for installation

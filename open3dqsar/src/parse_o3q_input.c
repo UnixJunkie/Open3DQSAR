@@ -1872,9 +1872,11 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
             od->field.compress = O3_COMPRESS_GZIP;
             break;
             
+            #ifdef HAVE_LIBMINIZIP
             case 'z':
             od->field.compress = O3_COMPRESS_ZIP;
             break;
+            #endif
             
             default:
             od->field.compress = 0;

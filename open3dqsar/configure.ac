@@ -38,10 +38,10 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(Open3DQSAR, 3.0, <paolo.tosco@unito.it>)
+AC_INIT(Open3DQSAR, 2.24, <paolo.tosco@unito.it>)
 AC_DEFINE([PACKAGE_NAME_SMALL_CAPS], ["open3dqsar"], [Package name in small caps])
 AC_DEFINE([O3Q], [1], [Open3DQSAR])
-AM_INIT_AUTOMAKE(Open3DQSAR, 3.0)
+AM_INIT_AUTOMAKE(Open3DQSAR, 2.24)
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -61,7 +61,7 @@ eof
 
 AC_CHECK_LIB([m], [sqrt], , AC_MSG_FAILURE([libm not found]))
 AC_CHECK_LIB([z], [gzopen], , AC_MSG_FAILURE([libz not found]))
-AC_CHECK_LIB([z -lminizip], [zipOpen], , AC_MSG_FAILURE([libminizip not found]))
+AC_CHECK_LIB([minizip], [zipOpen])
 
 # Checks for library functions.
 AC_FUNC_VPRINTF
