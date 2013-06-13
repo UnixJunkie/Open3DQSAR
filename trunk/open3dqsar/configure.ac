@@ -80,7 +80,7 @@ AC_CHECK_LIB([ws2_32], [main], ,
 	AC_CHECK_LIB([pthread], [pthread_create], ,
 	AC_MSG_FAILURE([libpthread not found])))
 AC_CHECK_LIB([ws2_32], [main],
-	AC_CHECK_LIB([shlwapi], [PathMatchSpecA], ,
+	AC_CHECK_LIB([shlwapi], [main], ,
 	AC_MSG_FAILURE([libshlwapi not found])))
 AC_CHECK_LIB([ws2_32], [main],
 	[AS_IF([$CC $CFLAGS src/test.c src/open3dqsar_win32.res -o src/test 2> /dev/null],
