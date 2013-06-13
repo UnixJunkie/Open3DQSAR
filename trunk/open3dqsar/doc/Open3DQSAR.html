@@ -2715,29 +2715,30 @@ name="zero"></a>zero</h3><br> <h4>SYNOPSIS</h4> <code>zero&nbsp;
 level=&lt;zeroing threshold&gt;&nbsp; \<br>&nbsp;&nbsp;&nbsp; [sign={POS
 | NEG | BOTH; defaults to BOTH}]&nbsp; \<br>&nbsp;&nbsp;&nbsp;
 [field_list=&lt;comma/hyphen separated list | ALL; defaults to
-ALL&gt;]</code><br><br> <h4>DESCRIPTION</h4> The <code>zero</code> keyword
-is used to set to zero, in the fields selected in <code>field_list</code>,
-all values smaller than a user-defined threshold. Zeroing may
-be performed checking absolute values (<code>sign=BOTH</code>,
-the default) or may affect only positive (<code>sign=POS</code>)
-or negative (<code>sign=NEG</code>) values.<br><br> <h4>EXAMPLES</h4>
-<code> # the following command sets to zero all grid points which have a
-value smaller than 0.05 in absolute value in all fields<br>zero&nbsp;
-type=BOTH&nbsp; level=0.05<br><br># the following command sets to
-zero all grid points which have a negative value lying between -0.25
-and 0.00 in field 1<br>zero&nbsp; type=NEG&nbsp; field_list=1&nbsp;
-level=0.25</code> <br><br><br><a href="#Contents"> <p align="right">Back
-to Contents</p></a><br> <hr color="#dbe5f1" align="center" width="95%"
-size="2"><br><h2><a name="ChangeLog">ChangeLog</a></h2><br><br>
-<ul><li>June 13, 2013: release of <B>Open3DQSAR</B> 2.24</li></ul>
-<ul>Changes with respect to the previous version include:</ul>
-<ul><ul><li>A bug which caused the terminal to be set to ECHOCTL on
-exit was fixed (Linux/Mac OS X only)</li></ul></ul> <ul><ul><li>A bug
-which caused abrupt program exit when PyMOL was closed while Open3DQSAR
-was still running was fixed</li></ul></ul> <ul><ul><li>Linking against
-libminizip is now optional</li></ul></ul> <br> <ul><li>January 14, 2013:
-release of <B>Open3DQSAR</B> 2.23</li></ul> <ul>Changes with respect to
-the previous version include:</ul> <ul><ul><li>A bug in the <code>import
+ALL&gt;]</code><br><br> <h4>DESCRIPTION</h4> The <code>zero</code>
+keyword is used to set to zero, in the fields selected in
+<code>field_list</code>, all values smaller than a user-defined
+threshold. Zeroing may be performed checking absolute values
+(<code>sign=BOTH</code>, the default) or may affect only positive
+(<code>sign=POS</code>) or negative (<code>sign=NEG</code>)
+values.<br><br> <h4>EXAMPLES</h4> <code> # the following command sets to
+zero all grid points which have a value smaller than 0.05 in absolute
+value in all fields<br>zero&nbsp; type=BOTH&nbsp; level=0.05<br><br>#
+the following command sets to zero all grid points which have a
+negative value lying between -0.25 and 0.00 in field 1<br>zero&nbsp;
+type=NEG&nbsp; field_list=1&nbsp; level=0.25</code> <br><br><br><a
+href="#Contents"> <p align="right">Back to Contents</p></a><br>
+<hr color="#dbe5f1" align="center" width="95%" size="2"><br><h2><a
+name="ChangeLog">ChangeLog</a></h2><br><br> <ul><li>June 13, 2013:
+release of <B>Open3DQSAR</B> 2.24</li></ul> <ul>Changes with respect to
+the previous version include:</ul> <ul><ul><li>A bug which caused the
+terminal to be set to <code>ECHOCTL</code> on exit was fixed (Linux/Mac
+OS X only)</li></ul></ul> <ul><ul><li>A bug which caused abrupt program
+exit when PyMOL was closed while <B>Open3DQSAR</B> was still running was
+fixed</li></ul></ul> <ul><ul><li>Linking against <code>libminizip</code>
+is now optional</li></ul></ul> <br> <ul><li>January 14, 2013: release
+of <B>Open3DQSAR</B> 2.23</li></ul> <ul>Changes with respect to the
+previous version include:</ul> <ul><ul><li>A bug in the <code>import
 type=DEPENDENT</code> keyword which caused an error message whenever
 attempting to import multiple dependent variables was fixed</li></ul></ul>
 <br> <ul><li>December 21, 2012: release of <B>Open3DQSAR</B>
