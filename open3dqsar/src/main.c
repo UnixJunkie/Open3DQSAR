@@ -667,6 +667,8 @@ int main(int argc, char **argv)
   COORD dwSize;
   COORD cursor_home;
   DWORD n_chars;
+  WORD wVersionRequested;
+  WSADATA wsaData;
   #endif
   #ifdef HAVE_EDITLINE_FUNCTIONALITY
   char el_rc[BUF_LEN];
