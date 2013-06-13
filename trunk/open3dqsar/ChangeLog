@@ -1,6 +1,81 @@
 Open3DQSAR's ChangeLog
 ----------------------
 
+*** June 13, 2013: release of Open3DQSAR 2.24 ***
+
+  Changes with respect to the previous version include:
+
+  - A bug which caused the terminal to be set to ECHOCTL on exit was fixed
+    (Linux/Mac OS X only)
+  - Linking against libminizip is now optional
+
+
+*** January 14, 2013: release of Open3DQSAR 2.23 ***
+
+  Changes with respect to the previous version include:
+
+  - A bug in the "import type=DEPENDENT" keyword which caused an error
+    message whenever attempting to import multiple dependent variables
+    was fixed
+
+
+*** December 21, 2012: release of Open3DQSAR 2.22 ***
+
+  Changes with respect to the previous version include:
+
+  - The new "type=MOE_GRID" parameter was added to the "prepare" keyword
+    to allow preparing a shape vector for the computation of interaction
+    potentials within MOE using the same grid box settings as defined in
+    Open3DQSAR
+  - The new "type=MOE_GRID" parameter was added to the import keyword to
+    allow importing in Open3DQSAR the interaction potential grids computed
+    within MOE
+  - The WriteMOEGRID.svl SVL script has been added to the util folder
+  - Minor bugfixes all over
+
+
+*** September 5, 2012: release of Open3DQSAR 2.21 ***
+
+  Changes with respect to the previous version include:
+
+  - Fixed a bug which affected the Windows version on start when the
+    program is installed in a location whose path contains spaces
+  - Fixed a regression in the calc_field() function introduced in version
+    2.2
+  - Fixed a bug in the import_dependent() function
+  - Fixed a bug affecting the "import type=SDF" keyword, which upon
+    completion claimed to have imported a MOL2 file
+
+
+*** August 10, 2012: release of Open3DQSAR 2.2 ***
+
+  Changes with respect to the previous version include:
+
+  - Added support to COSMOsar3D descriptor calculation from within
+    Open3DQSAR via the "calc_field type=cs3d" keyword
+  - Added compressed file support (GZIP, ZIP formats)
+  - Added the "rototrans" keyword to carry out rotations/translations on
+    selected objects
+  - Dropped GAFF support
+  - Added keyword and parameter shell-like TAB completion in interactive
+    mode
+  - Largely improved performance with "O3_SAVE_RAM=y" using OS-specific
+    kernel-managed page files
+  - More efficient scheduling of calc_field tasks was implemented
+  - Fixed a bug which might trigger a false grid mismatch error when
+    importing unformatted grid cube files
+  - Changed regex's into shell-like file patterns for "import type=
+    {FORMATTED_CUBE,UNFORMATTED_CUBE}"
+  - Open3DQSAR was linked against the updated versions of ATLAS (3.10.0)
+    and LAPACK (3.4.1) libraries
+  - Under Mac OS X, Open3DQSAR was linked against the ATLAS library instead
+    of the Accelerate Framework, since I relized that, as of Mac OS X
+    10.7, the LAPACK library included in the Accelerate Framework is not
+    completely thread-safe. In previous pre-built Open3DQSAR versions this
+    might have triggered numerical errors when using n_cpus > 1
+  - Added several new examples in the "example" folder
+
+
 *** July 16, 2012: release of Open3DQSAR 2.108 ***
 
   Changes with respect to the previous version include:

@@ -315,6 +315,7 @@ E-mail: paolo.tosco@unito.it
 #define MAX_DB        3
 #define BOUND        0
 #define WATER        1
+#define MAX_STATES      2
 #define TEMPLATE_OBJECT_NUM    0
 #define TEMPLATE_CONF_NUM    1
 #define MOVED_OBJECT_NUM    2
@@ -989,6 +990,7 @@ struct AlignInfo {
   int type;
   int filter_type;
   int n_tasks;
+  double level;
 };
 
 struct PharConfInfo {

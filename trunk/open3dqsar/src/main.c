@@ -492,12 +492,14 @@ void program_signal_handler(int signum)
     signal(signum, SIG_DFL);
     raise(signum);
   }
+  #ifdef HAVE_EDITLINE_FUNCTIONALITY
   else {
     if (rl_line_buffer) {
       rl_line_buffer[0] = EOF;
       rl_line_buffer[1] = '\0';
     }
   }
+  #endif
 }
 #else
 BOOL program_signal_handler(DWORD fdwCtrlType)
@@ -554,7 +556,7 @@ void reset_user_terminal(O3Data *od)
   #ifndef WIN32
   #ifdef HAVE_EDITLINE_FUNCTIONALITY
   if (od->user_termios) {
-    tcsetattr(STDIN_FILENO, TCSADRAIN, od->user_termios);
+    tcsetattr(STDOUT_FILENO, TCSADRAIN, od->user_termios);
   }
   #endif
   SET_INK(od, DEFAULT_INK);
@@ -876,7 +878,7 @@ int main(int argc, char **argv)
   }
   #else
   #ifdef HAVE_EDITLINE_FUNCTIONALITY
-  if (tcgetattr(STDIN_FILENO, &user_termios)) {
+  if (tcgetattr(STDOUT_FILENO, &user_termios)) {
     od.user_termios = NULL;
   }
   #endif
@@ -1120,6 +1122,11 @@ int main(int argc, char **argv)
     "%s\n\n"
     "The current working directory is:\n"
     "%s\n\n", od.temp_dir, current_dir);
+  #ifndef HAVE_LIBMINIZIP
+  tee_printf(&od,
+      "Since "PACKAGE_NAME" was not linked against libminizip, "
+      "support for ZIP files will not be available.\n\n");
+  #endif
   tee_flush(&od);
   strcpy(od.field.babel_exe_path, bin);
   if ((babel_path_string = getenv(BABEL_PATH_ENV))) {
