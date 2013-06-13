@@ -566,6 +566,8 @@ E-mail: paolo.tosco@unito.it
 #define BLOCK_COMPARE      1
 #define O3_COMPRESS_GZIP    1
 #define O3_COMPRESS_ZIP      2
+#define NEED_STDIN_NORMAL    (1<<0)
+#define NEED_STDIN_LEAVE_READ_PIPE_OPEN    (1<<1)
 #define NORMAL_FILE_HANDLE    (1<<0)
 #define ZIP_FILE_HANDLE      (1<<1)
 #define GZIP_FILE_HANDLE    (1<<2)

@@ -575,7 +575,7 @@ DWORD calc_qm_thread(void *pointer)
         continue;
       }
       remove_newline(buffer);
-      prog_exe_info.need_stdin = 1;
+      prog_exe_info.need_stdin = NEED_STDIN_NORMAL;
       prog_exe_info.stdout_fd = &log_fd;
       prog_exe_info.stderr_fd = &log_fd;
       prog_exe_info.exedir = ti->od.field.qm_dir;
@@ -1161,7 +1161,7 @@ DWORD calc_md_grid_thread(void *pointer)
       ti->od.al.task_list[object_num]->code = FL_OUT_OF_MEMORY;
       continue;
     }
-    prog_exe_info.need_stdin = 1;
+    prog_exe_info.need_stdin = NEED_STDIN_NORMAL;
     prog_exe_info.stdout_fd = &log_fd;
     prog_exe_info.stderr_fd = &log_fd;
     prog_exe_info.exedir = ti->od.field.md_grid_dir;
@@ -1328,7 +1328,7 @@ int call_md_grid_program(O3Data *od)
       O3_ERROR_LOCATE(&(od->task));
       return OUT_OF_MEMORY;
     }
-    prog_exe_info.need_stdin = 1;
+    prog_exe_info.need_stdin = NEED_STDIN_NORMAL;
     prog_exe_info.stdout_fd = od->file[TEMP_LOG];
     prog_exe_info.stderr_fd = od->file[TEMP_LOG];
     prog_exe_info.exedir = od->field.md_grid_dir;
