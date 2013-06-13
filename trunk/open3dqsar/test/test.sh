@@ -7,8 +7,8 @@
 # In case of failure check test/${OUTPUT_FILE}
 
 
-temp_ref=`mktemp`
-temp_test=`mktemp`
+temp_ref=ref_values.txt
+temp_test=test_values.txt
 TEST_COMPLETED_MSG="Successful completion"
 COPY_FILES=\
 "binding_data_36_compounds.txt \
@@ -25,7 +25,6 @@ OPEN3DTOOL=open3dqsar
 # where the user originally was
 clean_exit()
 {
-  rm -f $temp_ref $temp_test
   cd $old_cwd
   exit $1
 }
