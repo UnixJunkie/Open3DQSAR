@@ -41,7 +41,9 @@ src/Makefile.in \
 src/.deps \
 src/.libs \
 doc/Makefile \
-doc/Makefile.in
+doc/Makefile.in \
+doc/.deps \
+doc/.libs
 if [ `which libtoolize | awk '{print $1}' | grep -c libtoolize` != 0 ]; then
 	libtoolize
 else
