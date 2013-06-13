@@ -93,7 +93,7 @@ libsunperf:
 
 $ ./configure CC=suncc --with-sunperf && make && make install
 
-To test your Open3DQSAR Installation, run
+To test your Open3DQSAR installation, run
 
 $ test/test.sh
 
