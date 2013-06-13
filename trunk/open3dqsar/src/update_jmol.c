@@ -124,10 +124,6 @@ int update_jmol(O3Data *od)
   int attempts;
   FileDescriptor temp_jmol_fd;
   ProgExeInfo prog_exe_info;
-  #ifdef WIN32
-  WORD wVersionRequested;
-  WSADATA wsaData;
-  #endif
 
 
   memset(buffer, 0, BUF_LEN);
