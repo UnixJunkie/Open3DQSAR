@@ -7,6 +7,8 @@ Open3DQSAR's ChangeLog
 
   - A bug which caused the terminal to be set to ECHOCTL on exit was fixed
     (Linux/Mac OS X only)
+  - A bug which caused abrupt program exit when PyMOL was closed while
+    Open3DQSAR was still running was fixed
   - Linking against libminizip is now optional
 
 
