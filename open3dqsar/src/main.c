@@ -661,6 +661,7 @@ int main(int argc, char **argv)
   #else
   char cmd_cli[BUF_LEN];
   int wincmd = 0;
+  int error = 0;
   DWORD n;
   HANDLE hIcon = NULL;
   HMODULE hModule = NULL;
