@@ -1225,8 +1225,7 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
         }
         strcpy(od->file[ASCII_IN]->name, parameter);
         absolute_path(od->file[ASCII_IN]->name);
-        if (!(od->file[ASCII_IN]->handle =
-          (FILE *)fzopen(od->file[ASCII_IN]->name, "rb"))) {
+        if (!fexist(od->file[ASCII_IN]->name)) {
           tee_error(od, run_type, overall_line_num,
             E_FILE_CANNOT_BE_OPENED_FOR_READING,
             od->file[ASCII_IN]->name, IMPORT_FAILED);
@@ -1234,6 +1233,14 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
           continue;
         }
         if (!(run_type & DRY_RUN)) {
+          if (!(od->file[ASCII_IN]->handle =
+            (FILE *)fzopen(od->file[ASCII_IN]->name, "rb"))) {
+            tee_error(od, run_type, overall_line_num,
+              E_FILE_CANNOT_BE_OPENED_FOR_READING,
+              od->file[ASCII_IN]->name, IMPORT_FAILED);
+            fail = !(run_type & INTERACTIVE_RUN);
+            continue;
+          }
           ++command;
           tee_printf(od, M_TOOL_INVOKE, nesting, command, "IMPORT FREE_FORMAT", line_orig);
           tee_flush(od);
