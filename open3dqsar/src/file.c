@@ -313,7 +313,7 @@ char *get_basename_no_ext(char *filename)
 }
 
 
-#ifdef HAVE_LIBMINIZIP
+#if (defined HAVE_LIBMINIZIP) && (defined HAVE_MINIZIP_ZIP_H) && (defined HAVE_MINIZIP_UNZIP_H)
 int zipFiletime(char *filename, zip_fileinfo *zfi)
 {
   int ret = 0;
@@ -472,7 +472,7 @@ fzPtr *fzopen(char *filename, char *mode)
     fz_ptr->zip_type |= GZIP_FILE_HANDLE;
     fz_ptr->gzip_file_handle = gzopen(filename, rw_mode);
   }
-  #ifdef HAVE_LIBMINIZIP
+  #if (defined HAVE_LIBMINIZIP) && (defined HAVE_MINIZIP_ZIP_H) && (defined HAVE_MINIZIP_UNZIP_H)
   else if ((len >= 4) && (!strncasecmp(&filename[len - 4], ".zip", 4))) {
     fz_ptr->zip_type |= ZIP_FILE_HANDLE;
     if (fz_ptr->zip_type & ZIP_MODE_WRITE) {
@@ -488,10 +488,10 @@ fzPtr *fzopen(char *filename, char *mode)
     fz_ptr->normal_file_handle = fopen(filename, rw_mode);
   }
   if ((!(fz_ptr->gzip_file_handle))
-    #ifdef HAVE_LIBMINIZIP
+    #if (defined HAVE_LIBMINIZIP) && (defined HAVE_MINIZIP_ZIP_H) && (defined HAVE_MINIZIP_UNZIP_H)
     && (!(fz_ptr->zip_file_handle))
-    #endif
     && (!(fz_ptr->unz_file_handle))
+    #endif
     && (!(fz_ptr->normal_file_handle))) {
     free(fz_ptr);
     return NULL;
@@ -510,7 +510,7 @@ int fzclose(fzPtr *fz_ptr)
       && fz_ptr->gzip_file_handle) {
       ret = gzclose(fz_ptr->gzip_file_handle);
     }
-    #ifdef HAVE_LIBMINIZIP
+    #if (defined HAVE_LIBMINIZIP) && (defined HAVE_MINIZIP_ZIP_H) && (defined HAVE_MINIZIP_UNZIP_H)
     else if ((fz_ptr->zip_type & ZIP_FILE_HANDLE)
       && (fz_ptr->zip_type & ZIP_MODE_WRITE)
       && fz_ptr->zip_file_handle) {
@@ -565,7 +565,7 @@ int fzputs(fzPtr *fz_ptr, char *data)
       ret = EOF;
     }
   }
-  #ifdef HAVE_LIBMINIZIP
+  #if (defined HAVE_LIBMINIZIP) && (defined HAVE_MINIZIP_ZIP_H) && (defined HAVE_MINIZIP_UNZIP_H)
   else if ((fz_ptr->zip_type & ZIP_FILE_HANDLE)
     && (fz_ptr->zip_type & ZIP_MODE_WRITE)
     && fz_ptr->zip_file_handle) {
@@ -626,7 +626,7 @@ char *fzgets(char *data, int len, fzPtr *fz_ptr)
           return ret;
         }
       }
-      #ifdef HAVE_LIBMINIZIP
+      #if (defined HAVE_LIBMINIZIP) && (defined HAVE_MINIZIP_ZIP_H) && (defined HAVE_MINIZIP_UNZIP_H)
       else if ((fz_ptr->zip_type & ZIP_FILE_HANDLE)
         && (fz_ptr->zip_type & ZIP_MODE_READ)
         && fz_ptr->unz_file_handle) {
@@ -700,7 +700,7 @@ int fzwrite(void *data, size_t size, size_t count, fzPtr *fz_ptr)
       ret = -1;
     }
   }
-  #ifdef HAVE_LIBMINIZIP
+  #if (defined HAVE_LIBMINIZIP) && (defined HAVE_MINIZIP_ZIP_H) && (defined HAVE_MINIZIP_UNZIP_H)
   else if ((fz_ptr->zip_type & ZIP_FILE_HANDLE)
     && (fz_ptr->zip_type & ZIP_MODE_WRITE)
     && fz_ptr->zip_file_handle) {
@@ -733,7 +733,7 @@ int fzread(void *data, size_t size, size_t count, fzPtr *fz_ptr)
     ret = (((len = gzread(fz_ptr->gzip_file_handle, data, real_len)) ==
       real_len) ? count : (len / size));
   }
-  #ifdef HAVE_LIBMINIZIP
+  #if (defined HAVE_LIBMINIZIP) && (defined HAVE_MINIZIP_ZIP_H) && (defined HAVE_MINIZIP_UNZIP_H)
   else if ((fz_ptr->zip_type & ZIP_FILE_HANDLE)
     && (fz_ptr->zip_type & ZIP_MODE_READ)
     && fz_ptr->unz_file_handle) {
@@ -781,7 +781,7 @@ void fzrewind(fzPtr *fz_ptr)
       && fz_ptr->gzip_file_handle) {
       gzrewind(fz_ptr->gzip_file_handle);
     }
-    #ifdef HAVE_LIBMINIZIP
+    #if (defined HAVE_LIBMINIZIP) && (defined HAVE_MINIZIP_ZIP_H) && (defined HAVE_MINIZIP_UNZIP_H)
     else if ((fz_ptr->zip_type & ZIP_FILE_HANDLE)
       && (fz_ptr->zip_type & ZIP_MODE_READ)
       && fz_ptr->unz_file_handle) {

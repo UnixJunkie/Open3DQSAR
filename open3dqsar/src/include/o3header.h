@@ -102,8 +102,12 @@ E-mail: paolo.tosco@unito.it
 #include <sunperf.h>
 #endif
 #include <zlib.h>
+#ifdef HAVE_MINIZIP_ZIP_H
 #include <minizip/zip.h>
+#endif
+#ifdef HAVE_MINIZIP_UNZIP_H
 #include <minizip/unzip.h>
+#endif
 #include <include/safe_rint.h>
 
 #ifndef PRIO_MIN
@@ -825,8 +829,10 @@ struct fzPtr {
   int data_len;
   FILE *normal_file_handle;
   gzFile gzip_file_handle;
+  #if (defined HAVE_LIBMINIZIP) && (defined HAVE_MINIZIP_ZIP_H) && (defined HAVE_MINIZIP_UNZIP_H)
   zipFile zip_file_handle;
   unzFile unz_file_handle;
+  #endif
 };
 
 struct CationList {
@@ -1661,12 +1667,14 @@ void free_node(NodeInfo *fnode, int **path, RingInfo **ring, int n_atoms);
 void free_threads(O3Data *od);
 void free_x_var_array(O3Data *od);
 void free_y_var_array(O3Data *od);
-int zipFiletime(char *filename, zip_fileinfo *zfi);
 char *get_basename_no_ext(char *filename);
+#if (defined HAVE_LIBMINIZIP) && (defined HAVE_MINIZIP_ZIP_H) && (defined HAVE_MINIZIP_UNZIP_H)
+int zipFiletime(char *filename, zip_fileinfo *zfi);
 zipFile zipOpenWrite(char *filename);
 unzFile zipOpenRead(char *filename);
 int zipCloseWrite(unzFile handle);
 int zipCloseRead(zipFile handle);
+#endif
 fzPtr *fzopen(char *filename, char *mode);
 int fzclose(fzPtr *fz_ptr);
 int fzputs(fzPtr *fz_ptr, char *data);

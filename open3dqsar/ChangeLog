@@ -1,6 +1,14 @@
 Open3DQSAR's ChangeLog
 ----------------------
 
+*** July 2, 2013: Open3DQSAR 2.241 ***
+
+  Changes with respect to the previous version include:
+
+  - Fixed a bug which prevented building in the absence of libminizip
+    header files
+
+
 *** June 13, 2013: release of Open3DQSAR 2.24 ***
 
   Changes with respect to the previous version include:

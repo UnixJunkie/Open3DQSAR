@@ -1125,7 +1125,7 @@ int main(int argc, char **argv)
     "%s\n\n"
     "The current working directory is:\n"
     "%s\n\n", od.temp_dir, current_dir);
-  #ifndef HAVE_LIBMINIZIP
+  #if (!defined HAVE_LIBMINIZIP) || (!defined HAVE_MINIZIP_ZIP_H) || (!defined HAVE_MINIZIP_UNZIP_H)
   tee_printf(&od,
       "Since "PACKAGE_NAME" was not linked against libminizip, "
       "support for ZIP files will not be available.\n\n");
