@@ -69,18 +69,18 @@ int parse_comma_hyphen_list_to_array(O3Data *od, char *list, int type)
     numberlist = od->pel.numberlist[type];
     return 0;
   }
-  od->mel.list_orig = realloc(od->mel.list_orig, strlen(list) + 1);
+  od->mel.list_orig = realloc(od->mel.list_orig, strlen(list) + MAX_NAME_LEN);
   if (!(od->mel.list_orig)) {
     return OUT_OF_MEMORY;
   }
   list_orig = od->mel.list_orig;
-  memset(list_orig, 0, strlen(list) + 1);
-  od->mel.list_copy = realloc(od->mel.list_copy, strlen(list) + 1);
+  memset(list_orig, 0, strlen(list) + MAX_NAME_LEN);
+  od->mel.list_copy = realloc(od->mel.list_copy, strlen(list) + MAX_NAME_LEN);
   if (!(od->mel.list_copy)) {
     return OUT_OF_MEMORY;
   }
   list_copy = od->mel.list_copy;
-  memset(list_copy, 0, strlen(list) + 1);
+  memset(list_copy, 0, strlen(list) + MAX_NAME_LEN);
   strcpy(list_orig, list);
   strcpy(list_copy, list);
   /*
@@ -96,7 +96,7 @@ int parse_comma_hyphen_list_to_array(O3Data *od, char *list, int type)
     was a hyphen-separated
     start-end range specified in the n-th token?
     */
-    while ((*to != '-') && *to) {
+    while ((*to) && (*to != '-')) {
       ++to;
     };
     if (*to) {

@@ -85,11 +85,11 @@ char *get_args(O3Data *od, char *parameter_name)
     */
     if (parameter_name) {
       len = strlen(parameter_name);
-      if (!strncasecmp(parameter_name,
-        od->cimal.arg->me[i], ((len > j) ? len : j))) {
-        parameter_found = 1;
-        break;
-      }
+      parameter_found = ((len == j) && (!strncasecmp(parameter_name,
+        od->cimal.arg->me[i], len)));
+    }
+    if (parameter_found) {
+      break;
     }
   }
   /*

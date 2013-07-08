@@ -611,6 +611,7 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
       }
       else {
         for (result = 0, i = 0; i < 3; ++i) {
+          memset(buffer, 0, BUF_LEN);
           sprintf(buffer, "%c_start", i + 'x');
           if ((parameter = get_args(od, buffer))) {
             grid_fill[i] = 1;
