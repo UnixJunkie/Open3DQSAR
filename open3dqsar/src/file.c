@@ -207,6 +207,8 @@ void absolute_path(char *string)
   int is_absolute = 0;
   
   
+  memset(copy, 0, BUF_LEN);
+  memset(current_dir, 0, BUF_LEN);
   if (string) {
     #ifdef WIN32
     is_absolute = (isalpha((int)string[0])

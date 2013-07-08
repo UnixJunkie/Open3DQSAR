@@ -61,6 +61,7 @@ int calc_active_vars(O3Data *od, int model_type)
   od->overall_active_x_vars = 0;
   od->overall_zero_x_values = 0;
   od->overall_zero_y_values = 0;
+  memset(format, 0, BUF_LEN);
   for (i = 0; i < od->field_num; ++i) {
     if (get_field_attr(od, i, ACTIVE_BIT)) {
       active_count = 0;

@@ -49,6 +49,7 @@ int mol_to_sdf(O3Data *od, int object_num, double actual_value)
   FileDescriptor mol_fd;
   
   
+  memset(buffer, 0, BUF_LEN);
   if (od->file[ASCII_IN]->handle) {
     memset(&mol_fd, 0, sizeof(FileDescriptor));
     sprintf(mol_fd.name, "%s%c%04d.mol", od->field.mol_dir,

@@ -82,6 +82,8 @@ int import_dependent(O3Data *od, char *name_list)
   double value;
 
 
+  memset(buffer, 0, BUF_LEN);
+  memset(buffer_copy, 0, BUF_LEN);
   /*
   there must be at least struct_num lines in addition
   to the first line, which is reserved for variable names
