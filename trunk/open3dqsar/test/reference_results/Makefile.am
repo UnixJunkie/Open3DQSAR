@@ -36,6 +36,6 @@
 # E-mail: paolo.tosco@unito.it
 
 
-AUTOMAKE_OPTIONS = foreign
-ACLOCAL_AMFLAGS= -I m4
-SUBDIRS = src doc example test util
+reference_resultsdir = $(datadir)/@PACKAGE@/test/reference_results
+reference_results_DATA = \
+sample_input_MM.out

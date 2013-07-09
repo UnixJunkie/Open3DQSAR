@@ -41,7 +41,7 @@
 AC_INIT(Open3DQSAR, 2.241, <paolo.tosco@unito.it>)
 AC_DEFINE([PACKAGE_NAME_SMALL_CAPS], ["open3dqsar"], [Package name in small caps])
 AC_DEFINE([O3Q], [1], [Open3DQSAR])
-AM_INIT_AUTOMAKE(Open3DQSAR, 2.24)
+AM_INIT_AUTOMAKE(open3dqsar, 2.241)
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -301,5 +301,9 @@ AS_IF([test "x$BUGGY_RINT" = xyes],
 AS_IF([test "x$BUGGY_RINT" = xyes],
 	[AC_DEFINE([HAVE_SAFE_RINT], [1], [Use safe_rint() replacement for buggy rint()])])
 
-AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile example/Makefile util/Makefile test/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile \
+  example/Makefile example/CS3D/Makefile example/GRID/Makefile example/MM/Makefile \
+  example/QM_FIREFLY/Makefile example/QM_GAMESS/Makefile example/QM_GAUSSIAN/Makefile \
+  example/QM_TURBOMOLE/Makefile util/Makefile test/Makefile \
+  test/reference_results/Makefile])
 AC_OUTPUT

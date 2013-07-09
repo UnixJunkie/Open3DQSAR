@@ -40,6 +40,6 @@ testdir = $(datadir)/@PACKAGE@/test
 test_DATA = \
 binding_data_36_compounds.txt \
 ref_e2.sdf \
-reference_results/sample_input_MM.out \
 sample_input_MM.inp \
 test.sh
+SUBDIRS = reference_results
