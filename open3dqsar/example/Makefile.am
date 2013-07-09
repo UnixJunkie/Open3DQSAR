@@ -36,6 +36,5 @@
 # E-mail: paolo.tosco@unito.it
 
 
-AUTOMAKE_OPTIONS = foreign
-ACLOCAL_AMFLAGS= -I m4
-SUBDIRS = src doc example test util
+exampledir = $(datadir)/@PACKAGE@/example
+SUBDIRS = CS3D GRID MM QM_FIREFLY QM_GAMESS QM_GAUSSIAN QM_TURBOMOLE

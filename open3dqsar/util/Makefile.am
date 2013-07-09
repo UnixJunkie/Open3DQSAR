@@ -36,6 +36,9 @@
 # E-mail: paolo.tosco@unito.it
 
 
-AUTOMAKE_OPTIONS = foreign
-ACLOCAL_AMFLAGS= -I m4
-SUBDIRS = src doc example test util
+utildir = $(datadir)/@PACKAGE@/util
+util_DATA = \
+ReadMOEGRID.svl \
+WriteMOEGRID.svl \
+extract_comfa.spl \
+extract_comsia.spl

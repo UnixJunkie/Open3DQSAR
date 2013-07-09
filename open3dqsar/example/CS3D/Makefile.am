@@ -36,6 +36,8 @@
 # E-mail: paolo.tosco@unito.it
 
 
-AUTOMAKE_OPTIONS = foreign
-ACLOCAL_AMFLAGS= -I m4
-SUBDIRS = src doc example test util
+CS3Ddir = $(datadir)/@PACKAGE@/example/CS3D
+CS3D_DATA = \
+binding_data_36_compounds.txt \
+ref_e2.sdf \
+sample_input_CS3D.inp
