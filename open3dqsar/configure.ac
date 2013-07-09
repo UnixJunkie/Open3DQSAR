@@ -301,5 +301,5 @@ AS_IF([test "x$BUGGY_RINT" = xyes],
 AS_IF([test "x$BUGGY_RINT" = xyes],
 	[AC_DEFINE([HAVE_SAFE_RINT], [1], [Use safe_rint() replacement for buggy rint()])])
 
-AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile example/Makefile util/Makefile test/Makefile])
 AC_OUTPUT
