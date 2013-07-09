@@ -1,6 +1,13 @@
 Open3DQSAR's ChangeLog
 ----------------------
 
+*** July 9, 2013: Open3DQSAR 2.242 ***
+
+  Changes with respect to the previous version include:
+
+  - Added a few memset() commands to avoid complaints from valgrind
+
+
 *** July 2, 2013: Open3DQSAR 2.241 ***
 
   Changes with respect to the previous version include:
