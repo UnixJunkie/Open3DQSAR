@@ -36,14 +36,26 @@ src/*.a \
 src/*.o \
 src/open3dqsar \
 src/open3dqsar.exe \
-src/Makefile \
-src/Makefile.in \
-src/.deps \
-src/.libs \
-doc/Makefile \
-doc/Makefile.in \
-doc/.deps \
-doc/.libs
+`find doc -name Makefile` \
+`find doc -name Makefile.in` \
+`find doc -name .deps` \
+`find doc -name .libs` \
+`find example -name Makefile` \
+`find example -name Makefile.in` \
+`find example -name .deps` \
+`find example -name .libs` \
+`find src -name Makefile` \
+`find src -name Makefile.in` \
+`find src -name .deps` \
+`find src -name .libs` \
+`find test -name Makefile` \
+`find test -name Makefile.in` \
+`find test -name .deps` \
+`find test -name .libs` \
+`find util -name Makefile` \
+`find util -name Makefile.in` \
+`find util -name .deps` \
+`find util -name .libs`
 if [ `which libtoolize | awk '{print $1}' | grep -c libtoolize` != 0 ]; then
 	libtoolize
 else
