@@ -1,6 +1,14 @@
 Open3DQSAR's ChangeLog
 ----------------------
 
+*** July 18, 2013: Open3DQSAR 2.243 ***
+
+  Changes with respect to the previous version include:
+
+  - Modified configure.ac to allow fallback to GNU libreadline in
+    case libedit is not available
+
+
 *** July 9, 2013: Open3DQSAR 2.242 ***
 
   Changes with respect to the previous version include:

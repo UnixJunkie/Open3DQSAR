@@ -495,8 +495,15 @@ void program_signal_handler(int signum)
   #ifdef HAVE_EDITLINE_FUNCTIONALITY
   else {
     if (rl_line_buffer) {
+      #ifdef HAVE_GNU_READLINE
+      rl_delete_text(0, strlen(rl_line_buffer));
+      rl_free_line_state();
+      rl_replace_line("", 1);
+      rl_reset_after_signal();
+      #else
       rl_line_buffer[0] = EOF;
       rl_line_buffer[1] = '\0';
+      #endif
     }
   }
   #endif
