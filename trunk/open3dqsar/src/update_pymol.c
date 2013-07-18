@@ -130,6 +130,9 @@ int update_pymol(O3Data *od)
   if (!(od->pel.pymol_old_object_id)) {
     fputs(pymol_init, temp_pymol_fd.handle);
   }
+  if (getcwd(buffer, BUF_LEN)) {
+    fprintf(temp_pymol_fd.handle, "cd %s\n", buffer);
+  }
   fputs("disable all\n", temp_pymol_fd.handle);
   if (od->pymol.grid_box) {
     fputs("delete grid_box\n", temp_pymol_fd.handle);
