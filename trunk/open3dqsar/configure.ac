@@ -38,10 +38,10 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(Open3DQSAR, 2.242, <paolo.tosco@unito.it>)
+AC_INIT(Open3DQSAR, 2.243, <paolo.tosco@unito.it>)
 AC_DEFINE([PACKAGE_NAME_SMALL_CAPS], ["open3dqsar"], [Package name in small caps])
 AC_DEFINE([O3Q], [1], [Open3DQSAR])
-AM_INIT_AUTOMAKE(open3dqsar, 2.242)
+AM_INIT_AUTOMAKE(open3dqsar, 2.243)
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -76,6 +76,10 @@ AC_CHECK_LIB([edit], [readline], [AC_SUBST([LIBEDIT], ["-ledit"])
 AS_IF([test -z "$LIBEDIT"],
 	[AC_CHECK_LIB([edit -lcurses], [readline], [AC_SUBST([LIBEDIT], ["-ledit -lcurses"])
 	AC_DEFINE([HAVE_EDITLINE_FUNCTIONALITY], [1], [Use editline])])])
+AS_IF([test -z "$LIBEDIT"],
+	[AC_CHECK_LIB([readline], [readline], [AC_SUBST([LIBEDIT], ["-lreadline"])
+	AC_DEFINE([HAVE_EDITLINE_FUNCTIONALITY], [1], [Use readline])])])
+AS_IF([test "$LIBEDIT" = "-lreadline"], AC_DEFINE([HAVE_GNU_READLINE], [1], [Use GNU Readline]))
 AC_CHECK_LIB([ws2_32], [main], ,
 	AC_CHECK_LIB([pthread], [pthread_create], ,
 	AC_MSG_FAILURE([libpthread not found])))
