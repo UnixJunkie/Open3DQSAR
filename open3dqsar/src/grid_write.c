@@ -994,6 +994,7 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
             x_var = od->x_vars;
           }
           if (field_num != (field_list->pe[i] - 1)) {
+            ++n;
             continue;
           }
           /*
