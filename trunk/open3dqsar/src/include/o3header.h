@@ -463,7 +463,6 @@ E-mail: paolo.tosco@unito.it
 #define DEFAULT_INK      "\x1b[m"
 #define SET_INK(x, y)      if ((!((x)->terminal)) && ((x)->prompt)) { \
             printf("%s\n", y); \
-            if ((x)->out) fprintf((x)->out, "\n"); \
           }
 #define GET_TEMPDIR      P_tmpdir
 #define NEWLINE      "\n"
