@@ -6200,8 +6200,13 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
       continue;
     }
     else if (!strcasecmp(arg->me[0], "dataset")) {
+      ++command;
+      tee_printf(od, M_TOOL_INVOKE, nesting, command, "DATASET", line_orig);
+      tee_flush(od);
       update_field_object_attr(od, VERBOSE_BIT);
       calc_active_vars(od, FULL_MODEL);
+      tee_printf(od, M_TOOL_SUCCESS, nesting, command, "DATASET");
+      tee_flush(od);
     }
     else if ((!strcasecmp(arg->me[0], "exit"))
       || (!strcasecmp(arg->me[0], "quit"))
