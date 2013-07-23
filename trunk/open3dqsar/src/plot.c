@@ -179,7 +179,7 @@ int plot(O3Data *od, char *filename, int type,
               od->file[PLT_DAT_OUT]->name);
           }
           else {
-            with_labels[0] = '\0';
+            memset(with_labels, 0, BUF_LEN);
           }
           fprintf(plt_cmd_out,
             "unset key\n"
@@ -242,7 +242,7 @@ int plot(O3Data *od, char *filename, int type,
                 }
               }
               else {
-                with_labels[0] = '\0';
+                memset(with_labels, 0, BUF_LEN);
               }
               if (label == NAME_LABEL) {
                 fprintf(plt_dat_out, "%-40s",
@@ -490,7 +490,7 @@ int plot(O3Data *od, char *filename, int type,
                 }
               }
               else {
-                with_labels[0] = '\0';
+                memset(with_labels, 0, BUF_LEN);
               }
               if (label == NAME_LABEL) {
                 fprintf(plt_dat_out, "%-40s",
@@ -605,7 +605,7 @@ int plot(O3Data *od, char *filename, int type,
             od->file[PLT_DAT_OUT]->name);
         }
         else {
-          with_labels[0] = '\0';
+          memset(with_labels, 0, BUF_LEN);
         }
         if (label == NAME_LABEL) {
           fprintf(plt_dat_out, "%-40s",
@@ -801,7 +801,7 @@ int plot(O3Data *od, char *filename, int type,
         }
       }
       else {
-        with_labels[0] = '\0';
+        memset(with_labels, 0, BUF_LEN);
       }
       if (label == NAME_LABEL) {
         fprintf(plt_dat_out, "%-40s",

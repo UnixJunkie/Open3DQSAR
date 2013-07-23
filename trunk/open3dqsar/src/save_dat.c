@@ -158,9 +158,9 @@ int save_dat(O3Data *od, int file_id)
   
   /*
   then, write an unsigned long:
-  - od->valid, after zeroing the PLS valid bit
+  - od->valid, after zeroing the PLS, CV, and PREDICT bits
   */
-  valid = (unsigned long)(od->valid & (~PLS_BIT));
+  valid = (unsigned long)(od->valid & (~(PLS_BIT | CV_BIT | PREDICT_BIT)));
   fzwrite(&valid, sizeof(unsigned long), 1, dat_out);
   
   /*

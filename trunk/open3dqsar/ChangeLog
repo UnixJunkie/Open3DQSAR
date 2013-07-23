@@ -1,6 +1,15 @@
 Open3DQSAR's ChangeLog
 ----------------------
 
+*** July 23, 2013: Open3DQSAR 2.244 ***
+
+  Changes with respect to the previous version include:
+
+  - Fixed a bug which caused the "plot" keyword to fail after loading
+    a DAT file from disk; now also CV and PREDICT bits are cleared in
+    addition to PLS before saving.
+
+
 *** July 18, 2013: Open3DQSAR 2.243 ***
 
   Changes with respect to the previous version include:

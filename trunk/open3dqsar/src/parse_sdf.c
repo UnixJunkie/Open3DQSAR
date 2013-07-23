@@ -1739,9 +1739,12 @@ int fill_md_grid_types(AtomInfo **atom)
           count how many alkyl/aryl-vinyl/carbonyl substituents are there
           */
           if (atom[i]->n_bonded == 2) {
-            for (j = 0, n_aryl_vinyl = 0, n_alkyl = 0, n_carb_sulf_phos = 0; j < 2; ++j) {
+            for (j = 0, n_aryl_vinyl = 0, n_alkyl = 0, n_carb_sulf_phos = 0, n_nitro = 0; j < 2; ++j) {
               if (atom[atom[i]->bonded[j].num]->atom_type == 1) {
                 ++n_alkyl;
+              }
+              if (!strcmp(atom[atom[i]->bonded[j].num]->element, "N")) {
+                ++n_nitro;
               }
               else if ((atom[atom[i]->bonded[j].num]->atom_type == 37)
                 || (atom[atom[i]->bonded[j].num]->atom_type == 2)
@@ -1765,7 +1768,7 @@ int fill_md_grid_types(AtomInfo **atom)
               */
               strcpy(atom[i]->atom_name, " OC2");
             }
-            else if ((n_alkyl == 1) && (n_aryl_vinyl == 1)) {
+            else if (((n_alkyl == 1) || (n_nitro == 1)) && (n_aryl_vinyl == 1)) {
               /*
               alkylaryl(vinyl)ether
               */
