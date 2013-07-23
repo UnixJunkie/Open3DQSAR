@@ -7824,24 +7824,24 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
 
           case OUT_OF_MEMORY:
           tee_error(od, run_type, overall_line_num,
-            E_OUT_OF_MEMORY, SRD_FAILED);
+            E_OUT_OF_MEMORY, PLOT_FAILED);
           return PARSE_INPUT_ERROR;
 
           case CANNOT_READ_TEMP_FILE:
           tee_error(od, run_type, overall_line_num,
-            E_ERROR_IN_READING_TEMP_FILE, "TEMP_FIELD", SRD_FAILED);
+            E_ERROR_IN_READING_TEMP_FILE, "TEMP_FIELD", PLOT_FAILED);
           return PARSE_INPUT_ERROR;
 
           case PREMATURE_PLT_DAT_EOF:
           tee_error(od, run_type, overall_line_num,
             E_FILE_CANNOT_BE_OPENED_FOR_WRITING,
-            od->file[PLT_DAT_OUT]->name, SRD_FAILED);
+            od->file[PLT_DAT_OUT]->name, PLOT_FAILED);
           return PARSE_INPUT_ERROR;
 
           case PREMATURE_PLT_CMD_EOF:
           tee_error(od, run_type, overall_line_num,
             E_FILE_CANNOT_BE_OPENED_FOR_WRITING,
-            od->file[PLT_CMD_OUT]->name, SRD_FAILED);
+            od->file[PLT_CMD_OUT]->name, PLOT_FAILED);
           return PARSE_INPUT_ERROR;
 
           default:
