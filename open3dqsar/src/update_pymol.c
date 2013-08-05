@@ -105,7 +105,7 @@ int update_pymol(O3Data *od)
     prog_exe_info.stdout_fd = 0;
     prog_exe_info.stderr_fd = 0;
     prog_exe_info.exedir = buffer;
-    prog_exe_info.sep_proc_grp = 0;
+    prog_exe_info.sep_proc_grp = 1;
     strcpy(prog_exe_info.command_line, od->pymol.pymol_exe);
     ext_program_exe(&prog_exe_info, &error);
     od->pymol.pymol_pid = 1;

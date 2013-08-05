@@ -404,6 +404,29 @@ O3KeywordData keyword_data[] =
       }
     }
   }, {
+    "tanimoto",
+    {
+      {
+        O3_PARAM_NUMERIC, "ref_struct", {
+          NULL
+        }
+      }, {
+        O3_PARAM_STRING, "field_list", {
+          "ALL",
+          NULL
+        }
+      }, {
+        O3_PARAM_STRING, "struct_list", {
+          "ALL",
+          NULL
+        }
+      }, {  // this is the terminator
+        0, NULL, {
+          NULL
+        }
+      }
+    }
+  }, {
     "exclude",
     {
       {
@@ -463,6 +486,8 @@ O3KeywordData keyword_data[] =
           "LOADINGS",
           "PCA_LOADINGS",
           "COEFFICIENTS",
+          "MEAN_X_COEFFICIENTS",
+          "SD_X_COEFFICIENTS",
           "2_LEVEL",
           "3_LEVEL",
           "4_LEVEL",
