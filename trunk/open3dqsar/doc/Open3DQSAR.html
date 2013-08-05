@@ -329,7 +329,8 @@ href="#rototrans">rototrans</a></li> <li><a href="#save">save</a></li>
 <li><a href="#scale_y_vars">scale_y_vars</a></li> <li><a
 href="#scramble">scramble</a></li> <li><a href="#sdcut">sdcut</a></li>
 <li><a href="#set">set</a></li> <li><a href="#source">source</a></li>
-<li><a href="#srd">srd</a></li> <li><a href="#stop">stop</a></li> <li><a
+<li><a href="#srd">srd</a></li> <li><a href="#stop">stop</a></li>
+<li><a href="#tanimoto">tanimoto</a></li> <li><a
 href="#transform">transform</a></li> <li><a href="#uvepls">uvepls</a></li>
 <li><a href="#zero">zero</a></li></ul> <br><br><br><a href="#Contents">
 <p align="right">Back to Contents</p></a><br> <hr color="#dbe5f1"
@@ -1166,15 +1167,19 @@ current PLS model&gt;]&nbsp; \<br> &nbsp;&nbsp;&nbsp; | PCA_LOADINGS
 [pc=&lt;number of PCs, defaults to the number of PCs of the current PCA
 analysis]&nbsp; \<br> &nbsp;&nbsp;&nbsp; | COEFFICIENTS [pc=&lt;number
 of PCs, defaults to the number of PCs of the current PLS model]&nbsp;
-\<br> &nbsp;&nbsp;&nbsp; [y_var_list=&lt;comma/hyphen separated list |
-ALL; defaults to ALL&gt;]&nbsp; \<br> &nbsp;&nbsp;&nbsp; | 2_LEVEL |
-3_LEVEL | 4_LEVEL | D_OPTIMAL | FFDSEL | UVEPLS | SRD&nbsp; \<br>
-&nbsp;&nbsp;&nbsp; | FIELD_SD [object_list | id_list=&lt;comma/hyphen
-separated list | ALL; defaults to ALL&gt;]&nbsp; \<br> &nbsp;&nbsp;&nbsp;
-| OBJECT_FIELD [object_list | id_list=&lt;comma/hyphen separated
-list | ALL; defaults to ALL&gt;]&nbsp; \<br> &nbsp;&nbsp;&nbsp;
-[inactive={ORIGINAL | ZERO | LABEL}; defaults to ORIGINAL]&nbsp; \<br>
-&nbsp;&nbsp;&nbsp; [missing={ZERO | LABEL}; defaults to ZERO]}&nbsp; \<br>
+\<br> &nbsp;&nbsp;&nbsp; | MEAN_X_COEFFICIENTS [pc=&lt;number of
+PCs, defaults to the number of PCs of the current PLS model]&nbsp;
+\<br> &nbsp;&nbsp;&nbsp; | SD_X_COEFFICIENTS [pc=&lt;number of PCs,
+defaults to the number of PCs of the current PLS model]&nbsp; \<br>
+&nbsp;&nbsp;&nbsp; [y_var_list=&lt;comma/hyphen separated list | ALL;
+defaults to ALL&gt;]&nbsp; \<br> &nbsp;&nbsp;&nbsp; | 2_LEVEL | 3_LEVEL |
+4_LEVEL | D_OPTIMAL | FFDSEL | UVEPLS | SRD&nbsp; \<br> &nbsp;&nbsp;&nbsp;
+| FIELD_SD [object_list | id_list=&lt;comma/hyphen separated list |
+ALL; defaults to ALL&gt;]&nbsp; \<br> &nbsp;&nbsp;&nbsp; | OBJECT_FIELD
+[object_list | id_list=&lt;comma/hyphen separated list | ALL; defaults
+to ALL&gt;]&nbsp; \<br> &nbsp;&nbsp;&nbsp; [inactive={ORIGINAL | ZERO |
+LABEL}; defaults to ORIGINAL]&nbsp; \<br> &nbsp;&nbsp;&nbsp;
+[missing={ZERO | LABEL}; defaults to ZERO]}&nbsp; \<br>
 &nbsp;&nbsp;&nbsp; file=&lt;file basename without extension&gt;&nbsp;
 \<br> &nbsp;&nbsp;&nbsp; [field_list=&lt;comma/hyphen separated
 list | ALL; defaults to ALL&gt;]&nbsp; \<br> &nbsp;&nbsp;&nbsp;
@@ -1194,57 +1199,63 @@ formats, which are intended for exporting grid data as a human-readable
 text file; the <code>XYZ</code> format includes the indication of
 the Cartesian coordinates of the grid point each energy value refers
 to.<br> The values which may be exported, defined by the parameter
-<code>type</code>, are:<br><br><ul><li><code>WEIGHTS</code>: the
-PLS partial weights of the component specified through the <code>pc
-</code>parameter; by default, the highest component extracted by
-the PLS algorithm is used</li></ul><ul><li><code>LOADINGS</code>:
-the PLS loadings of the component specified through the <code>pc
-</code>parameter; by default, the highest component extracted by the
-PLS algorithm is used</li></ul><ul><li><code>PCA_LOADINGS</code>:
-the PCA loadings of the component specified through the <code>pc
-</code>parameter; by default, the highest component extracted by the PCA
-algorithm is used</li></ul><ul><li><code>COEFFICIENTS</code>: the PLS
-pseudo-coefficients of the model built out of <code>pc </code>principal
+<code>type</code>, are:<br><br> <ul><li><code>WEIGHTS</code>: the PLS
+partial weights of the component specified through the <code>pc</code>
+parameter; by default, the highest component extracted by the PLS
+algorithm is used</li></ul><ul><li><code>LOADINGS</code>: the PLS
+loadings of the component specified through the <code>pc</code>
+parameter; by default, the highest component extracted by the PLS
+algorithm is used</li></ul> <ul><li><code>PCA_LOADINGS</code>: the
+PCA loadings of the component specified through the <code>pc</code>
+parameter; by default, the highest component extracted by the PCA
+algorithm is used</li></ul> <ul><li><code>COEFFICIENTS</code>: the PLS
+pseudo-coefficients of the model built out of <code>pc</code> principal
 components are plotted. Since the pseudo-coefficients are linked to a
 specific dependent variable, if multiple dependent variables are present,
 specific <I>y</I>'s may be indicated through the <code>y_var_list</code>
-parameter; by default a grid plot will be generated for each
-dependent variable</li></ul><ul><li><code>2_LEVEL</code>: in
-the grid plot, a 1 value will be plotted in correspondence of
-the 2-level X variables, while all other variables will bear a 0
-value</li></ul><ul><li><code>3_LEVEL</code>: in the grid plot, a 1 value
-will be plotted in correspondence of the 3-level X variables, while all
-other variables will bear a 0 value</li></ul><ul><li><code>4_LEVEL</code>:
-in the grid plot, a 1 value will be plotted in correspondence of
-the 4-level X variables, while all other variables will bear a 0
-value</li></ul><ul><li><code>D_OPTIMAL</code>: in the grid plot, a 1
+parameter; by default a grid plot will be generated for each dependent
+variable</li></ul> <ul><li><code>MEAN_X_COEFFICIENTS</code>: as for
+<code>COEFFICIENTS</code>, but in this case PLS pseudo-coefficients
+of the model are multiplied by the mean value of the variable across
+the dataset.</li></ul> <ul><li><code>SD_X_COEFFICIENTS</code>: as for
+<code>COEFFICIENTS</code>, but in this case PLS pseudo-coefficients
+of the model are multiplied by the standard deviation of the variable
+across the dataset.</li></ul> <ul><li><code>2_LEVEL</code>: in the
+grid plot, a 1 value will be plotted in correspondence of the 2-level
+X variables, while all other variables will bear a 0 value</li></ul>
+<ul><li><code>3_LEVEL</code>: in the grid plot, a 1 value will be plotted
+in correspondence of the 3-level X variables, while all other variables
+will bear a 0 value</li></ul> <ul><li><code>4_LEVEL</code>: in the
+grid plot, a 1 value will be plotted in correspondence of the 4-level
+X variables, while all other variables will bear a 0 value</li></ul>
+<ul><li><code>D_OPTIMAL</code>: in the grid plot, a 1 value will be
+plotted in correspondence of the X variables selected by a previous
+D-optimal variable selection, while all other variables will bear a
+0 value</li></ul> <ul><li><code>FFDSEL</code>: in the grid plot, a 1
 value will be plotted in correspondence of the X variables selected by
-a previous D-optimal variable selection, while all other variables will
-bear a 0 value</li></ul><ul><li><code>FFDSEL</code>: in the grid plot,
-a 1 value will be plotted in correspondence of the X variables selected
-by a previous FFD variable selection, while all other variables will
-bear a 0 value</li></ul><ul><li><code>UVEPLS</code>: in the grid plot,
-a 1 value will be plotted in correspondence of the X variables selected
-by a previous UVE-PLS variable selection, while all other variables
-will bear a 0 value</li></ul><ul><li><code>SRD</code>: in the grid
-plot, an integer value corresponding to the group number (except for
-the variables belonging to group zero, which will be characterized
-by a -1 value) will be plotted in correspondence of the X variables
-belonging to the groups listed in the <code>group_list</code>, as
-a consequence of a previous SRD procedure; all other variables will
-bear a 0 value</li></ul><ul><li><code>FIELD_SD</code>: at each grid
-point, the standard deviation among the values assumed by objects
-specified in <code>object_list</code> or in <code>id_list</code>
-(which defaults to all active objects in the dataset) is
-plotted</li></ul><ul><li><code>OBJECT_FIELD</code>: at each grid point,
-the energy value assumed by objects specified in <code>object_list</code>
-or in <code>id_list</code> (which defaults to all active objects in the
-dataset) is plotted; a separate grid file is produced for each of the
-objects. According to the setting of the <code>inactive</code> parameter
-one may choose to plot the actual energy value also in the case of
-inactive variables (<code>inactive=ORIGINAL</code>, the default), to plot
-a zero energy value for inactive variables (<code>inactive=ZERO</code>,
-the default), or to plot a special label value (<code>INACTIVE</code> in
+a previous FFD variable selection, while all other variables will bear
+a 0 value</li></ul> <ul><li><code>UVEPLS</code>: in the grid plot, a 1
+value will be plotted in correspondence of the X variables selected by
+a previous UVE-PLS variable selection, while all other variables will
+bear a 0 value</li></ul> <ul><li><code>SRD</code>: in the grid plot,
+an integer value corresponding to the group number (except for the
+variables belonging to group zero, which will be characterized by a -1
+value) will be plotted in correspondence of the X variables belonging to
+the groups listed in the <code>group_list</code>, as a consequence of a
+previous SRD procedure; all other variables will bear a 0 value</li></ul>
+<ul><li><code>FIELD_SD</code>: at each grid point, the standard deviation
+among the values assumed by objects specified in <code>object_list</code>
+or in <code>id_list</code> (which defaults to all active objects in
+the dataset) is plotted</li></ul><ul> <li><code>OBJECT_FIELD</code>:
+at each grid point, the energy value assumed by objects specified in
+<code>object_list</code> or in <code>id_list</code> (which defaults
+to all active objects in the dataset) is plotted; a separate grid
+file is produced for each of the objects. According to the setting
+of the <code>inactive</code> parameter one may choose to plot
+the actual energy value also in the case of inactive variables
+(<code>inactive=ORIGINAL</code>, the default), to plot a zero
+energy value for inactive variables (<code>inactive=ZERO</code>, the
+default), or to plot a special label value (<code>INACTIVE</code> in
 <code>ASCII</code> and <code>XYZ</code> formats, <code>-1.0e37</code>
 in binary formats).  The <code>missing</code> parameter instead
 regulates the behaviour in case of missing values; by default they
@@ -1252,12 +1263,12 @@ are replaced by zeros (<code>missing=ZERO</code>), while setting
 <code>missing=LABEL</code> causes a special label to be plotted
 (<code>MISSING</code> in <code>ASCII</code> and <code>XYZ</code>
 formats, <code>1.0e37</code> in binary formats).</li></ul><br> The
-keyword <code>file </code>allows to set a basename for all files
+keyword <code>file</code> allows to set a basename for all files
 which will be generated by the <code>export</code> command. The
-<code>export</code> command also has a number of optional parameters
-listed below:<br><br><ul><li><code>field_list</code>: a list of fields
-on which <code>export</code> should operate may be defined; as a default,
-all active fields will be taken into
+<code>export</code> command also has a number of optional
+parameters listed below:<br><br><ul><li><code>field_list</code>:
+a list of fields on which <code>export</code> should operate may
+be defined; as a default, all active fields will be taken into
 consideration</li></ul><ul><li><code>endianness</code>: allows
 to specify the endianness of the binary grid files which will be
 generated; defaults to the native endianness of the machine on which
@@ -2530,10 +2541,29 @@ target="_blank">DOI</a></li></ol> <br><br><br><a
 href="#Contents"> <p align="right">Back to Contents</p></a><br>
 <hr color="#dbe5f1" align="center" width="95%" size="2"><br><h3><a
 name="stop"></a>stop</h3><br> <h4>SYNOPSIS</h4> <code>stop | exit |
-quit</code><br><br> <h4>DESCRIPTION</h4> The <code>stop</code> keyword, as
-well as its synonyms <code>exit</code> and <code>quit</code>, is used to
-abandon an <B>Open3DQSAR</B> input file ignoring all keywords eventually
-present downstream the <code>stop</code> command.  <br><br><br><a
+quit</code><br><br> <h4>DESCRIPTION</h4> The <code>stop</code> keyword,
+as well as its synonyms <code>exit</code> and <code>quit</code>,
+is used to abandon an <B>Open3DQSAR</B> input file ignoring all
+keywords eventually present downstream the <code>stop</code>
+command.  <br><br><br><a href="#Contents"> <p align="right">Back
+to Contents</p></a><br> <hr color="#dbe5f1" align="center"
+width="95%" size="2"><br><h3><a name="tanimoto"></a>tanimoto</h3><br>
+<h4>SYNOPSIS</h4> <code>tanimoto&nbsp; ref_struct=&lt;reference structure
+ID&gt;&nbsp; \<br> &nbsp;&nbsp;&nbsp; [field_list=&lt;comma/hyphen
+separated list | ALL; defaults to ALL&gt;]&nbsp; \<br> &nbsp;&nbsp;&nbsp;
+[struct_list=&lt;comma/hyphen separated list | ALL; defaults to ALL&gt;]
+</code><br><br> <h4>DESCRIPTION</h4> The <code>tanimoto</code> keyword
+allows computing pairwise Tanimoto similarity between MIFs. The
+reference structure is chosen with the <code>ref_struct</code>
+parameter, while the list of structures to be compared to the former
+is provided with the <code>struct_list</code> parameter (which
+defaults to <code>ALL</code>).	By default, all available fields are
+used for the comparison; alternatively, a <code>field_list</code>
+can be provided.<br><br> <h4>EXAMPLES</h4> <code> # the following
+command outputs a table with as many rows as available structures,
+and as many columns as available fields; in each cell the Tanimoto
+similarity between each structure and stucture 1 is reported
+for each field<br> tanimoto ref_struct=1 </code> <br><br><br><a
 href="#Contents"> <p align="right">Back to Contents</p></a><br>
 <hr color="#dbe5f1" align="center" width="95%" size="2"><br><h3><a
 name="transform"></a>transform</h3><br> <h4>SYNOPSIS</h4>
@@ -2715,23 +2745,41 @@ name="zero"></a>zero</h3><br> <h4>SYNOPSIS</h4> <code>zero&nbsp;
 level=&lt;zeroing threshold&gt;&nbsp; \<br>&nbsp;&nbsp;&nbsp; [sign={POS
 | NEG | BOTH; defaults to BOTH}]&nbsp; \<br>&nbsp;&nbsp;&nbsp;
 [field_list=&lt;comma/hyphen separated list | ALL; defaults to
-ALL&gt;]</code><br><br> <h4>DESCRIPTION</h4> The <code>zero</code>
-keyword is used to set to zero, in the fields selected in
-<code>field_list</code>, all values smaller than a user-defined
-threshold. Zeroing may be performed checking absolute values
-(<code>sign=BOTH</code>, the default) or may affect only positive
-(<code>sign=POS</code>) or negative (<code>sign=NEG</code>)
-values.<br><br> <h4>EXAMPLES</h4> <code> # the following command sets to
-zero all grid points which have a value smaller than 0.05 in absolute
-value in all fields<br>zero&nbsp; type=BOTH&nbsp; level=0.05<br><br>#
-the following command sets to zero all grid points which have a
-negative value lying between -0.25 and 0.00 in field 1<br>zero&nbsp;
-type=NEG&nbsp; field_list=1&nbsp; level=0.25</code> <br><br><br><a
-href="#Contents"> <p align="right">Back to Contents</p></a><br>
-<hr color="#dbe5f1" align="center" width="95%" size="2"><br><h2><a
-name="ChangeLog">ChangeLog</a></h2><br><br> <ul><li>June 13, 2013:
-release of <B>Open3DQSAR</B> 2.24</li></ul> <ul>Changes with respect to
-the previous version include:</ul> <ul><ul><li>A bug which caused the
+ALL&gt;]</code><br><br> <h4>DESCRIPTION</h4> The <code>zero</code> keyword
+is used to set to zero, in the fields selected in <code>field_list</code>,
+all values smaller than a user-defined threshold. Zeroing may
+be performed checking absolute values (<code>sign=BOTH</code>,
+the default) or may affect only positive (<code>sign=POS</code>)
+or negative (<code>sign=NEG</code>) values.<br><br> <h4>EXAMPLES</h4>
+<code> # the following command sets to zero all grid points which have a
+value smaller than 0.05 in absolute value in all fields<br>zero&nbsp;
+type=BOTH&nbsp; level=0.05<br><br># the following command sets to
+zero all grid points which have a negative value lying between -0.25
+and 0.00 in field 1<br>zero&nbsp; type=NEG&nbsp; field_list=1&nbsp;
+level=0.25</code> <br><br><br><a href="#Contents"> <p align="right">Back
+to Contents</p></a><br> <hr color="#dbe5f1" align="center" width="95%"
+size="2"><br><h2><a name="ChangeLog">ChangeLog</a></h2><br><br>
+<ul><li>August 5, 2013: release of <B>Open3DQSAR</B> 2.25</li></ul>
+<ul>Changes with respect to the previous version include:</ul>
+<ul><ul><li>Added the <code>tanimoto</code> keyword to compute
+Tanimoto similarity between MIFs</li></ul></ul> <ul><ul><li>Added
+the <code>export type=sd_x_coefficient</code> and <code>export
+type=mean_x_coefficient</code> keywords to export <code>PLS coefficient
+&times; standard deviation</code> and <code>PLS coefficient &times;
+mean</code> grid maps, respectively</li></ul></ul> <ul><ul><li>Fixed a bug
+which prevented exporting <code>field_sd</code> and <code>group</code>
+grid maps</li></ul></ul> <ul><ul><li>Fixed a bug which caused the
+<code>plot</code> keyword to fail after loading a <code>DAT</code> file
+from disk; now also <code>CV</code> and <code>PREDICT</code> bits are
+cleared in addition to <code>PLS</code> before saving</li></ul></ul>
+<ul><ul><li>Modified <code>configure.ac</code> to allow fallback
+to GNU <code>libreadline</code> in case <code>libedit</code> is not
+available</li></ul></ul> <ul><ul><li>Added a few <code>memset()</code>
+calls to avoid complaints from <code>valgrind</code></li></ul></ul>
+<ul><ul><li>Fixed a bug which prevented building in the absence of
+<code>libminizip</code> header files</li></ul></ul> <br> <ul><li>June 13,
+2013: release of <B>Open3DQSAR</B> 2.24</li></ul> <ul>Changes with respect
+to the previous version include:</ul> <ul><ul><li>A bug which caused the
 terminal to be set to <code>ECHOCTL</code> on exit was fixed (Linux/Mac
 OS X only)</li></ul></ul> <ul><ul><li>A bug which caused abrupt program
 exit when PyMOL was closed while <B>Open3DQSAR</B> was still running was
@@ -2882,29 +2930,29 @@ collapsing algorithm yields exactly the same results as the original
 <a href="http://www.miasrl.com/golpe.htm" target="_blank">GOLPE</a>
 implementation</li></ul></ul> <br> <ul><li>July 24, 2011: release
 of <B>Open3DQSAR</B> 2.02</li></ul> <ul>Changes with respect to
-the previous version include:</ul> <ul><ul><li>Implementation of
-a more robust Y variable import procedure both in the <code>import
-type=SDF</code> and in the <code>import type=DEPENDENT</code> modules;
-for this purpose, the <code>y_var_list</code> parameter was replaced by
-the <code>y_var_name</code> parameter</li></ul></ul> <ul><ul><li>Fixed
-a bug which caused sudden logout from the interactive program shell
-under particular conditions</li></ul></ul> <br> <ul><li>June 29, 2011:
-release of <B>Open3DQSAR</B> 2.01</li></ul> <ul>Changes with respect to
-the previous version include:</ul> <ul><ul><li>Implementation of a more
-robust check of OpenBabel functionality on program start</li></ul></ul>
-<br> <ul><li>June 20, 2011: release of <B>Open3DQSAR</B> 2.0</li></ul>
+the previous version include:</ul> <ul><ul><li>Implementation of a
+more robust Y variable import procedure both in the <code>import
+type=SDF</code> and in the <code>import type=DEPENDENT</code>
+modules; for this purpose, the <code>y_var_list</code> parameter
+was replaced by the <code>y_var_name</code> parameter</li></ul></ul>
+<ul><ul><li>Fixed a bug which caused sudden logout from the interactive
+program shell under particular conditions</li></ul></ul> <br>
+<ul><li>June 29, 2011: release of <B>Open3DQSAR</B> 2.01</li></ul>
 <ul>Changes with respect to the previous version include:</ul>
-<ul><ul><li>A regression introduced in version 1.54 which prevented
-running QM calculations using external QM engines was fixed</li></ul></ul>
-<br> <ul><li>June 4, 2011: release of <B>Open3DQSAR</B> 1.54</li></ul>
-<ul>Changes with respect to the previous version include:</ul>
-<ul><ul><li><code>n_cpus</code> is not a parameter to parallel-enabled
-computations anymore; instead, a new <code>O3_N_CPUS</code> environment
-variable (as well as a new <code>n_cpus</code> parameter to the
-<code>env</code> keyword) has been added which is valid for all
-parallel-enabled computations</li></ul></ul> <ul><ul><li>Binary
-grids can now also be exported in the native MOE grid format,
-which is easily readable in MOE with the <code>fread_GRID</code>
+<ul><ul><li>Implementation of a more robust check of OpenBabel
+functionality on program start</li></ul></ul> <br> <ul><li>June 20,
+2011: release of <B>Open3DQSAR</B> 2.0</li></ul> <ul>Changes with
+respect to the previous version include:</ul> <ul><ul><li>A regression
+introduced in version 1.54 which prevented running QM calculations using
+external QM engines was fixed</li></ul></ul> <br> <ul><li>June 4, 2011:
+release of <B>Open3DQSAR</B> 1.54</li></ul> <ul>Changes with respect
+to the previous version include:</ul> <ul><ul><li><code>n_cpus</code>
+is not a parameter to parallel-enabled computations anymore; instead,
+a new <code>O3_N_CPUS</code> environment variable (as well as a new
+<code>n_cpus</code> parameter to the <code>env</code> keyword) has been
+added which is valid for all parallel-enabled computations</li></ul></ul>
+<ul><ul><li>Binary grids can now also be exported in the native MOE grid
+format, which is easily readable in MOE with the <code>fread_GRID</code>
 SVL function; the <code>ReadMOEGRID.svl</code> script provides an
 example of how this can be accomplished</li></ul></ul> <ul><ul><li>A
 bug which under certain conditions might cause a segmentation
@@ -2964,43 +3012,43 @@ to supported operating systems</li></ul></ul> <br> <ul><li>August 26,
 2010: release of <B>Open3DQSAR</B> 1.303</li></ul> <ul>Changes with
 respect to the previous version include:</ul> <ul><ul><li>Fixed an
 issue which is occasionally raised when running several GRID jobs at
-once on a multi-CPU machine; since GRID appears to read/write on a
-file with a hardcoded path and name, a data race by the different jobs
-may take place, leading to failures; a workaround has been implemented
-which solves the problem</li></ul></ul> <br> <ul><li>August 24, 2010:
-release of <B>Open3DQSAR</B> 1.302</li></ul> <ul>Changes with respect
-to the previous version include:</ul> <ul><ul><li>New layout for
-the output of results obtained through FFDSEL and UVE-PLS variable
-selection</li></ul></ul> <ul><ul><li>Fixed two bugs resulting in
-the inability by the <code>calc_field</code> keyword to assign GRID
-force-field atom types in some particular cases</li></ul></ul> <br>
-<ul><li>August 17, 2010: release of <B>Open3DQSAR</B> 1.301</li></ul>
+once on a multi-CPU machine; since GRID appears to read/write on a file
+with a hardcoded path and name, a data race by the different jobs may
+take place, leading to failures; a workaround has been implemented which
+solves the problem</li></ul></ul> <br> <ul><li>August 24, 2010: release of
+<B>Open3DQSAR</B> 1.302</li></ul> <ul>Changes with respect to the previous
+version include:</ul> <ul><ul><li>New layout for the output of results
+obtained through FFDSEL and UVE-PLS variable selection</li></ul></ul>
+<ul><ul><li>Fixed two bugs resulting in the inability by the
+<code>calc_field</code> keyword to assign GRID force-field atom types
+in some particular cases</li></ul></ul> <br> <ul><li>August 17, 2010:
+release of <B>Open3DQSAR</B> 1.301</li></ul> <ul>Changes with respect to
+the previous version include:</ul> <ul><ul><li>Fixed a bug which might
+cause QM computations with GAUSSIAN to fail under particular conditions
+due to incorrect setting of environment variables</li></ul></ul> <br>
+<ul><li>August 16, 2010: release of <B>Open3DQSAR</B> 1.3</li></ul>
 <ul>Changes with respect to the previous version include:</ul>
-<ul><ul><li>Fixed a bug which might cause QM computations with
-GAUSSIAN to fail under particular conditions due to incorrect setting
-of environment variables</li></ul></ul> <br> <ul><li>August 16, 2010:
-release of <B>Open3DQSAR</B> 1.3</li></ul> <ul>Changes with respect
-to the previous version include:</ul> <ul><ul><li>The possibility to
-import multi-MOL2 files was removed. It was verified that OpenBabel is
-not always able to assign correct atom types to MOL2 files, since they
-lack explicit formal charges, which instead are included in MOL/SDF
-files. Please note that this is definitely not a failure in OpenBabel:
-simply, in the absence of explicit formal charges, some structures
-carry an intrinsic ambiguity which cannot be univocally solved. Instead,
-OpenBabel makes an outstanding job in assigning atom types to SDF/MOL
-files. Therefore, since correct atom typing is of the utmost importance
-in force-field-based computations, we decided to stick to SDF format for
-structure importation. Since the majority of 3D structure building tools
-available (MOE, Maestro, ecc.) can export structures in SDF/MOL format,
-we believe this does not represent an issue.<br> As a consequence of this
-choice, also the internal format used by <B>Open3DQSAR</B> to deal with
-3D molecular coordinates has been changed from MOL2 to MOL. This means
-that <code>.DAT</code> files saved with <B>Open3DQSAR</B> 1.3 (and upper)
-cannot be read by previous versions. On the contrary, <code>.DAT</code>
-files saved with previous versions can be read by <B>Open3DQSAR</B>
-1.3</li></ul></ul> <ul><ul><li>The <code>calc_field</code> keyword now
-supports an additional MIF type, namely <code>md_grid</code>. This allows
-to calculate MIFs with <a href="http://www.moldiscovery.com/soft_grid.php"
+<ul><ul><li>The possibility to import multi-MOL2 files was removed. It
+was verified that OpenBabel is not always able to assign correct
+atom types to MOL2 files, since they lack explicit formal charges,
+which instead are included in MOL/SDF files. Please note that this is
+definitely not a failure in OpenBabel: simply, in the absence of explicit
+formal charges, some structures carry an intrinsic ambiguity which cannot
+be univocally solved. Instead, OpenBabel makes an outstanding job in
+assigning atom types to SDF/MOL files. Therefore, since correct atom
+typing is of the utmost importance in force-field-based computations,
+we decided to stick to SDF format for structure importation. Since
+the majority of 3D structure building tools available (MOE, Maestro,
+ecc.) can export structures in SDF/MOL format, we believe this does not
+represent an issue.<br> As a consequence of this choice, also the internal
+format used by <B>Open3DQSAR</B> to deal with 3D molecular coordinates
+has been changed from MOL2 to MOL. This means that <code>.DAT</code>
+files saved with <B>Open3DQSAR</B> 1.3 (and upper) cannot be read by
+previous versions. On the contrary, <code>.DAT</code> files saved with
+previous versions can be read by <B>Open3DQSAR</B> 1.3</li></ul></ul>
+<ul><ul><li>The <code>calc_field</code> keyword now supports an
+additional MIF type, namely <code>md_grid</code>. This allows to
+calculate MIFs with <a href="http://www.moldiscovery.com/soft_grid.php"
 target="_blank">Molecular Discovery GRID</a> program from inside
 <B>Open3DQSAR</B>, so that integration of GRID fields with other MM or
 QM fields computed in <B>Open3DQSAR</B> is even more straightforward.

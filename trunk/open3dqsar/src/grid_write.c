@@ -793,7 +793,8 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
   y_var_list = od->pel.numberlist[Y_VAR_LIST];
   object_list = od->pel.numberlist[OBJECT_LIST];
   if ((type == WEIGHTS) || (type == LOADINGS)
-    || (type == PCA_LOADINGS) || (type == COEFFICIENTS)) {
+    || (type == PCA_LOADINGS) || (type == COEFFICIENTS)
+    || (type == MEAN_X_COEFFICIENTS) || (type == SD_X_COEFFICIENTS)) {
     /*
     Read from the TEMP_X_MATRIX file field_num
     and x_var numbers corresponding to active x_vars
@@ -819,6 +820,8 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
     break;
     
     case COEFFICIENTS:
+    case MEAN_X_COEFFICIENTS:
+    case SD_X_COEFFICIENTS:
     outer_loop_limit = y_var_list->size;
     break;
     
@@ -873,7 +876,8 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
         rewind(od->file[TEMP_GRD]->handle);
       }
       if ((type == WEIGHTS) || (type == LOADINGS)
-        || (type == PCA_LOADINGS) || (type == COEFFICIENTS)) {
+        || (type == PCA_LOADINGS) || (type == COEFFICIENTS)
+        || (type == MEAN_X_COEFFICIENTS) || (type == SD_X_COEFFICIENTS)) {
         od->vel.b = double_vec_resize(od->vel.b,
           od->mal.x_weights->m);
         if (!(od->vel.b)) {
@@ -907,6 +911,8 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
           break;
 
           case COEFFICIENTS:
+          case MEAN_X_COEFFICIENTS:
+          case SD_X_COEFFICIENTS:
           if (reload_coefficients(od, pc_num)) {
             O3_ERROR_STRING(&(od->task), od->file[TEMP_PLS_COEFF]->name);
             O3_ERROR_LOCATE(&(od->task));
@@ -1026,6 +1032,12 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
           }
           if (x_var < od->x_vars) {
             value = od->vel.b->ve[n];
+            if (type == MEAN_X_COEFFICIENTS) {
+              value *= get_x_var_buf(od, field_num, x_var, AVE_BUF);
+            }
+            else if (type == SD_X_COEFFICIENTS) {
+              value *= get_x_var_buf(od, field_num, x_var, STDDEV_BUF);
+            }
             if (((value > 0.0) && (sign == -1))
               || ((value < 0.0) && (sign == 1))) {
               value = 0.0;
@@ -1201,7 +1213,7 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
         z_plane = 0;
         for (x_var_count = 0; x_var_count < od->x_vars; ++x_var_count) {
           var_to_xyz(od, x_var_count, &varcoord);
-          if (type == SD) {
+          if (type == FIELD_SD) {
             value = get_x_var_buf(od, field_list->pe[i] - 1,
               x_var_count, AVE_BUF);
           }

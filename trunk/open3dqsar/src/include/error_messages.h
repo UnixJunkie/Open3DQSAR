@@ -316,6 +316,8 @@ char TRANSFORM_FAILED[] =
   "TRANSFORM failed.\n";
 char ZERO_FAILED[] =
   "ZERO failed.\n";
+char TANIMOTO_FAILED[] =
+  "TANIMOTO failed.\n";
 char EXCLUDE_FAILED[] =
   "EXCLUDE failed.\n";
 char SDCUT_FAILED[] =

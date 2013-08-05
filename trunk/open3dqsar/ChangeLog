@@ -1,13 +1,27 @@
 Open3DQSAR's ChangeLog
 ----------------------
 
+*** August 5, 2013: Open3DQSAR 2.25 ***
+
+  Changes with respect to the previous version include:
+
+  - Added the "tanimoto" keyword to compute Tanimoto similarity
+    between MIFs
+  - Added the "export type=sd_x_coefficient" and
+    "export type=mean_x_coefficient" keywords to export
+    (PLS coefficient * standard deviation) and
+    (PLS coefficient * mean) grid maps, respectively
+  - Fixed a bug which prevented exporting "field_sd" and "group"
+    grid maps
+
+
 *** July 23, 2013: Open3DQSAR 2.244 ***
 
   Changes with respect to the previous version include:
 
   - Fixed a bug which caused the "plot" keyword to fail after loading
     a DAT file from disk; now also CV and PREDICT bits are cleared in
-    addition to PLS before saving.
+    addition to PLS before saving
 
 
 *** July 18, 2013: Open3DQSAR 2.243 ***
@@ -22,7 +36,7 @@ Open3DQSAR's ChangeLog
 
   Changes with respect to the previous version include:
 
-  - Added a few memset() commands to avoid complaints from valgrind
+  - Added a few memset() calls to avoid complaints from valgrind
 
 
 *** July 2, 2013: Open3DQSAR 2.241 ***

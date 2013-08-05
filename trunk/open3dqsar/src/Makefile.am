@@ -116,6 +116,7 @@ set_weight.c \
 srd.c \
 stddev.c \
 store_weights_loadings.c \
+tanimoto.c \
 tee.c \
 time.c \
 transform.c \

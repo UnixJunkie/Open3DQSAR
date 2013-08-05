@@ -38,13 +38,14 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(Open3DQSAR, 2.244, <paolo.tosco@unito.it>)
+AC_INIT(Open3DQSAR, 2.25, <paolo.tosco@unito.it>)
 AC_DEFINE([PACKAGE_NAME_SMALL_CAPS], ["open3dqsar"], [Package name in small caps])
 AC_DEFINE([O3Q], [1], [Open3DQSAR])
-AM_INIT_AUTOMAKE(open3dqsar, 2.244)
+AM_INIT_AUTOMAKE(open3dqsar, 2.25)
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
+AS_IF([test "${host_os}" = "SunOS"], [AC_USE_SYSTEM_EXTENSIONS])
 
 # Checks for programs.
 AC_PROG_CC

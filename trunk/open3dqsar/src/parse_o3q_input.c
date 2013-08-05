@@ -104,6 +104,7 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
   int format;
   int type = 0;
   int ref_field;
+  int ref_struct;
   int operation;
   int sign;
   int state = 0;
@@ -3945,6 +3946,93 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
         }
       }
     }
+    else if (!strcasecmp(arg->me[0], "tanimoto")) {
+      gettimeofday(&start, NULL);
+      /*
+      user wants to compute Tanimoto similarity index
+      for a field_list between a reference struct and
+      a struct list
+      */
+      if (!(parameter = get_args(od, "ref_struct"))) {
+        tee_error(od, run_type, overall_line_num,
+          "Please specify the reference structure ID "
+          "against which Tanimoto similarity indices "
+          "should be computed.\n%s",
+          TANIMOTO_FAILED);
+        fail = !(run_type & INTERACTIVE_RUN);
+        continue;
+      }
+      sscanf(parameter, "%d", &ref_struct);
+      if ((ref_struct < 1) || (ref_struct > od->grid.struct_num)) {
+        tee_error(od, run_type, overall_line_num,
+          E_ALLOWED_FIELD_RANGE, od->grid.struct_num, TANIMOTO_FAILED);
+        fail = !(run_type & INTERACTIVE_RUN);
+        continue;
+      }
+      if (!(run_type & DRY_RUN)) {
+        if (!(od->field_num)) {
+          tee_error(od, run_type, overall_line_num,
+            E_NO_FIELDS_PRESENT, TANIMOTO_FAILED);
+          fail = !(run_type & INTERACTIVE_RUN);
+          continue;
+        }
+        strcpy(comma_hyphen_list, "all");
+        if ((parameter = get_args(od, "field_list"))) {
+          strcpy(comma_hyphen_list, parameter);
+        }
+        result = parse_comma_hyphen_list_to_array(od,
+          comma_hyphen_list, FIELD_LIST);
+        switch (result) {
+          case OUT_OF_MEMORY:
+          tee_error(od, run_type, overall_line_num,
+            E_OUT_OF_MEMORY, TANIMOTO_FAILED);
+          return PARSE_INPUT_ERROR;
+
+          case INVALID_LIST_RANGE:
+          tee_error(od, run_type, overall_line_num,
+            E_LIST_PARSING, "fields", "TANIMOTO", TANIMOTO_FAILED);
+          fail = !(run_type & INTERACTIVE_RUN);
+          continue;
+        }
+        result = set(od, FIELD_LIST, OPERATE_BIT, 1, SILENT);
+        if (result) {
+          tee_error(od, run_type, overall_line_num, E_ALLOWED_FIELD_RANGE,
+            od->field_num, TANIMOTO_FAILED);
+          fail = !(run_type & INTERACTIVE_RUN);
+          continue;
+        }
+        result = parse_synonym_lists(od, "TANIMOTO", TANIMOTO_FAILED,
+          1 << STRUCT_LIST, &list_type,
+          OBJECT_LIST, run_type, overall_line_num);
+        switch (result) {
+          case PARSE_INPUT_RECOVERABLE_ERROR:
+          fail = !(run_type & INTERACTIVE_RUN);
+          continue;
+          
+          case PARSE_INPUT_ERROR:
+          return PARSE_INPUT_ERROR;
+        }
+        /*
+        perform tanimoto operation
+        */
+        ++command;
+        tee_printf(od, M_TOOL_INVOKE, nesting, command, "TANIMOTO", line_orig);
+        tee_flush(od);
+        result = tanimoto(od, ref_struct - 1);
+        gettimeofday(&end, NULL);
+        elapsed_time(od, &start, &end);
+        switch (result) {
+          case OUT_OF_MEMORY:
+          tee_error(od, run_type, overall_line_num,
+            E_OUT_OF_MEMORY, TANIMOTO_FAILED);
+          return PARSE_INPUT_ERROR;
+
+          default:
+          tee_printf(od, M_TOOL_SUCCESS, nesting, command, "TANIMOTO");
+          tee_flush(od);
+        }
+      }
+    }
     else if (!strcasecmp(arg->me[0], "exclude")) {
       gettimeofday(&start, NULL);
       /*
@@ -5720,14 +5808,21 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
           || (!strncasecmp(parameter, "weight", 6))
           || (!strncasecmp(parameter, "loading", 7))
           || (!strncasecmp(parameter, "coefficient", 11))
+          || (!strncasecmp(parameter, "mean_x_coefficient", 18))
+          || (!strncasecmp(parameter, "sd_x_coefficient", 16))
+          || (!strncasecmp(parameter, "coefficient", 11))
           || (!strncasecmp(parameter, "d_optimal", 9))
           || (!strncasecmp(parameter, "ffdsel", 6))
           || (!strncasecmp(parameter, "uvepls", 6))
           || (!strncasecmp(parameter, "group", 5))
           ) {
           type = (int)tolower(parameter[0]);
+          if (!strncasecmp(parameter, "field_sd", 8)) {
+            type = 'F';
+          }
           if ((type == WEIGHTS) || (type == LOADINGS)
-            || (type == PCA_LOADINGS) || (type == COEFFICIENTS)) {
+            || (type == PCA_LOADINGS) || (type == COEFFICIENTS)
+            || (type == SD_X_COEFFICIENTS) || (type == MEAN_X_COEFFICIENTS)) {
             if (type == PCA_LOADINGS) {
               if (!(od->valid & PCA_BIT)) {
                 tee_error(od, run_type, overall_line_num,
@@ -5853,7 +5948,7 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
             }
             break;
 
-            case SD:
+            case FIELD_SD:
             if (!(run_type & DRY_RUN)) {
               if (!(od->object_num)) {
                 tee_error(od, run_type, overall_line_num,
@@ -5963,6 +6058,8 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
             break;
 
             case COEFFICIENTS:
+            case MEAN_X_COEFFICIENTS:
+            case SD_X_COEFFICIENTS:
             if (!(od->valid & PLS_BIT)) {
               tee_error(od, run_type, overall_line_num,
                 E_NO_PLS_MODEL, EXPORT_FAILED);
@@ -6023,9 +6120,10 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
         else {
           tee_error(od, run_type, overall_line_num,
             "Only \"WEIGHTS\", \"LOADINGS\", \"PCA_LOADINGS\", "
-            "\"COEFFICIENTS\", \"2_LEVEL\", \"3_LEVEL\", "
-            "\"4_LEVEL\", \"D_OPTIMAL\", \"FFDSEL\", "
-            "\"FIELD_SD\", \"SRD\" and \"OBJECT_FIELD\" "
+            "\"COEFFICIENTS\", \"MEAN_X_COEFFICIENTS\", "
+            "\"SD_X_COEFFICIENTS\", \"2_LEVEL\", \"3_LEVEL\", "
+            "\"4_LEVEL\", \"D_OPTIMAL\", \"FFDSEL\", \"UVEPLS\", "
+            "\"FIELD_SD\", \"GROUPS\" and \"OBJECT_FIELD\" "
             "types are allowed.\n%s",
             EXPORT_FAILED);
           fail = !(run_type & INTERACTIVE_RUN);
