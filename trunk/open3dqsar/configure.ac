@@ -46,7 +46,8 @@ AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 m4_pattern_allow([AC_USE_SYSTEM_EXTENSIONS])
-AS_IF([test "${host_os}" = "SunOS"], [AC_USE_SYSTEM_EXTENSIONS])
+AC_CANONICAL_HOST
+AS_IF([test `echo "${host_os}" | cut -c -7` = "solaris"], [AC_USE_SYSTEM_EXTENSIONS])
 
 # Checks for programs.
 AC_PROG_CC
@@ -64,6 +65,7 @@ eof
 AC_CHECK_LIB([m], [sqrt], , AC_MSG_FAILURE([libm not found]))
 AC_CHECK_LIB([z], [gzopen], , AC_MSG_FAILURE([libz not found]))
 AC_CHECK_LIB([minizip], [zipOpen])
+AC_CHECK_LIB([nsl -lsocket], [inet_addr])
 
 # Checks for library functions.
 AC_FUNC_VPRINTF
@@ -92,6 +94,7 @@ AC_CHECK_LIB([ws2_32], [main],
 	[AS_IF([$CC $CFLAGS src/test.c src/open3dqsar_win32.res -o src/test 2> /dev/null],
 	[AC_SUBST([WINDOWS_RES], ["open3dqsar_win32.res"])],
 	[AC_SUBST([WINDOWS_RES], ["open3dqsar_win64.res"])])])
+
 rm -f src/test.c src/test
 
 # Checks for header files.

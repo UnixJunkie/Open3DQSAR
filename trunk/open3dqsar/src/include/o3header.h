@@ -1877,6 +1877,7 @@ char *strtok_r(char *s1, const char *s2, char **lasts);
 int superpose_conf_lap(LAPInfo *li, ConfInfo *moved_conf, ConfInfo *template_conf, ConfInfo *fitted_conf, ConfInfo *progress_conf, AtomPair *temp_sdm, AtomPair *fitted_sdm, char **used, double *rt_mat, double *heavy_msd, double *original_heavy_msd, int *pairs);
 int superpose_conf_syst(ConfInfo *moved_conf, ConfInfo *template_conf, ConfInfo *fitted_conf, ConfInfo *progress_conf, ConfInfo *cand_conf, AtomPair *sdm, AtomPair *local_best_sdm, AtomPair *fitted_sdm, char **used, double *rt_mat, int angle_step, double *heavy_msd, double *original_heavy_msd, int *pairs);
 void sync_field_mmap(O3Data *od);
+int tanimoto(O3Data *od, int ref_struct);
 void tee_error(O3Data *od, int run_type, int overall_line_num, char *fmt, ...);
 void tee_flush(O3Data *od);
 void tee_printf(O3Data *od, char *fmt, ...);
