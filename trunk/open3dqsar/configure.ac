@@ -45,6 +45,7 @@ AM_INIT_AUTOMAKE(open3dqsar, 2.25)
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
+m4_pattern_allow([AC_USE_SYSTEM_EXTENSIONS])
 AS_IF([test "${host_os}" = "SunOS"], [AC_USE_SYSTEM_EXTENSIONS])
 
 # Checks for programs.
