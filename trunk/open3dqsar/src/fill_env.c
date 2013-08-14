@@ -173,7 +173,7 @@ char *fill_env(O3Data *od, EnvList personalized_env[], char *bin, int object_num
   */
   max_len = 0;
   while (curr_environ[i]) {
-    len = strlen(&curr_environ[i]) + MAX_NAME_LEN;
+    len = strlen(&curr_environ[i]) + 1;
     if (len > max_len) {
       max_len = len;
       string = realloc(string, len);
@@ -187,7 +187,7 @@ char *fill_env(O3Data *od, EnvList personalized_env[], char *bin, int object_num
       *equal_sign = '\0';
     }
     k = 0;
-    len = strlen(&curr_environ[i]) + MAX_NAME_LEN;
+    len = strlen(&curr_environ[i]) + 1;
     found = 0;
     while (personalized_env[k].name && (!found)) {
       /*
@@ -208,12 +208,12 @@ char *fill_env(O3Data *od, EnvList personalized_env[], char *bin, int object_num
     len += BUF_LEN;
     ++k;
   }
-  proc_env = malloc(j + len + MAX_NAME_LEN);
+  proc_env = malloc(j + len + 1);
   if (!proc_env) {
     free(string);
     return NULL;
   }
-  memset(proc_env, 0, j + len + MAX_NAME_LEN);
+  memset(proc_env, 0, j + len + 1);
   /*
   copy the current environment, excluding
   variables included in personalized_env
@@ -226,7 +226,7 @@ char *fill_env(O3Data *od, EnvList personalized_env[], char *bin, int object_num
       *equal_sign = '\0';
     }
     k = 0;
-    len = strlen(&curr_environ[i]) + MAX_NAME_LEN;
+    len = strlen(&curr_environ[i]) + 1;
     found = 0;
     while (personalized_env[k].name && (!found)) {
       /*
@@ -509,7 +509,7 @@ char *fill_env(O3Data *od, EnvList personalized_env[], char *bin, int object_num
       ++j;
       #else
       sprintf(&proc_env[j], "%s=%s", personalized_env[k].name, string);
-      j += (strlen(&proc_env[j]) + MAX_NAME_LEN);
+      j += (strlen(&proc_env[j]) + 1);
       #endif
     }
     ++k;
@@ -520,6 +520,6 @@ char *fill_env(O3Data *od, EnvList personalized_env[], char *bin, int object_num
   if (string) {
     free(string);
   }
-  
+
   return proc_env;
 }
