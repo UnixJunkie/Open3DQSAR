@@ -541,6 +541,12 @@ E-mail: paolo.tosco@unito.it
 #define PLS_CONV_THRESHOLD    1.0e-04
 #define MSD_THRESHOLD      1.0e-07
 #define ENERGY_THRESHOLD    1.0e-12
+#define DEFAULT_MAX_ITER_ALIGN    200
+#define MIN_IMPROVEMENT_ITER_ALIGN  0.001
+#define DEFAULT_RMSD_ITER_ALIGN    0.001
+#define DEFAULT_BEST_PERCENT_ITER_ALIGN  0.95
+#define DEFAULT_MIN_PERCENT_ITER_ALIGN  0.60
+#define DEFAULT_MAX_FAIL_ALIGN    10
 #define MAX_CUTOFF      1.0e35
 #define MISSING_VALUE      1.0e37
 #define INACTIVE_VALUE      -1.0e37
@@ -591,6 +597,7 @@ E-mail: paolo.tosco@unito.it
 #define ALIGN_TOGGLE_MERGE_BIT    (1<<9)
 #define ALIGN_PRINT_RMSD_BIT    (1<<10)
 #define ALIGN_TOGGLE_LOOP_BIT    (1<<11)
+#define ALIGN_ITERATIVE_TEMPLATE_BIT  (1<<12)
 #define FILTER_INTRA_CONF_DB_BIT  (1<<0)
 #define FILTER_INTER_CONF_DB_BIT  (1<<1)
 #define IMPORT_Y_VARS_BIT    (1<<0)
@@ -999,7 +1006,10 @@ struct AlignInfo {
   int type;
   int filter_type;
   int n_tasks;
+  int max_iter;
+  int max_fail;
   double level;
+  double gold;
 };
 
 struct PharConfInfo {
@@ -1495,6 +1505,7 @@ struct ThreadInfo {
 
 void absolute_path(char *string);
 int add_to_list(IntPerm **list, int elem);
+int align_iterative(O3Data *od);
 int align_random(O3Data *od);
 int align(O3Data *od);
 #ifndef WIN32

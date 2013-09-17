@@ -158,6 +158,8 @@ int check_babel(O3Data *od, char *bin)
 int check_pharao(O3Data *od, char *bin)
 {
   char buffer[BUF_LEN];
+  char babel_libdir[BUF_LEN];
+  char babel_datadir[BUF_LEN];
   char pharao_dir[BUF_LEN];
   char methane[] =
     "METHANE\n"
@@ -183,6 +185,10 @@ int check_pharao(O3Data *od, char *bin)
 
 
   memset(buffer, 0, BUF_LEN);
+  memset(babel_libdir, 0, BUF_LEN);
+  strcpy(babel_libdir, od->field.babel_libdir);
+  memset(babel_datadir, 0, BUF_LEN);
+  strcpy(babel_datadir, od->field.babel_datadir);
   memset(pharao_dir, 0, BUF_LEN);
   for (i = 0, result = 0; i < 2; ++i) {
     memset(&prog_exe_info, 0, sizeof(ProgExeInfo));
@@ -248,6 +254,10 @@ int check_pharao(O3Data *od, char *bin)
       break;
     }
     remove(od->file[TEMP_LOG]->name);
+  }
+  if (result || check_babel(od, bin)) {
+    strcpy(od->field.babel_libdir, babel_libdir);
+    strcpy(od->field.babel_datadir, babel_datadir);
   }
 
   return result;
