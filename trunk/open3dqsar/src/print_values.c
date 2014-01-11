@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ int mol_to_sdf(O3Data *od, int object_num, double actual_value)
 }
 
 
-int print_calc_values(O3Data *od)
+int print_calc_values(O3Data *od, int calc_leverage)
 {
   char format[MAX_NAME_LEN];
   char buffer[BUF_LEN];
@@ -94,6 +94,7 @@ int print_calc_values(O3Data *od)
   int struct_num;
   int conf_num;
   int n_conf;
+  int n_hat;
   int x_max_y;
   int y_max;
   int pc_num;
@@ -102,6 +103,7 @@ int print_calc_values(O3Data *od)
   int active_struct_num = 0;
   int active_found;
   int predict_found;
+  double leverage;
   double sumweight;
   double best_delta;
   double value;
@@ -209,7 +211,7 @@ int print_calc_values(O3Data *od)
     tee_printf(od, "Calculated values for dependent variable %2d (%s)\n",
       x + 1, od->cimal.y_var_name->me[x]);
     tee_printf(od, "-------------------------------------------------------------------");
-    for (i = 0; i < (pc_num + 1); ++i) {
+    for (i = 0; i < (pc_num + 1 + calc_leverage); ++i) {
       tee_printf(od, "------------");
     }
     tee_printf(od, "\n%5s%5s%5s    %-36s%12s", "N", "ID", "Str", "Name", "Actual");
@@ -217,30 +219,40 @@ int print_calc_values(O3Data *od)
       tee_printf(od, "%12d", i + 1);
     }
     tee_printf(od, "%12s", "Opt PC n");
+    if (calc_leverage) {
+      tee_printf(od, "%12s", "Leverage");
+    }
     tee_printf(od, "\n-------------------------------------------------------------------");
-    for (i = 0; i < (pc_num + 1); ++i) {
+    for (i = 0; i < (pc_num + 1 + calc_leverage); ++i) {
       tee_printf(od, "------------");
     }
     object_num = 0;
     struct_num = 0;
     i = 0;
     y = 0;
+    n_hat = 0;
     active_struct_num = 0;
     active_value_ave = 0.0;
     actual_value = 0.0;
     while (object_num < od->object_num) {
       struct_num = od->al.mol_info[object_num]->struct_num;
       conf_num = 1;
-      for (n_conf = 0, active_found = 0, predict_found = 0; n_conf < conf_num; ++n_conf) {
+      for (n_conf = 0, active_found = 0, predict_found = 0,
+        leverage = 0.0; n_conf < conf_num; ++n_conf) {
         if (get_object_attr(od, object_num + n_conf, ACTIVE_BIT)) {
           if (!active_found) {
             actual_value = get_y_value(od, object_num + n_conf, x, WEIGHT_BIT);
             active_value_ave += actual_value;
             ++active_struct_num;
           }
+          if (calc_leverage) {
+            leverage += M_PEEK(od->mal.hat_mat, n_hat, n_hat);
+          }
+          ++n_hat;
           ++active_found;
         }
       }
+      leverage /= (double)conf_num;
       if (!active_found) {
         object_num += n_conf;
         continue;
@@ -318,6 +330,9 @@ int print_calc_values(O3Data *od)
           (actual_value - od->mel.weighted_value[j]);
       }
       tee_printf(od, "%12d", opt_pc_n);
+      if (calc_leverage) {
+        tee_printf(od, "%12.4lf", leverage);
+      }
       if (od->file[ASCII_IN]->handle) {
         fprintf(od->file[ASCII_IN]->handle,
           ">  <Opt PC n>\n%d\n\n"
@@ -353,6 +368,10 @@ int print_calc_values(O3Data *od)
       od->vel.ave_sdec->ve[i], od->vel.r2->ve[i]);
   }
   tee_printf(od, "\n");
+  if (od->mal.hat_mat) {
+    double_mat_free(od->mal.hat_mat);
+    od->mal.hat_mat = NULL;
+  }
   
   return 0;
 }

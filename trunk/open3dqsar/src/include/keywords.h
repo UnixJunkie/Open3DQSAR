@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ typedef struct O3ParameterData O3ParameterData;
 typedef struct O3KeywordData O3KeywordData;
 
 struct O3ParameterData {
-  unsigned short type;
+  uint16_t type;
   char *parameter;
   char *choice[MAX_ARG];
 };
@@ -60,6 +60,12 @@ O3KeywordData keyword_data[] =
     "box",
     {
       {
+        O3_PARAM_STRING, "mode", {
+          "SET",
+          "GET",
+          NULL
+        }
+      }, {
         O3_PARAM_NUMERIC, "outgap", {
           "5.0",
           NULL
@@ -553,6 +559,8 @@ O3KeywordData keyword_data[] =
           "MAESTRO",
           "MOE",
           "SYBYL",
+          "FORMATTED_CUBE",
+          "UNFORMATTED_CUBE",
           "ASCII",
           "XYZ",
           NULL
@@ -709,6 +717,12 @@ O3KeywordData keyword_data[] =
         O3_PARAM_FILE, "file", {
           NULL
         }
+      }, {
+        O3_PARAM_STRING, "mode", {
+          "APPEND",
+          "NORMAL",
+          NULL
+        }
       }, {  // this is the terminator
         0, NULL, {
           NULL
@@ -834,6 +848,12 @@ O3KeywordData keyword_data[] =
           "X",
           "Y",
           "BOTH",
+          NULL
+        }
+      }, {
+        O3_PARAM_STRING, "calc_leverage", {
+          "NO",
+          "YES",
           NULL
         }
       }, {

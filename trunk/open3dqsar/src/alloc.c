@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -346,14 +346,14 @@ int alloc_x_var_array(O3Data *od, int num_fields)
     memset(od->mel.x_var_array[od->field_num + i], 0,
       sizeof(float *) * od->object_num);
   }
-  od->mel.x_var_attr = (unsigned short **)realloc
-    (od->mel.x_var_attr, sizeof(unsigned short *)
+  od->mel.x_var_attr = (uint16_t **)realloc
+    (od->mel.x_var_attr, sizeof(uint16_t *)
     * (od->field_num + num_fields));
   if (!(od->mel.x_var_attr)) {
     return OUT_OF_MEMORY;
   }
   memset(&(od->mel.x_var_attr[od->field_num]), 0,
-    sizeof(unsigned short *) * num_fields);
+    sizeof(uint16_t *) * num_fields);
   for (i = 0; i < MAX_VAR_BUF; ++i) {
     od->mel.x_var_buf[i] = (double **)realloc
     (od->mel.x_var_buf[i], sizeof(double *)
@@ -411,7 +411,7 @@ int alloc_x_var_array(O3Data *od, int num_fields)
       }
     }
     od->mel.x_var_attr[od->field_num + i] =
-      (unsigned short *)malloc(od->x_vars * sizeof(unsigned short));
+      (uint16_t *)malloc(od->x_vars * sizeof(uint16_t));
     if (!(od->mel.x_var_attr[od->field_num + i])) {
       return OUT_OF_MEMORY;
     }
@@ -429,10 +429,10 @@ int alloc_x_var_array(O3Data *od, int num_fields)
     }
   }
   
-  od->mel.field_attr = (unsigned short *)realloc
+  od->mel.field_attr = (uint16_t *)realloc
     (od->mel.field_attr,
     (od->field_num + num_fields)
-    * sizeof(unsigned short));
+    * sizeof(uint16_t));
   if (!(od->mel.field_attr)) {
     return OUT_OF_MEMORY;
   }
@@ -462,14 +462,93 @@ int alloc_x_var_array(O3Data *od, int num_fields)
 }
 
 
-int alloc_object_attr(O3Data *od)
+int realloc_x_var_array(O3Data *od, int old_object_num)
+{
+  char buffer[LARGE_BUF_LEN];
+  int i;
+  int j;
+  int n;
+  int len;
+  int actual_len;
+  
+  
+  memset(buffer, 0, LARGE_BUF_LEN);
+  od->valid &= SDF_BIT;
+  for (i = 0; i < od->field_num; ++i) {
+    od->mel.x_var_array[i] =
+      (float **)realloc(od->mel.x_var_array[i],
+      sizeof(float *) * od->object_num);
+    if (!(od->mel.x_var_array[i])) {
+      return OUT_OF_MEMORY;
+    }
+  }
+  for (i = 0; i < od->field_num; ++i) {
+    if (od->save_ram) {
+      if (fseek(od->file[TEMP_FIELD_DATA + i]->handle,
+        od->object_pagesize * old_object_num, SEEK_SET)) {
+        return PREMATURE_DAT_EOF;
+      }
+      n = od->object_pagesize * (od->object_num - old_object_num) / LARGE_BUF_LEN + 1;
+      for (j = 0; j < n; ++j) {
+        len = ((j == (n - 1)) ? od->object_pagesize
+          * (od->object_num - old_object_num) % LARGE_BUF_LEN : LARGE_BUF_LEN);
+        if (len) {
+          actual_len = fwrite(buffer, 1, len,
+            od->file[TEMP_FIELD_DATA + i]->handle);
+          if (actual_len != len) {
+            return CANNOT_WRITE_TEMP_FILE;
+          }
+        }
+      }
+      rewind(od->file[TEMP_FIELD_DATA + i]->handle);
+    }
+    else {
+      /*
+      reserve RAM for the x variable array
+      */
+      for (j = old_object_num; j < od->object_num; ++j) {
+        od->mel.x_var_array[i][j] =
+          (float *)malloc(sizeof(float) * od->x_vars);
+        if (!(od->mel.x_var_array[i][j])) {
+          return OUT_OF_MEMORY;
+        }
+      }
+    }
+    #if 0
+    for (j = 0; j < od->x_vars; ++j) {
+      od->mel.x_var_attr[i][j] = ACTIVE_BIT;
+    }
+    #endif
+    for (j = 0; j < MAX_VAR_BUF; ++j) {
+      memset(od->mel.x_var_buf[j][i], 0,
+        sizeof(double) * od->x_vars);
+    }
+  }
+  
+  #if 0
+  for (i = 0; i < od->field_num; ++i) {
+    od->mel.field_attr[i] = ACTIVE_BIT;
+  }
+  memset(od->mel.x_data, 0, od->field_num * sizeof(XData));
+  for (i = 0; i < od->field_num; ++i) {
+    od->mel.x_data[i].x_weight_coefficient = 1.0;
+    od->mel.x_data[i].min_cutoff = -MAX_CUTOFF;
+    od->mel.x_data[i].max_cutoff = MAX_CUTOFF;
+  }
+  #endif
+
+  return 0;
+}
+
+
+int alloc_object_attr(O3Data *od, int start)
 {
   int i;
   
   
   od->mel.object_attr =
-    (unsigned short *)realloc(od->mel.object_attr,
-    od->grid.object_num * sizeof(unsigned short));
+    (uint16_t *)realloc(od->mel.object_attr,
+    od->grid.object_num * sizeof(uint16_t));
   if (!(od->mel.object_attr)) {
     return OUT_OF_MEMORY;
   }
@@ -479,7 +558,7 @@ int alloc_object_attr(O3Data *od)
   if (!(od->mel.object_attr)) {
     return OUT_OF_MEMORY;
   }
-  for (i = 0; i < od->grid.object_num; ++i) {
+  for (i = start; i < od->grid.object_num; ++i) {
     od->mel.object_attr[i] = ACTIVE_BIT;
     od->mel.object_weight[i] = 1.0;
   }
@@ -505,14 +584,14 @@ int alloc_y_var_array(O3Data *od)
   }
   memset(od->mel.y_var_array, 0,
     sizeof(float) * od->grid.object_num * od->y_vars);
-  od->mel.y_var_attr =
-    realloc(od->mel.y_var_attr,
-    od->y_vars * sizeof(unsigned short));
+  od->mel.y_var_attr = realloc(od->mel.y_var_attr,
+    od->y_vars * sizeof(uint16_t));
   if (!(od->mel.y_var_attr)) {
     return OUT_OF_MEMORY;
   }
-  memset(od->mel.y_var_attr, ACTIVE_BIT,
-    od->y_vars * sizeof(unsigned short));
+  for (i = 0; i < od->y_vars; ++i) {
+    od->mel.y_var_attr[i] = ACTIVE_BIT;
+  }
   for (i = 0; i < MAX_VAR_BUF; ++i) {
     od->mel.y_var_buf[i] =
       (double *)realloc(od->mel.y_var_buf[i],
@@ -530,6 +609,28 @@ int alloc_y_var_array(O3Data *od)
   for (i = 0; i < od->y_vars; ++i) {
     od->mel.y_data[i].y_weight_coefficient = 1.0;
   }
+
+  return 0;
+}
+
+
+int realloc_y_var_array(O3Data *od, int old_object_num)
+{
+  int i;
+  
+  
+  /*
+  reserve RAM for the y variable array
+  */
+  od->mel.y_var_array =
+    (float *)realloc(od->mel.y_var_array,
+    sizeof(float) * od->grid.object_num
+    * od->y_vars);
+  if (!(od->mel.y_var_array)) {
+    return OUT_OF_MEMORY;
+  }
+  memset(&(od->mel.y_var_array[od->y_vars * old_object_num]), 0,
+    sizeof(float) * (od->grid.object_num - old_object_num) * od->y_vars);
 
   return 0;
 }

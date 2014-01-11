@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -183,6 +183,8 @@ int match_grids(O3Data *od)
       (int)safe_rint((double)(od->grid.start_coord[i]) * 1.0e03))
       || ((int)safe_rint((double)(od->newgrid.end_coord[i]) * 1.0e03) != 
       (int)safe_rint((double)(od->grid.end_coord[i]) * 1.0e03))
+      || ((int)safe_rint((double)(od->newgrid.step[i]) * 1.0e03) != 
+      (int)safe_rint((double)(od->grid.step[i]) * 1.0e03))
       || (od->newgrid.nodes[i] != od->grid.nodes[i])) {
       return 0;
     }

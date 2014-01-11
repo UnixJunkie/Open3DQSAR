@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -44,6 +44,7 @@ E-mail: paolo.tosco@unito.it
 #include <include/keywords.h>
 #include <include/ff_parm.h>
 #include <include/proc_env.h>
+#include <include/rl_runtime.h>
 #include <sys/stat.h>
 #ifdef WIN32
 #include <include/nice_windows.h>
@@ -68,14 +69,43 @@ E-mail: paolo.tosco@unito.it
 #define PACKAGE_CODE      "O3Q"
 #endif
 #ifdef HAVE_EDITLINE_FUNCTIONALITY
+#ifdef HAVE_GNU_READLINE
+#include <readline/readline.h>
+#include <readline/history.h>
+#else
 #include <editline/readline.h>
 #include <histedit.h>
-#define EL_RC_FILE      ".editrc"
 #endif
+#endif
+#define EL_RC_FILE      ".editrc"
 
 
 O3Data *extern_od;
-#ifdef HAVE_EDITLINE_FUNCTIONALITY
+void *(*_dlsym_add_history)(const char *) = NULL;
+HIST_ENTRY *(*_dlsym_next_history)(void) = NULL;
+HIST_ENTRY *(*_dlsym_previous_history)(void) = NULL;
+int (*_dlsym_read_history)(const char *) = NULL;
+int (*_dlsym_write_history)(const char *) = NULL;
+void (*_dlsym_using_history)(void) = NULL;
+char *(*_dlsym_readline)(const char *) = NULL;
+void (*_dlsym_rl_free)(void *) = NULL;
+void *(*_dlsym_rl_attempted_completion_function) = NULL;
+#ifdef WIN32
+void *(*_dlsym_rl_user_completion_entry_free_function) = NULL;
+#endif
+int *_dlsym_rl_attempted_completion_over = NULL;
+int *_dlsym_rl_completion_append_character = NULL;
+char **(*_dlsym_rl_completion_matches)(const char *, void *) = NULL;
+int (*_dlsym_rl_delete_text)(int, int) = NULL;
+void (*_dlsym_rl_free_line_state)(void) = NULL;
+void (*_dlsym_rl_replace_line)(const char *, int) = NULL;
+void (*_dlsym_rl_reset_after_signal)(void) = NULL;
+char *(*_dlsym_rl_filename_completion_function)(const char *, int) = NULL;
+char *(*_dlsym_rl_line_buffer) = NULL;
+int *_dlsym_rl_point = NULL;
+char have_editline = 0;
+char have_gnu_readline = 0;
+
 
 char *o3_get_keyword(int *keyword_len)
 {
@@ -103,6 +133,7 @@ char *o3_completion_generator(const char *text, int state)
 {
   char buffer[BUF_LEN];
   char *completion = NULL;
+  char *file_completion = NULL;
   char *keyword = NULL;
   char *parameter = NULL;
   char *temp_string;
@@ -305,10 +336,25 @@ char *o3_completion_generator(const char *text, int state)
                 strncpy(temp_string, &rl_line_buffer[n], rl_point - n);
               }
               temp_string[rl_point - n] = '\0';
-              completion = rl_filename_completion_function(temp_string, state);
+              file_completion = rl_filename_completion_function(temp_string, state);
+              completion = (file_completion ? strdup(file_completion) : NULL);
               free(temp_string);
             }
             if (completion) {
+              #ifdef HAVE_EDITLINE_FUNCTIONALITY
+              #ifdef HAVE_GNU_READLINE
+              rl_free(file_completion);
+              #else
+              free(file_completion);
+              #endif
+              #else
+              if (have_editline && _dlsym_rl_free) {
+                rl_free(file_completion);
+              }
+              else {
+                free(file_completion);
+              }
+              #endif
               n = strlen(completion);
               if ((completion = realloc(completion, n + 4))) {
                 skip = 0;
@@ -334,21 +380,38 @@ char *o3_completion_generator(const char *text, int state)
               memmove(completion, &completion[m], strlen(completion) + 1);
             }
             #else
-            completion = rl_filename_completion_function(text, state);
-            if (completion && (temp_string = strdup(completion))) {
-              n = strlen(temp_string);
-              if (n && (open_quote = (temp_string[n - 1] == '\"'))) {
-                temp_string[n - 1] = '\0';
+            file_completion = rl_filename_completion_function(text, state);
+            completion = (file_completion ? strdup(file_completion) : NULL);
+            if (completion) {
+              #ifdef HAVE_EDITLINE_FUNCTIONALITY
+              #ifdef HAVE_GNU_READLINE
+              rl_free(file_completion);
+              #else
+              free(file_completion);
+              #endif
+              #else
+              if (have_editline && _dlsym_rl_free) {
+                rl_free(file_completion);
               }
-              skip = ((temp_string[0] == '\"') ? 1 : 0);
-              if (stat(&temp_string[skip], &filestat) != -1) {
-                if (S_ISDIR(filestat.st_mode)) {
-                  if (open_quote) {
-                    completion[n - 1] ='\0';
+              else {
+                free(file_completion);
+              }
+              #endif
+              if ((temp_string = strdup(completion))) {
+                n = strlen(temp_string);
+                if (n && (open_quote = (temp_string[n - 1] == '\"'))) {
+                  temp_string[n - 1] = '\0';
+                }
+                skip = ((temp_string[0] == '\"') ? 1 : 0);
+                if (stat(&temp_string[skip], &filestat) != -1) {
+                  if (S_ISDIR(filestat.st_mode)) {
+                    if (open_quote) {
+                      completion[n - 1] ='\0';
+                    }
                   }
                 }
+                free(temp_string);
               }
-              free(temp_string);
             }
             #endif
             break;
@@ -444,6 +507,13 @@ char **o3_completion_matches(const char *text, int start, int end)
 {
   return rl_completion_matches(text, o3_completion_generator);
 }
+
+
+#ifdef WIN32
+void o3_compentry_free(void *mem)
+{
+  free(mem);
+}
 #endif
 
 
@@ -453,14 +523,12 @@ void program_signal_handler(int signum)
   char current_time[BUF_LEN];
 
 
-  #ifdef HAVE_EDITLINE_FUNCTIONALITY
-  if (((signum == SIGINT) && (extern_od->prompt)
+  if ((have_editline
+    && (((signum == SIGINT) && (extern_od->prompt)
     && rl_line_buffer && (!rl_line_buffer[0]))
     || ((signum == SIGINT) && (!(extern_od->prompt)))
-    || (!(rl_line_buffer)) || (signum != SIGINT)) {
-  #else
-  if (1) {
-  #endif
+    || (!(rl_line_buffer)) || (signum != SIGINT)))
+    || (!have_editline)) {
     SET_INK(extern_od, NORMAL_INK);
     tee_printf(extern_od, "\nJob terminated ");
     memset(current_time, 0, BUF_LEN);
@@ -492,21 +560,18 @@ void program_signal_handler(int signum)
     signal(signum, SIG_DFL);
     raise(signum);
   }
-  #ifdef HAVE_EDITLINE_FUNCTIONALITY
-  else {
-    if (rl_line_buffer) {
-      #ifdef HAVE_GNU_READLINE
+  else if (have_editline && rl_line_buffer) {
+    if (have_gnu_readline) {
       rl_delete_text(0, strlen(rl_line_buffer));
       rl_free_line_state();
       rl_replace_line("", 1);
       rl_reset_after_signal();
-      #else
+    }
+    else {
       rl_line_buffer[0] = EOF;
       rl_line_buffer[1] = '\0';
-      #endif
     }
   }
-  #endif
 }
 #else
 BOOL program_signal_handler(DWORD fdwCtrlType)
@@ -514,7 +579,7 @@ BOOL program_signal_handler(DWORD fdwCtrlType)
   char current_time[BUF_LEN];
 
 
-  if ((fdwCtrlType == CTRL_C_EVENT)
+  if (have_editline && (fdwCtrlType == CTRL_C_EVENT)
     && extern_od->prompt && rl_line_buffer
     && strlen(rl_line_buffer)) {
     return TRUE;
@@ -561,11 +626,9 @@ BOOL program_signal_handler(DWORD fdwCtrlType)
 void reset_user_terminal(O3Data *od)
 {
   #ifndef WIN32
-  #ifdef HAVE_EDITLINE_FUNCTIONALITY
-  if (od->user_termios) {
+  if (have_editline && od->user_termios) {
     tcsetattr(STDOUT_FILENO, TCSADRAIN, od->user_termios);
   }
-  #endif
   SET_INK(od, DEFAULT_INK);
   #endif
 }
@@ -596,31 +659,31 @@ int main(int argc, char **argv)
   extern char M_NUMBER_OF_CPUS[];
   extern char O3_FAILED[];
   char *too_many_arguments =
-    PACKAGE_NAME_SMALL_CAPS": Too many arguments\n";
+    PACKAGE_NAME_LOWERCASE": Too many arguments\n";
   char *invalid_option =
-    PACKAGE_NAME_SMALL_CAPS": invalid option -- %s\n";
+    PACKAGE_NAME_LOWERCASE": invalid option -- %s\n";
   char *unrecognized_option =
-    PACKAGE_NAME_SMALL_CAPS": unrecognized option `%s'\n";
+    PACKAGE_NAME_LOWERCASE": unrecognized option `%s'\n";
   char *option_requires_argument =
-    PACKAGE_NAME_SMALL_CAPS": option requires an argument -- %s\n";
+    PACKAGE_NAME_LOWERCASE": option requires an argument -- %s\n";
   char *try_help_usage =
-    "Try `"PACKAGE_NAME_SMALL_CAPS" --help' or `"
-    PACKAGE_NAME_SMALL_CAPS" --usage' "
+    "Try `"PACKAGE_NAME_LOWERCASE" --help' or `"
+    PACKAGE_NAME_LOWERCASE" --usage' "
     "for more information.\n";
   char *package_version =
     "\n"
     PACKAGE_NAME" version " VERSION "\n"
     #ifdef O3Q
-    "Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle\n"
+    "Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle\n"
     #else
-    "Copyright (C) 2010-2013 Paolo Tosco, Thomas Balle\n"
+    "Copyright (C) 2010-2014 Paolo Tosco, Thomas Balle\n"
     #endif
     "Licensed under the terms of GPLv3\n"
     "Report bugs to " PACKAGE_BUGREPORT "\n"
     "\n";
   char help[] =
     "\n"
-    "Usage: "PACKAGE_NAME_SMALL_CAPS" [OPTION...]\n"
+    "Usage: "PACKAGE_NAME_LOWERCASE" [OPTION...]\n"
     "\n"
     "------------\n"
     PACKAGE_NAME"\n"
@@ -638,9 +701,9 @@ int main(int argc, char **argv)
     "\n"
     "Version " VERSION "\n"
     #ifdef O3Q
-    "Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle\n"
+    "Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle\n"
     #else
-    "Copyright (C) 2010-2013 Paolo Tosco, Thomas Balle\n"
+    "Copyright (C) 2010-2014 Paolo Tosco, Thomas Balle\n"
     #endif
     "\n"
     "\n"
@@ -654,7 +717,7 @@ int main(int argc, char **argv)
     "Report bugs to " PACKAGE_BUGREPORT "\n"
     "\n";
   char usage[] =
-    "Usage: "PACKAGE_NAME_SMALL_CAPS" [-p?V] [-i FILE] [-o FILE] "
+    "Usage: "PACKAGE_NAME_LOWERCASE" [-p?V] [-i FILE] [-o FILE] "
     "[--help] [--usage] [--version]\n";
   int i;
   int result;
@@ -665,6 +728,8 @@ int main(int argc, char **argv)
   #ifndef WIN32
   struct sigaction setup_action;
   sigset_t block_mask;
+  struct termios user_termios;
+  void *dl_handle;
   #else
   char cmd_cli[BUF_LEN];
   int wincmd = 0;
@@ -677,13 +742,10 @@ int main(int argc, char **argv)
   DWORD n_chars;
   WORD wVersionRequested;
   WSADATA wsaData;
+  HMODULE dl_handle;
   #endif
-  #ifdef HAVE_EDITLINE_FUNCTIONALITY
   char el_rc[BUF_LEN];
   FILE *el_rc_handle = NULL;
-  #ifndef WIN32
-  struct termios user_termios;
-  #endif
 
   #undef HAVE_DEFAULT_EL_RC
   #ifdef WIN32
@@ -729,7 +791,6 @@ int main(int argc, char **argv)
     "bind ^[[1;5D vi-prev-word\n"
     "bind ^[[1;5C vi-next-word\n";
   #endif
-  #endif
   #ifndef O3G
   char *random_seed_string;
   long random_seed;
@@ -760,13 +821,17 @@ int main(int argc, char **argv)
   strncpy(bin, argv[0], BUF_LEN - 2);
   absolute_path(bin);
   get_dirname(bin);
-  #ifdef HAVE_EDITLINE_FUNCTIONALITY
-  memset(el_rc, 0, BUF_LEN);
-  rl_attempted_completion_function = o3_completion_matches;
+  dl_handle = check_readline();
+  if (have_editline) {
+    memset(el_rc, 0, BUF_LEN);
+    rl_attempted_completion_function = o3_completion_matches;
+    #ifdef WIN32
+    rl_user_completion_entry_free_function = o3_compentry_free;
+    #endif
+  }
   #ifndef WIN32
   memset (&user_termios, 0, sizeof(struct termios));
   od.user_termios = &user_termios;
-  #endif
   #endif
   cli_args.prompt = INTERACTIVE_RUN;
   i = 1;
@@ -887,11 +952,9 @@ int main(int argc, char **argv)
     }
   }
   #else
-  #ifdef HAVE_EDITLINE_FUNCTIONALITY
-  if (tcgetattr(STDOUT_FILENO, &user_termios)) {
+  if (have_editline && tcgetattr(STDOUT_FILENO, &user_termios)) {
     od.user_termios = NULL;
   }
-  #endif
   #endif
   /*
   otherwise Intel MKL on IVE-PLS will be a memory hog
@@ -1035,9 +1098,9 @@ int main(int argc, char **argv)
   if (appdata) {
     sprintf(od.home_dir, "%s%c", appdata, SEPARATOR);
     #ifndef WIN32
-    #ifdef HAVE_EDITLINE_FUNCTIONALITY
-    sprintf(el_rc, "%s%c%s", appdata, SEPARATOR, EL_RC_FILE);
-    #endif
+    if (have_editline && (!have_gnu_readline)) {
+      sprintf(el_rc, "%s%c%s", appdata, SEPARATOR, EL_RC_FILE);
+    }
     #endif
   }
   strcat(od.home_dir, HOMEDIR);
@@ -1047,25 +1110,25 @@ int main(int argc, char **argv)
   #else
   nice_value = 1;
   mkdir(od.home_dir);
-  #ifdef HAVE_EDITLINE_FUNCTIONALITY
-  sprintf(el_rc, "%s%c%s", od.home_dir, SEPARATOR, EL_RC_FILE);
-  sprintf(el_rc_env, "EDITRC=%s", el_rc);
-  putenv(el_rc_env);
-  #endif
-  #endif
-  #ifdef HAVE_EDITLINE_FUNCTIONALITY
-  #ifdef HAVE_DEFAULT_EL_RC
-  if (el_rc[0]) {
-    if (access(el_rc, F_OK) == -1) {
-      el_rc_handle = fopen(el_rc, "w+");
-      if (el_rc_handle) {
-        fprintf(el_rc_handle, "%s", default_el_rc);
-        fclose(el_rc_handle);
-      }
-    }
+  if (have_editline && (!have_gnu_readline)) {
+    sprintf(el_rc, "%s%c%s", od.home_dir, SEPARATOR, EL_RC_FILE);
+    sprintf(el_rc_env, "EDITRC=%s", el_rc);
+    putenv(el_rc_env);
   }
   #endif
-  #endif
+  if (have_editline && (!have_gnu_readline)) {
+    #ifdef HAVE_DEFAULT_EL_RC
+    if (el_rc[0]) {
+      if (access(el_rc, F_OK) == -1) {
+        el_rc_handle = fopen(el_rc, "w+");
+        if (el_rc_handle) {
+          fprintf(el_rc_handle, "%s", default_el_rc);
+          fclose(el_rc_handle);
+        }
+      }
+    }
+    #endif
+  }
   nice_string = getenv("O3_NICE");
   if (nice_string) {
     #ifndef WIN32
@@ -1599,7 +1662,7 @@ int main(int argc, char **argv)
     FFLUSH_WRAP(od.pymol.pymol_handle);
     free_proc_env(od.pymol.proc_env);
   }
-  if (od.jmol.port != -1) {
+  if (od.jmol.use_jmol && (od.jmol.port != -1)) {
     send_jmol_command(&od, "exitJmol");
     free_proc_env(od.jmol.proc_env);
     #ifndef WIN32
@@ -1630,7 +1693,26 @@ int main(int argc, char **argv)
   if ((!result) || (!(od.debug))) {
     remove_temp_files(PACKAGE_CODE);
   }
+  if (od.mel.line) {
+    #if (defined HAVE_EDITLINE_FUNCTIONALITY && defined HAVE_GNU_READLINE)
+    rl_free(od.mel.line);
+    od.mel.line = NULL;
+    #endif
+    #ifndef HAVE_EDITLINE_FUNCTIONALITY
+    if (have_editline && _dlsym_rl_free) {
+      rl_free(od.mel.line);
+      od.mel.line = NULL;
+    }
+    #endif
+  }
   free_mem(&od);
+  if (dl_handle) {
+    #ifndef WIN32
+    dlclose(dl_handle);
+    #else
+    FreeLibrary(dl_handle);
+    #endif
+  }
 
   return result;
 }

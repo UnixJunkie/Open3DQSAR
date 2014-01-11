@@ -322,7 +322,7 @@ href="#prepare">prepare</a></li> <li><a href="#print">print</a></li>
 <li><a href="#remove_field">remove_field</a></li>
 <li><a href="#remove_object">remove_object</a></li>
 <li><a href="#remove_x_vars">remove_x_vars</a></li>
-<li><a href="#remove_y_vars">remove_x_vars</a></li> <li><a
+<li><a href="#remove_y_vars">remove_y_vars</a></li> <li><a
 href="#rototrans">rototrans</a></li> <li><a href="#save">save</a></li>
 <li><a href="#scale_object">scale_object</a></li>
 <li><a href="#scale_x_vars">scale_x_vars</a></li>
@@ -335,7 +335,8 @@ href="#transform">transform</a></li> <li><a href="#uvepls">uvepls</a></li>
 <li><a href="#zero">zero</a></li></ul> <br><br><br><a href="#Contents">
 <p align="right">Back to Contents</p></a><br> <hr color="#dbe5f1"
 align="center" width="95%" size="2"><br><h3><a name="box"></a>box</h3><br>
-<h4>SYNOPSIS</h4> <code>box&nbsp; {[outgap=&lt;number of &Aring;
+<h4>SYNOPSIS</h4> <code>box&nbsp; [mode={GET | SET; defaults to
+SET}]&nbsp; \<br> &nbsp;&nbsp;&nbsp; {[outgap=&lt;number of &Aring;
 by which the grid box exceeds the largest molecule in all directions;
 defaults to 5.0&gt;]&nbsp; \<br> &nbsp;&nbsp;&nbsp; [step=&lt;grid step
 size in &Aring;; defaults to 1.0&gt;]&nbsp; \<br> &nbsp;&nbsp;&nbsp; |
@@ -349,8 +350,9 @@ z_start=&lt;top left z coordinate&gt;&nbsp; \<br> &nbsp;&nbsp;&nbsp;
 {z_end=&lt;bottom right z coordinate&gt; | z_nodes=&lt;number of nodes
 on the z coordinate&gt;}&nbsp; \<br> &nbsp;&nbsp;&nbsp; | [file=&lt;CoMFA
 .rgn file&gt;]} </code><br><br> <h4>DESCRIPTION</h4> The <code>box</code>
-keyword allows to specify the position, size and mesh of the grid box
-which surrounds the molecules belonging to the dataset. Before invoking
+keyword, whose default operation <code>mode</code> is <code>SET</code>,
+allows specifying the position, size and mesh of the grid box which
+surrounds the molecules belonging to the dataset.  Before invoking
 <code>box</code>, some 3D structures must have been imported through
 the <code>import type=SDF</code> keyword. Invoking <code>box</code>
 without parameters creates a 1.0 &Aring; step size box surrounding all
@@ -361,22 +363,24 @@ right corners may be given; the actual position of the bottom right
 corner will be adjusted to the nearest multiple of the grid step size.
 As an alternative to <code>[x,y,z]_end</code> parameters, the number of
 nodes on the <code>x,y,z</code> coordinates may be entered through the
-<code>[x,y,z]_nodes</code> parameters.<br> Finally, a grid box consistent
-with the one used in a CoMFA study may be created by importing a CoMFA
-region <code>.rgn</code> file through the <code>file</code> parameter.
-<br><br> <h4>EXAMPLES</h4> <code> # the following command creates a 1.0
-&Aring; step size box surrounding all molecules leaving a 5.0 &Aring;
-outgap around the largest<br> box<br><br> # the following command
-creates a 0.3333 &Aring; step size box surrounding all molecules leaving
-a 4.0 &Aring; outgap around the largest<br> box&nbsp; step=0.3333&nbsp;
-outgap=4.0<br><br> # the following command creates a 1.0 &Aring; step size
-box whose top left, bottom right corners have the following coordinates:
-[(21.0, 30.0, 27.0), (39.0, 46.0, 49.0)]<br> box&nbsp; x_start=21.0&nbsp;
-x_end=39.0&nbsp; y_start=30.0&nbsp; y_end=46.0&nbsp; z_start=27.0&nbsp;
-z_end=49.0<br><br> # the following command creates a 1.5 &Aring; step
-size box whose top left corner has the following coordinates: (17.0, 21.0,
-24.0); the number of nodes in the x, y, z directions are respectively 15,
-18, 19<br> box&nbsp; step=1.5&nbsp; x_start=17.0&nbsp; y_start=21.0&nbsp;
+<code>[x,y,z]_nodes</code> parameters.<br> A grid box consistent with
+the one used in a CoMFA study may be created by importing a CoMFA region
+<code>.rgn</code> file through the <code>file</code> parameter.<br>
+Finally, invoking <code>box</code> with <code>mode=GET</code> outputs
+the current grid box settings.  <br><br> <h4>EXAMPLES</h4> <code> #
+the following command creates a 1.0 &Aring; step size box surrounding
+all molecules leaving a 5.0 &Aring; outgap around the largest<br>
+box<br><br> # the following command creates a 0.3333 &Aring; step
+size box surrounding all molecules leaving a 4.0 &Aring; outgap around
+the largest<br> box&nbsp; step=0.3333&nbsp; outgap=4.0<br><br> # the
+following command creates a 1.0 &Aring; step size box whose top left,
+bottom right corners have the following coordinates: [(21.0, 30.0, 27.0),
+(39.0, 46.0, 49.0)]<br> box&nbsp; x_start=21.0&nbsp; x_end=39.0&nbsp;
+y_start=30.0&nbsp; y_end=46.0&nbsp; z_start=27.0&nbsp; z_end=49.0<br><br>
+# the following command creates a 1.5 &Aring; step size box whose
+top left corner has the following coordinates: (17.0, 21.0, 24.0);
+the number of nodes in the x, y, z directions are respectively 15, 18,
+19<br> box&nbsp; step=1.5&nbsp; x_start=17.0&nbsp; y_start=21.0&nbsp;
 z_start=24.0&nbsp; x_nodes=15&nbsp; y_nodes=18&nbsp; z_nodes=19<br><br>
 # the following command creates a grid consistent with the one used in
 a CoMFA study<br> box&nbsp; file=comfa_study.rgn</code> <br><br><br><a
@@ -1183,35 +1187,37 @@ LABEL}; defaults to ORIGINAL]&nbsp; \<br> &nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp; file=&lt;file basename without extension&gt;&nbsp;
 \<br> &nbsp;&nbsp;&nbsp; [field_list=&lt;comma/hyphen separated
 list | ALL; defaults to ALL&gt;]&nbsp; \<br> &nbsp;&nbsp;&nbsp;
-[endianness={LITTLE_ENDIAN | BIG_ENDIAN | NATIVE; defaults
-to NATIVE}]&nbsp; \<br> &nbsp;&nbsp;&nbsp; [format={INSIGHT |
-MAESTRO | MOE | SYBYL | ASCII | XYZ; defaults to INSIGHT}]&nbsp;
-\<br> &nbsp;&nbsp;&nbsp; [sign={POS | NEG | BOTH, defaults to
-BOTH]]&nbsp; \<br> &nbsp;&nbsp;&nbsp; [interpolate=&lt;0-5, defaults
+[endianness={LITTLE_ENDIAN | BIG_ENDIAN | NATIVE; defaults to
+NATIVE}]&nbsp; \<br> &nbsp;&nbsp;&nbsp; [format={INSIGHT | MAESTRO | MOE
+| SYBYL | FORMATTED_CUBE | UNFORMATTED_CUBE | ASCII | XYZ; defaults to
+INSIGHT}]&nbsp; \<br> &nbsp;&nbsp;&nbsp; [sign={POS | NEG | BOTH, defaults
+to BOTH]]&nbsp; \<br> &nbsp;&nbsp;&nbsp; [interpolate=&lt;0-5, defaults
 to 0&gt;]</code><br><br> <h4>DESCRIPTION</h4> The <code>export</code>
 keyword is used to export a 3D grid of values in several formats for
 visualization by means of a molecular modelling package. Currently,
-four formats are supported, which allow respectively visualization in
+five formats are supported, which allow respectively visualization in
 PyMOL/Insight II (<code>INSIGHT</code>), Maestro (<code>MAESTRO</code>),
-MOE (<code>MOE</code>), SYBYL (<code>SYBYL</code>). Additionally,
-grid data can be exported in <code>ASCII</code> or <code>XYZ</code>
-formats, which are intended for exporting grid data as a human-readable
-text file; the <code>XYZ</code> format includes the indication of
-the Cartesian coordinates of the grid point each energy value refers
-to.<br> The values which may be exported, defined by the parameter
-<code>type</code>, are:<br><br> <ul><li><code>WEIGHTS</code>: the PLS
-partial weights of the component specified through the <code>pc</code>
-parameter; by default, the highest component extracted by the PLS
-algorithm is used</li></ul><ul><li><code>LOADINGS</code>: the PLS
-loadings of the component specified through the <code>pc</code>
-parameter; by default, the highest component extracted by the PLS
-algorithm is used</li></ul> <ul><li><code>PCA_LOADINGS</code>: the
-PCA loadings of the component specified through the <code>pc</code>
-parameter; by default, the highest component extracted by the PCA
-algorithm is used</li></ul> <ul><li><code>COEFFICIENTS</code>: the PLS
-pseudo-coefficients of the model built out of <code>pc</code> principal
-components are plotted. Since the pseudo-coefficients are linked to a
-specific dependent variable, if multiple dependent variables are present,
+MOE (<code>MOE</code>), SYBYL (<code>SYBYL</code>), JMol or Gabedit
+(<code>FORMATTED_CUBE</code>). Additionally, grid data can be exported in
+<code>ASCII</code> or <code>XYZ</code> formats, which are intended for
+exporting grid data as a human-readable text file; the <code>XYZ</code>
+format includes the indication of the Cartesian coordinates of the grid
+point each energy value refers to.  Finally, <code>CUBE</code> files may
+also be exported in binary form (<code>UNFORMATTED_CUBE</code>).<br> The
+values which may be exported, defined by the parameter <code>type</code>,
+are:<br><br> <ul><li><code>WEIGHTS</code>: the PLS partial weights
+of the component specified through the <code>pc</code> parameter;
+by default, the highest component extracted by the PLS algorithm is
+used</li></ul><ul><li><code>LOADINGS</code>: the PLS loadings of the
+component specified through the <code>pc</code> parameter; by default,
+the highest component extracted by the PLS algorithm is used</li></ul>
+<ul><li><code>PCA_LOADINGS</code>: the PCA loadings of the component
+specified through the <code>pc</code> parameter; by default, the
+highest component extracted by the PCA algorithm is used</li></ul>
+<ul><li><code>COEFFICIENTS</code>: the PLS pseudo-coefficients of
+the model built out of <code>pc</code> principal components are
+plotted. Since the pseudo-coefficients are linked to a specific
+dependent variable, if multiple dependent variables are present,
 specific <I>y</I>'s may be indicated through the <code>y_var_list</code>
 parameter; by default a grid plot will be generated for each dependent
 variable</li></ul> <ul><li><code>MEAN_X_COEFFICIENTS</code>: as for
@@ -1249,17 +1255,17 @@ or in <code>id_list</code> (which defaults to all active objects in
 the dataset) is plotted</li></ul><ul> <li><code>OBJECT_FIELD</code>:
 at each grid point, the energy value assumed by objects specified in
 <code>object_list</code> or in <code>id_list</code> (which defaults
-to all active objects in the dataset) is plotted; a separate grid
-file is produced for each of the objects. According to the setting
-of the <code>inactive</code> parameter one may choose to plot
-the actual energy value also in the case of inactive variables
-(<code>inactive=ORIGINAL</code>, the default), to plot a zero
-energy value for inactive variables (<code>inactive=ZERO</code>, the
-default), or to plot a special label value (<code>INACTIVE</code> in
-<code>ASCII</code> and <code>XYZ</code> formats, <code>-1.0e37</code>
-in binary formats).  The <code>missing</code> parameter instead
-regulates the behaviour in case of missing values; by default they
-are replaced by zeros (<code>missing=ZERO</code>), while setting
+to all active objects in the dataset) is plotted; a separate
+grid file is produced for each of the objects. According to the
+setting of the <code>inactive</code> parameter one may choose to
+plot the actual energy value also in the case of inactive variables
+(<code>inactive=ORIGINAL</code>, the default), to plot a zero energy value
+for inactive variables (<code>inactive=ZERO</code>, the default), or to
+plot a special label value (<code>INACTIVE</code> in <code>ASCII</code>
+and <code>XYZ</code> formats, <code>-1.0e37</code> in binary formats).
+The <code>missing</code> parameter instead regulates the
+behaviour in case of missing values; by default they are
+replaced by zeros (<code>missing=ZERO</code>), while setting
 <code>missing=LABEL</code> causes a special label to be plotted
 (<code>MISSING</code> in <code>ASCII</code> and <code>XYZ</code>
 formats, <code>1.0e37</code> in binary formats).</li></ul><br> The
@@ -1732,46 +1738,61 @@ extracted with the SPL script included in Open3DQSAR's distribution. These
 files are respectively named 1.efs.txt, 2.efs.txt, ..., 20.efs.txt
 (steric fields) and 1.efe.txt, 2.efe.txt, ..., 20.efe.txt (electrostatic
 fields)<br> import&nbsp; type=GRID_ASCII&nbsp; file=%d.efs.txt<br>
-import&nbsp; type=GRID_ASCII&nbsp; file=%d.efe.txt</code> <br><br><br><a
-href="#Contents"> <p align="right">Back to Contents</p></a><br>
-<hr color="#dbe5f1" align="center" width="95%" size="2"><br><h3><a
-name="load"></a>load</h3><br> <h4>SYNOPSIS</h4> <code>load&nbsp;
+import&nbsp; type=GRID_ASCII&nbsp; file=%d.efe.txt</code>
+<br><br><br><a href="#Contents"> <p align="right">Back to
+Contents</p></a><br> <hr color="#dbe5f1" align="center" width="95%"
+size="2"><br><h3><a name="load"></a>load</h3><br> <h4>SYNOPSIS</h4>
+<code>load&nbsp; [mode={NORMAL | APPEND}; defaults to NORMAL]&nbsp;
 file=&lt;filename&gt;</code><br><br> <h4>DESCRIPTION</h4> The
 <code>load</code> keyword is used to retrieve data previously stored
 by <B>Open3DQSAR</B> with the <code>save</code> keyword. When data is
 retrieved, also variable selection procedures eventually carried out
 before saving are retrieved; this means that it is possible to remove
 variables previously selected by FFD, D-optimal, SRD, UVE-PLS procedures
-without having to carry out the computation once again. Basically, all
-variable attributes are saved, except the PLS model itself. This is due
-to the fact that saving PLS weights, loadings and scores would increase
-the size of data files without a real necessity, since it extremely
-fast to recalculate a PLS model on the fly after reloading data.<br>
+without having to carry out the computation once again. Basically,
+all variable attributes are saved, except the PLS model itself. This
+is due to the fact that saving PLS weights, loadings and scores would
+increase the size of data files without a real necessity, since a PLS
+model can be quickly re-calculated on the fly after reloading data.<br>
 The <code>load</code> keyword supports GZIP/ZIP-compressed files
 without need to decompress them in advance; the compression format is
 recognized by the file extension (<code>.gz</code> or <code>.zip</code>,
-respectively).	<br><br><br><a href="#Contents"> <p align="right">Back
-to Contents</p></a><br> <hr color="#dbe5f1" align="center" width="95%"
-size="2"><br><h3><a name="nlevel"></a>nlevel</h3><br> <h4>SYNOPSIS</h4>
-<code>nlevel&nbsp; [level=&lt;2-4 or ALL; defaults to ALL&gt;]&nbsp;
-\<br>&nbsp;&nbsp;&nbsp; [field_list=&lt;comma/hyphen separated list
-| ALL; defaults to ALL&gt;]</code><br><br> <h4>DESCRIPTION</h4> The
-<code>nlevel</code> keyword is used to select <I>n</I>-level variables,
-that is variables assuming only <I>n</I> different values across the
-various objects of the dataset with an uneven distribution among them. In
-particular, 2-level variables are those variables assuming only two
-different values across the dataset, one of which is found only in 2,
-3 or 4 objects. 3-level variables are those variables assuming only
-three different values across the dataset, two of which appear only in 1
-or 2 objects. 4-level variables are those variables assuming only four
-different values across the dataset, one of which appears only in one
-object, while the other three may appear in up to 2 objects. According
-to Baroni et al. [<a href="#nlevel_ref1">1</a>], it is advisable to
-remove such variables having a highly skewed distribution of values
-before building the PLS model since they could put a heavy bias on the
-latter.<br><br> <h4>EXAMPLES</h4> <code># the following command identifies
-2, 3, 4-level variables on all fields; once identified, they are removed
-by means of the remove_x_vars keyword<br>nlevel<br>remove_x_vars&nbsp;
+respectively).<br> The default <code>mode</code> for the <code>load</code>
+keyword is <code>NORMAL</code>; <I>i.e.</I>, the newly loaded data replace
+the previously loaded ones. Instead, when <code>mode=APPEND</code>,
+the new molecules are appended to the already loaded ones. The
+<code>APPEND</code> parameter requires that the grid box size and field
+data in the appended file are compatible with those currently loaded in
+the program. If all objects in the appended dataset are characterized by
+the <code>TESTSET</code> attribute, then the currently loaded analyses
+can be maintained. This means that the <code>APPEND</code> parameter
+is especially useful to load an external test set and predict its
+activity based on the currently loaded model.<br><br> <h4>EXAMPLES</h4>
+<code> # this command imports a SDF file and opens it in PyMOL,
+whose path is given<br> env&nbsp; pymol=/usr/local/bin/pymol<br>
+import&nbsp; type=SDF&nbsp; file=my_dataset.sdf</code> <br><br><br><a
+href="#Contents"> <p align="right">Back to Contents</p></a><br>
+<hr color="#dbe5f1" align="center" width="95%" size="2"><br><h3><a
+name="nlevel"></a>nlevel</h3><br> <h4>SYNOPSIS</h4> <code>nlevel&nbsp;
+[level=&lt;2-4 or ALL; defaults to ALL&gt;]&nbsp; \<br> &nbsp;&nbsp;&nbsp;
+[field_list=&lt;comma/hyphen separated list | ALL; defaults to
+ALL&gt;]</code><br><br> <h4>DESCRIPTION</h4> The <code>nlevel</code>
+keyword is used to select <I>n</I>-level variables, that is variables
+assuming only <I>n</I> different values across the various objects of the
+dataset with an uneven distribution among them. In particular, 2-level
+variables are those variables assuming only two different values across
+the dataset, one of which is found only in 2, 3 or 4 objects. 3-level
+variables are those variables assuming only three different values
+across the dataset, two of which appear only in 1 or 2 objects. 4-level
+variables are those variables assuming only four different values
+across the dataset, one of which appears only in one object, while
+the other three may appear in up to 2 objects. According to Baroni
+et al. [<a href="#nlevel_ref1">1</a>], it is advisable to remove such
+variables having a highly skewed distribution of values before building
+the PLS model since they could put a heavy bias on the latter.<br><br>
+<h4>EXAMPLES</h4> <code># the following command identifies 2, 3, 4-level
+variables on all fields; once identified, they are removed by means
+of the remove_x_vars keyword<br>nlevel<br>remove_x_vars&nbsp;
 type=NLEVEL</code><br><br><h4>REFERENCES</h4><ol>
 <li><a name="nlevel_ref1"></a>Baroni, M.; Costantino,
 G.; Cruciani, G.; Riganelli, D.; Valigi, R.; Clementi, S.
@@ -1916,12 +1937,13 @@ pc_y=2&nbsp; pc_z=3&nbsp; type=PLS_WEIGHTS&nbsp; file=plot_name</code>
 <br><br><br><a href="#Contents"> <p align="right">Back to
 Contents</p></a><br> <hr color="#dbe5f1" align="center" width="95%"
 size="2"><br><h3><a name="pls"></a>pls</h3><br> <h4>SYNOPSIS</h4>
-<code>pls&nbsp; [pc=&lt;number of PCs, defaults to the number of PCs
-of the current PLS model&gt;]&nbsp; \<br> &nbsp;&nbsp;&nbsp; [scores={
-NONE | X | Y | BOTH }; defaults to NONE]&nbsp; \<br> &nbsp;&nbsp;&nbsp;
-[file=&lt;filename.sdf where results will be saved in SDF format&gt;]
-</code><br><br> <h4>DESCRIPTION</h4> The <code>pls</code> keyword
-is used to generate a PLS model through the NIPALS algorithm [<a
+<code>pls&nbsp; [pc=&lt;number of PCs, defaults to the number of PCs of
+the current PLS model&gt;]&nbsp; \<br> &nbsp;&nbsp;&nbsp; [scores={ NONE
+| X | Y | BOTH }; defaults to NONE]&nbsp; \<br> &nbsp;&nbsp;&nbsp;
+[calc_leverage={ YES | NO }; defaults to NO]&nbsp; \<br>
+&nbsp;&nbsp;&nbsp; [file=&lt;filename.sdf where results will be saved in
+SDF format&gt;] </code><br><br> <h4>DESCRIPTION</h4> The <code>pls</code>
+keyword is used to generate a PLS model through the NIPALS algorithm [<a
 href="#pls_ref1">1</a>], extracting the number of principal components
 specified by the <code>pc</code> parameter. PLS statistics (SDEC,
 <I>r<sup>2</sup></I>) together with recalculated values as a function of
@@ -1929,11 +1951,12 @@ the number of PCs are printed on the main output, and can be subsequently
 be printed or plotted through the <code>print</code>, <code>plot</code>
 and <code>grid</code> commands. The <code>scores</code> parameter, if
 specified, allows printing PLS <I>X</I> scores (<code>scores=X</code>,
-<code>Y</code> and <code>both</code>, respectively). Additionally,
-if the <code>file</code> parameter is specified, a file with the
-PLS statistics is generated in SDF format, ready to be imported
-in a molecular modeling software.<br><br> <h4>EXAMPLE</h4> <code>
-#the following command builds a PLS model extracting 5 principal
+<code>Y</code> and <code>both</code>, respectively), while the
+<code>calc_leverage</code> parameter will trigger the printout of
+object leverages. If the <code>file</code> parameter is specified,
+a file with the PLS statistics is generated in SDF format, ready to
+be imported in a molecular modeling software.<br><br> <h4>EXAMPLE</h4>
+<code> #the following command builds a PLS model extracting 5 principal
 components<br>pls&nbsp; pc=5</code><br><br> <h4>REFERENCES</h4><ol>
 <li><a name="pls_ref1"></a>Wold, S.; Sj&ouml;str&ouml;m, M.; Eriksson, L.
 <I>Chemometrics Intell. Lab. Syst.</I> <B>2001</B>, <I>58</I>, 109-130.
@@ -2759,6 +2782,36 @@ and 0.00 in field 1<br>zero&nbsp; type=NEG&nbsp; field_list=1&nbsp;
 level=0.25</code> <br><br><br><a href="#Contents"> <p align="right">Back
 to Contents</p></a><br> <hr color="#dbe5f1" align="center" width="95%"
 size="2"><br><h2><a name="ChangeLog">ChangeLog</a></h2><br><br>
+<ul><li>January 10, 2014: release of <B>Open3DQSAR</B> 2.27</li></ul>
+<ul>Changes with respect to the previous version include:</ul>
+<ul><ul><li>Added the possibility to print grid box settings
+with the <code>mode=GET</code> parameter, as opposed to the
+default <code>mode=SET</code></li></ul></ul> <ul><ul><li>Added the
+<code>mode=APPEND</code> parameter to the <code>load</code> keyword
+to allow appending a dataset to an already loaded one</li></ul></ul>
+<ul><ul><li>Removed the dependency from <code>libedit</code>;
+now the program attempts to open the <code>libedit</code>
+(or <code>libreadline</code>, if <code>libedit</code> is
+not available) dynamic library at runtime. The dependency
+from <code>libedit</code>/<code>libreadline</code> can still be
+introduced at compile time using the <code>--with-editline</code>
+configure switch</li></ul></ul> <ul><ul><li>Fixed a regression
+introduced in version 2.26 which under certain circumstances
+might cause a segmentation fault using the <code>export</code>
+keyword</li></ul></ul> <ul><ul><li>Minor bug fixes</li></ul></ul>
+<br> <ul><li>November 24, 2013: release of <B>Open3DQSAR</B>
+2.26</li></ul> <ul>Changes with respect to the previous version
+include:</ul> <ul><ul><li>Added the possibility to export formatted
+and unformatted <code>CUBE</code> files via the <code>export</code>
+keyword</li></ul></ul> <br> <ul><li>November 17, 2013: release of
+<B>Open3DQSAR</B> 2.252</li></ul> <ul>Changes with respect to the previous
+version include:</ul> <ul><ul><li>Fixed a bug in parsing V2000 SDF files
+missing the <code>V2000</code> keyword in the header line</li></ul></ul>
+<ul><ul><li>Fixed a bug in parsing V3000 SDF files</li></ul></ul> <br>
+<ul><li>October 31, 2013: release of <B>Open3DQSAR</B> 2.251</li></ul>
+<ul>Changes with respect to the previous version include:</ul>
+<ul><ul><li>Added the <code>calc_leverage</code> parameter to the
+<code>pls</code> keyword to compute object leverages</li></ul></ul> <br>
 <ul><li>August 5, 2013: release of <B>Open3DQSAR</B> 2.25</li></ul>
 <ul>Changes with respect to the previous version include:</ul>
 <ul><ul><li>Added the <code>tanimoto</code> keyword to compute
@@ -3251,7 +3304,26 @@ IEEE Press.  &nbsp; <a href="http://dx.doi.org/10.1109/CCGRID.2008.23"
 target="_blank">DOI</a></li> </ol> <br><br><br><br><br><a
 href="#Contents"> <p align="right">Back to
 Contents</p></a><br> <hr color="#dbe5f1" align="center"
-width="95%" size="2"><br><h1>Downloads</h1><br><br>
+width="95%" size="2"><br><h1>Tutorials</h1><br><br> <a
+href="http://open3dqsar.org/downloads/Open3DTOOLS_installation_tutorial.pdf"
+target="_blank">Here</a> you may find a nice step-by-step tutorial written
+by <a href="http://www.researchgate.net/profile/Enrico_Perspicace/"
+target="_blank">Enrico Perspicace</a> (thanks
+Enrico!) to install Open3DTOOLS on your system.<br><br> <a
+href="http://open3dqsar.org/downloads/Open3DTOOLS_tutorial_20130812.pdf"
+target="_blank">Here</a> you may find a basic tutorial to learn using
+<a href="http://open3dqsar.org/" target="_blank">Open3DQSAR</a> and <a
+href="http://open3dalign.org/" target="_blank">Open3DALIGN</a>.<br><br>
+<a href="http://file.teach-discover-treat.org/download_winner.php?w=1"
+target="_blank">Here</a> you may download a very
+comprehensive advanced tutorial (winner of the <a
+href="http://www.teach-discover-treat.org/the-2012-competition"
+target="_blank">Teach-Discover-Treat competition 2012</a>) which shows how
+to use <a href="http://open3dqsar.org/" target="_blank">Open3DQSAR</a> and
+<a href="http://open3dalign.org/" target="_blank">Open3DALIGN</a> in the
+context of virtual screening.  <br><br><br><br><br><a href="#Contents">
+<p align="right">Back to Contents</p></a><br> <hr color="#dbe5f1"
+align="center" width="95%" size="2"><br><h1>Downloads</h1><br><br>
 <B>Open3DQSAR</B> may be downloaded from <a
 href="http://sourceforge.net/projects/open3dqsar/files/"
 target="_blank">SourceForge</a> as <a

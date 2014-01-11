@@ -8,7 +8,7 @@
 # An open-source software aimed at high-throughput
 # chemometric analysis of molecular interaction fields
 # 
-# Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle
+# Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,10 +38,11 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(Open3DQSAR, 2.25, <paolo.tosco@unito.it>)
-AC_DEFINE([PACKAGE_NAME_SMALL_CAPS], ["open3dqsar"], [Package name in small caps])
+AC_INIT(Open3DQSAR, 2.27, <paolo.tosco@unito.it>)
+AC_DEFINE([PACKAGE_NAME_LOWERCASE], ["open3dqsar"], [Package name in lowercase])
+AC_DEFINE([PACKAGE_NAME_UPPERCASE], ["OPEN3DQSAR"], [Package name in uppercase])
 AC_DEFINE([O3Q], [1], [Open3DQSAR])
-AM_INIT_AUTOMAKE(open3dqsar, 2.25)
+AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -64,19 +65,41 @@ eof
 
 AC_CHECK_LIB([m], [sqrt], , AC_MSG_FAILURE([libm not found]))
 AC_CHECK_LIB([z], [gzopen], , AC_MSG_FAILURE([libz not found]))
-AC_CHECK_LIB([minizip], [zipOpen])
 AC_CHECK_LIB([nsl -lsocket], [inet_addr])
+AC_CHECK_LIB([ws2_32], [main])
+AC_ARG_WITH([minizip],
+	[AC_HELP_STRING([--with-minizip],
+	[link against libminizip (default=yes)])],
+	[],
+	[with_minizip=yes])
+AS_IF([test "x$with_minizip" = xyes], [AC_CHECK_LIB([minizip], [zipOpen])])
 
 # Checks for library functions.
 AC_FUNC_VPRINTF
 AC_FUNC_FORK
+AC_FUNC_MMAP
 AC_TYPE_SIGNAL
+AC_TYPE_INT32_T
+AC_TYPE_INT64_T
+AC_TYPE_UINT16_T
+AC_TYPE_UINT64_T
 AC_CHECK_FUNCS([dup2 getcwd gettimeofday memset mkdir mkdtemp mkstemp munmap \
-	pow putenv rint rmdir setenv sqrt strcasecmp strchr strncasecmp strstr strtok_r uname])
+	pow putenv rint rmdir setenv sqrt strcasecmp strchr strncasecmp strstr \
+  strdup strtok_r uname])
 
-LIBEDIT=
-AC_CHECK_LIB([edit], [readline], [AC_SUBST([LIBEDIT], ["-ledit"])
-	AC_DEFINE([HAVE_EDITLINE_FUNCTIONALITY], [1], [Use editline])])
+AC_ARG_WITH([editline],
+	[AC_HELP_STRING([--with-editline],
+	[link against libedit (or libreadline, if libedit is not available) \
+  (default=no; libedit/libreadline will be picked up at runtime, if \
+  available)])],
+	[],
+	[with_editline=no])
+
+LIBEDIT=no
+AS_IF([test "x$with_editline" != xno], [AC_SUBST([LIBEDIT], [""])])
+AS_IF([test -z "$LIBEDIT"],
+	[AC_CHECK_LIB([edit], [readline], [AC_SUBST([LIBEDIT], ["-ledit"])
+	AC_DEFINE([HAVE_EDITLINE_FUNCTIONALITY], [1], [Use editline])])])
 AS_IF([test -z "$LIBEDIT"],
 	[AC_CHECK_LIB([edit -lcurses], [readline], [AC_SUBST([LIBEDIT], ["-ledit -lcurses"])
 	AC_DEFINE([HAVE_EDITLINE_FUNCTIONALITY], [1], [Use editline])])])
@@ -84,9 +107,11 @@ AS_IF([test -z "$LIBEDIT"],
 	[AC_CHECK_LIB([readline], [readline], [AC_SUBST([LIBEDIT], ["-lreadline"])
 	AC_DEFINE([HAVE_EDITLINE_FUNCTIONALITY], [1], [Use readline])])])
 AS_IF([test "$LIBEDIT" = "-lreadline"], AC_DEFINE([HAVE_GNU_READLINE], [1], [Use GNU Readline]))
-AC_CHECK_LIB([ws2_32], [main], ,
-	AC_CHECK_LIB([pthread], [pthread_create], ,
-	AC_MSG_FAILURE([libpthread not found])))
+AS_IF([test "$LIBEDIT" = "no" && test "$host_os" != "mingw32"], \
+  AC_CHECK_LIB([dl], [dlopen], , AC_MSG_FAILURE([libdl not found])))
+AS_IF([test "$LIBEDIT" = "no"], AC_SUBST([LIBEDIT], [""]))
+AS_IF([test "$host_os" != "mingw32"], AC_CHECK_LIB([pthread], \
+  [pthread_create], ,	AC_MSG_FAILURE([libpthread not found])))
 AC_CHECK_LIB([ws2_32], [main],
 	AC_CHECK_LIB([shlwapi], [main], ,
 	AC_MSG_FAILURE([libshlwapi not found])))

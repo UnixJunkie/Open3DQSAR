@@ -8,7 +8,7 @@
 # An open-source software aimed at high-throughput
 # chemometric analysis of molecular interaction fields
 # 
-# Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle
+# Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -140,6 +140,7 @@ include/nice_windows.h \
 include/o3header.h \
 include/proc_env.h \
 include/prog_exe_info.h \
+include/rl_runtime.h \
 include/safe_rint.h
 
 bin_PROGRAMS = \
@@ -159,6 +160,7 @@ include/nice_windows.h \
 include/o3header.h \
 include/proc_env.h \
 include/prog_exe_info.h \
+include/rl_runtime.h \
 include/safe_rint.h \
 parse_o3q_input.c
 

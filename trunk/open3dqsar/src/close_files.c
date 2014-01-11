@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ void remove_recursive(char *filename)
     #ifndef WIN32
     closedir(dir);
     #else
-    CloseHandle(dir);
+    FindClose(dir);
     #endif
   }
   rmdir(filename);
@@ -143,7 +143,7 @@ void remove_temp_files(char *package_code)
       #ifndef WIN32
       closedir(dir);
       #else
-      CloseHandle(dir);
+      FindClose(dir);
       #endif
     }
     sprintf(prefix, "%s.%d", package_code, (int)getpid());
@@ -215,7 +215,7 @@ int remove_with_prefix(char *temp_dir_string, char *prefix)
       #ifndef WIN32
       closedir(dir);
       #else
-      CloseHandle(dir);
+      FindClose(dir);
       #endif
     }
     if (n) {
