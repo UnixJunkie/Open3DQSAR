@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -43,39 +43,39 @@ E-mail: paolo.tosco@unito.it
 #include <include/o3header.h>
 
 
-unsigned short get_field_attr(O3Data *od,
-  int field_num, unsigned short attr)
+uint16_t get_field_attr(O3Data *od,
+  int field_num, uint16_t attr)
 {
-  return (unsigned short)((od->mel.field_attr
+  return (uint16_t)((od->mel.field_attr
     [field_num]) & attr);
 }
 
 
-unsigned short get_object_attr(O3Data *od,
-  int object_num, unsigned short attr)
+uint16_t get_object_attr(O3Data *od,
+  int object_num, uint16_t attr)
 {
-  return (unsigned short)((od->mel.object_attr
+  return (uint16_t)((od->mel.object_attr
     [object_num]) & attr);
 }
 
 
-unsigned short get_x_var_attr(O3Data *od,
-  int field_num, int x_var, unsigned short attr)
+uint16_t get_x_var_attr(O3Data *od,
+  int field_num, int x_var, uint16_t attr)
 {
-  return (unsigned short)((od->mel.x_var_attr
+  return (uint16_t)((od->mel.x_var_attr
     [field_num][x_var]) & attr);
 }
 
 
-unsigned short get_y_var_attr(O3Data *od,
-  int y_var, unsigned short attr)
+uint16_t get_y_var_attr(O3Data *od,
+  int y_var, uint16_t attr)
 {
-  return (unsigned short)
+  return (uint16_t)
     ((od->mel.y_var_attr[y_var]) & attr);
 }
 
 
-void get_attr_struct_ave(O3Data *od, int y_var, unsigned short attr, int *attr_struct_num, double *attr_value_ave)
+void get_attr_struct_ave(O3Data *od, int y_var, uint16_t attr, int *attr_struct_num, double *attr_value_ave)
 {
   int object_num = 0;
   int struct_num;

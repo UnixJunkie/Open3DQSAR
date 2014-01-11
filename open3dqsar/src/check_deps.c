@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ E-mail: paolo.tosco@unito.it
 #include <include/o3header.h>
 #include <include/prog_exe_info.h>
 #include <include/proc_env.h>
+#include <include/rl_runtime.h>
 
 
 extern EnvList babel_env[];
@@ -372,3 +373,147 @@ int check_define(O3Data *od, char *bin)
 
   return 0;
 }
+
+
+void *check_readline()
+{
+  #ifdef HAVE_EDITLINE_FUNCTIONALITY
+  have_editline = 1;
+  void *dl_handle = NULL;
+  #ifdef HAVE_GNU_READLINE
+  have_gnu_readline = 1;
+  #endif
+  #else
+  #ifdef WIN32
+  HMODULE dl_handle = NULL;
+  int i = 0;
+  char *lib_array[] = {
+    "edit.dll",
+    "libedit.dll",
+    NULL
+  };
+  while ((!dl_handle) && lib_array[i]) {
+    dl_handle = LoadLibrary(lib_array[i]);
+    ++i;
+  }
+  #else
+  void *dl_handle = NULL;
+  int i = 0;
+  char *lib_array[] = {
+    #ifdef __APPLE__
+    "libreadline.6.dylib",
+    "libreadline.5.dylib",
+    "libreadline.dylib",
+    "libedit.dylib",
+    #else
+    "libedit.so",
+    "libreadline.so",
+    "libreadline.so.6",
+    "libreadline.so.5",
+    #endif
+    NULL
+  };
+  while ((!dl_handle) && lib_array[i]) {
+    dl_handle = dlopen(lib_array[i], RTLD_NOW);
+    ++i;
+  }
+  #endif
+  if (dl_handle) {
+    #ifndef WIN32
+    _dlsym_add_history = (void *(*)())dlsym(dl_handle, "add_history");
+    _dlsym_next_history = (HIST_ENTRY *(*)())dlsym(dl_handle, "next_history");
+    _dlsym_previous_history = (HIST_ENTRY *(*)())dlsym(dl_handle, "previous_history");
+    _dlsym_read_history = (int (*)())dlsym(dl_handle, "read_history");
+    _dlsym_write_history = (int (*)())dlsym(dl_handle, "write_history");
+    _dlsym_using_history = (void (*)())dlsym(dl_handle, "using_history");
+    _dlsym_readline = (char *(*)())dlsym(dl_handle, "readline");
+    _dlsym_rl_free = (void (*)())dlsym(dl_handle, "rl_free");
+    _dlsym_rl_attempted_completion_function = dlsym(dl_handle, "rl_attempted_completion_function");
+    _dlsym_rl_attempted_completion_over = dlsym(dl_handle, "rl_attempted_completion_over");
+    _dlsym_rl_completion_append_character = dlsym(dl_handle, "rl_completion_append_character");
+    _dlsym_rl_completion_matches = (char **(*)())dlsym(dl_handle, "rl_completion_matches");
+    _dlsym_rl_delete_text = (int (*)())dlsym(dl_handle, "rl_delete_text");
+    _dlsym_rl_free_line_state = (void (*)())dlsym(dl_handle, "rl_free_line_state");
+    _dlsym_rl_replace_line = (void (*)())dlsym(dl_handle, "rl_free_line_state");
+    _dlsym_rl_reset_after_signal = (void (*)())dlsym(dl_handle, "rl_reset_after_signal");
+    _dlsym_rl_filename_completion_function = (char *(*)())dlsym(dl_handle, "rl_filename_completion_function");
+    _dlsym_rl_line_buffer = dlsym(dl_handle, "rl_line_buffer");
+    _dlsym_rl_point = dlsym(dl_handle, "rl_point");
+    #else
+    _dlsym_add_history = (void *(__cdecl *)(const char *))
+      GetProcAddress(dl_handle, "add_history");
+    _dlsym_next_history = (HIST_ENTRY *(__cdecl *)(void))
+      GetProcAddress(dl_handle, "next_history");
+    _dlsym_previous_history = (HIST_ENTRY *(__cdecl *)(void))
+      GetProcAddress(dl_handle, "previous_history");
+    _dlsym_read_history = (int (__cdecl *)(const char *))
+      GetProcAddress(dl_handle, "read_history");
+    _dlsym_write_history = (int (__cdecl *)(const char *))
+      GetProcAddress(dl_handle, "write_history");
+    _dlsym_using_history = (void (__cdecl *)(void))
+      GetProcAddress(dl_handle, "using_history");
+    _dlsym_readline = (char *(__cdecl *)(const char *))
+      GetProcAddress(dl_handle, "readline");
+    _dlsym_rl_free = (void (__cdecl *)(void *))
+      GetProcAddress(dl_handle, "rl_free");
+    _dlsym_rl_attempted_completion_function = (void **)
+      GetProcAddress(dl_handle, "rl_attempted_completion_function");
+    _dlsym_rl_user_completion_entry_free_function = (void **)
+      GetProcAddress(dl_handle, "rl_user_completion_entry_free_function");
+    _dlsym_rl_attempted_completion_over = (int *)
+      GetProcAddress(dl_handle, "rl_attempted_completion_over");
+    _dlsym_rl_completion_append_character = (int *)
+      GetProcAddress(dl_handle, "rl_completion_append_character");
+    _dlsym_rl_completion_matches = (char **(__cdecl *)(const char *, void *))
+      GetProcAddress(dl_handle, "rl_completion_matches");
+    _dlsym_rl_delete_text = (int (__cdecl *)(int, int))
+      GetProcAddress(dl_handle, "rl_delete_text");
+    _dlsym_rl_free_line_state = (void (__cdecl *)(void))
+      GetProcAddress(dl_handle, "rl_free_line_state");
+    _dlsym_rl_replace_line = (void (__cdecl *)(const char *, int))
+      GetProcAddress(dl_handle, "rl_free_line_state");
+    _dlsym_rl_reset_after_signal = (void (__cdecl *)(void))
+      GetProcAddress(dl_handle, "rl_reset_after_signal");
+    _dlsym_rl_filename_completion_function = (char *(__cdecl *)(const char *, int))
+      GetProcAddress(dl_handle, "rl_filename_completion_function");
+    _dlsym_rl_line_buffer = (char **)GetProcAddress(dl_handle, "rl_line_buffer");
+    _dlsym_rl_point = (int *)GetProcAddress(dl_handle, "rl_point");
+    #endif
+    have_editline = (_dlsym_add_history && _dlsym_next_history
+      && _dlsym_previous_history && _dlsym_read_history
+      && _dlsym_using_history && _dlsym_write_history
+      && _dlsym_readline
+      && _dlsym_rl_attempted_completion_function
+      && _dlsym_rl_attempted_completion_over
+      #ifndef WIN32
+      && _dlsym_rl_completion_append_character
+      #else
+      && _dlsym_rl_user_completion_entry_free_function
+      && _dlsym_rl_free
+      #endif
+      && _dlsym_rl_completion_matches
+      && _dlsym_rl_filename_completion_function
+      && _dlsym_rl_line_buffer && _dlsym_rl_point);
+    have_gnu_readline = (have_editline && _dlsym_rl_delete_text
+      && _dlsym_rl_free_line_state && _dlsym_rl_replace_line
+      && _dlsym_rl_reset_after_signal);
+  }
+  #endif
+  
+  return dl_handle;
+}
+#if (defined HAVE_EDITLINE_FUNCTIONALITY && (!defined HAVE_GNU_READLINE))
+int rl_delete_text(int start, int end)
+{
+  return 0;
+}
+void rl_free_line_state()
+{
+}
+rl_replace_line(const char *text, int clear_undo)
+{
+}
+void rl_reset_after_signal()
+{
+}
+#endif

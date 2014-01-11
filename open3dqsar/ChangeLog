@@ -1,6 +1,50 @@
 Open3DQSAR's ChangeLog
 ----------------------
 
+*** January 10, 2014: Open3DQSAR 2.27 ***
+
+  Changes with respect to the previous version include:
+
+  - Added the possibility to print grid box settings with the "mode=GET"
+    parameter, as opposed to the default "mode=SET"
+  - Added the "mode=APPEND"parameter to the "load" keyword to allow
+    appending a dataset to an already loaded one
+  - Removed the dependency from libedit; now the program attempts to open
+    the libedit (or libreadline, if libedit is not available) dynamic
+    library at runtime. The dependency from libedit/libreadline can still
+    be introduced at compile time using the --with-editline configure
+    switch
+  - Fixed a regression introduced in version 2.26 which under certain
+    circumstances might cause a segmentation fault using the "export"
+    keyword
+  - Minor bug fixes
+
+
+*** November 24, 2013: Open3DQSAR 2.26 ***
+
+  Changes with respect to the previous version include:
+
+  - Added the possibility to export formatted and unformatted
+    CUBE files via the "export" keyword
+
+
+*** November 17, 2013: Open3DQSAR 2.252 ***
+
+  Changes with respect to the previous version include:
+
+  - Fixed a bug in parsing V2000 SDF files missing the "V2000"
+    keyword in the header line
+  - Fixed a bug in parsing V3000 SDF files
+
+
+*** October 31, 2013: Open3DQSAR 2.251 ***
+
+  Changes with respect to the previous version include:
+
+  - Added the "calc_leverage" parameter to the "pls" keyword to
+    compute object leverages
+
+
 *** August 5, 2013: Open3DQSAR 2.25 ***
 
   Changes with respect to the previous version include:

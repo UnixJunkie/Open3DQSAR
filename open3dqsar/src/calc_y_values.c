@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -42,15 +42,17 @@ E-mail: paolo.tosco@unito.it
 #include <include/o3header.h>
 
 
-int calc_y_values(O3Data *od)
+int calc_y_values(O3Data *od, int calc_leverage)
 {
   int i;
+  int j;
   int x;
   int y;
   int num_blocks;
   int x_max_x;
   int x_max_y;
   int y_max;
+  int hat_max;
   int object_num;
   int struct_num;
   int conf_num;
@@ -58,11 +60,13 @@ int calc_y_values(O3Data *od)
   int pc_num;
   int actual_len;
   int result;
-  int info;
-  #if (!defined HAVE_LIBLAPACK_ATLAS) && (!defined HAVE_LIBSUNPERF)
+  int info = 0;
+  int rank;
+  #ifndef HAVE_LIBSUNPERF
   int lwork;
   #endif
   double sqrt_weight;
+  double rcond = 1.0e-10;
   
   
   /*
@@ -315,6 +319,135 @@ int calc_y_values(O3Data *od)
         }
       }
     }
+  }
+  if (calc_leverage) {
+    od->mal.hat_temp1_mat = double_mat_alloc
+      (od->mal.e_mat->m, od->mal.e_mat->n);
+    if (!(od->mal.hat_temp1_mat)) {
+      return OUT_OF_MEMORY;
+    }
+    for (i = 0; i < od->mal.e_mat->n; ++i) {
+      cblas_dcopy(od->mal.e_mat->m,
+        &M_PEEK(od->mal.e_mat, 0, i), 1,
+        &M_PEEK(od->mal.hat_temp1_mat, 0, i), 1);
+    }
+    hat_max = ((od->mal.e_mat->n > od->mal.e_mat->m)
+      ? od->mal.e_mat->n : od->mal.e_mat->m);
+    od->mal.hat_temp2_mat = double_mat_alloc(hat_max, hat_max);
+    if (!(od->mal.hat_temp2_mat)) {
+      return OUT_OF_MEMORY;
+    }
+    od->mal.hat_mat = double_mat_alloc(od->mal.e_mat->m, od->mal.e_mat->m);
+    if (!(od->mal.hat_mat)) {
+      return OUT_OF_MEMORY;
+    }
+    for (i = 0; i < hat_max; ++i) {
+      M_POKE(od->mal.hat_temp2_mat, i, i, 1.0);
+    }
+    od->mel.s = (double *)malloc(hat_max * sizeof(double));
+    if (!(od->mel.s)) {
+      return OUT_OF_MEMORY;
+    }
+    #ifndef HAVE_LIBSUNPERF
+    od->mel.work = (double *)realloc(od->mel.work, sizeof(double));
+    if (!(od->mel.work)) {
+      return OUT_OF_MEMORY;
+    }
+    lwork = -1;
+    #ifdef HAVE_LIBMKL
+    dgelss(&(od->mal.hat_temp1_mat->m),
+      &(od->mal.hat_temp1_mat->n),
+      &(od->mal.hat_temp1_mat->m),
+      od->mal.hat_temp1_mat->base,
+      &(od->mal.hat_temp1_mat->m),
+      od->mal.hat_temp2_mat->base,
+      &hat_max, od->mel.s, &rcond,
+      &rank, od->mel.work, &lwork, &info);
+    #elif HAVE_LIBLAPACK_ATLAS
+    dgelss_(&(od->mal.hat_temp1_mat->m),
+      &(od->mal.hat_temp1_mat->n),
+      &(od->mal.hat_temp1_mat->m),
+      od->mal.hat_temp1_mat->base,
+      &(od->mal.hat_temp1_mat->m),
+      od->mal.hat_temp2_mat->base,
+      &hat_max, od->mel.s, &rcond,
+      &rank, od->mel.work, &lwork, &info);
+    #else
+    dgelss_(&(od->mal.hat_temp1_mat->m),
+      &(od->mal.hat_temp1_mat->n),
+      &(od->mal.hat_temp1_mat->m),
+      od->mal.hat_temp1_mat->base,
+      &(od->mal.hat_temp1_mat->m),
+      od->mal.hat_temp2_mat->base,
+      &hat_max, od->mel.s, &rcond,
+      &rank, od->mel.work, &lwork, &info);
+    #endif
+    #endif
+    if (!info) {
+      #ifndef HAVE_LIBSUNPERF
+      lwork = (int)(*(od->mel.work));
+      od->mel.work = (double *)realloc(od->mel.work, lwork * sizeof(double));
+      if (!(od->mel.work)) {
+        return OUT_OF_MEMORY;
+      }
+      #endif
+      #ifdef HAVE_LIBMKL
+      dgelss(&(od->mal.hat_temp1_mat->m),
+        &(od->mal.hat_temp1_mat->n),
+        &(od->mal.hat_temp1_mat->m),
+        od->mal.hat_temp1_mat->base,
+        &(od->mal.hat_temp1_mat->m),
+        od->mal.hat_temp2_mat->base,
+        &hat_max, od->mel.s, &rcond,
+        &rank, od->mel.work, &lwork, &info);
+      #elif HAVE_LIBSUNPERF
+      dgelss(od->mal.hat_temp1_mat->m,
+        od->mal.hat_temp1_mat->n,
+        od->mal.hat_temp1_mat->m,
+        od->mal.hat_temp1_mat->base,
+        od->mal.hat_temp1_mat->m,
+        od->mal.hat_temp2_mat->base,
+        hat_max, od->mel.s, rcond,
+        &rank, &info);
+      #elif HAVE_LIBLAPACK_ATLAS
+      dgelss_(&(od->mal.hat_temp1_mat->m),
+        &(od->mal.hat_temp1_mat->n),
+        &(od->mal.hat_temp1_mat->m),
+        od->mal.hat_temp1_mat->base,
+        &(od->mal.hat_temp1_mat->m),
+        od->mal.hat_temp2_mat->base,
+        &hat_max, od->mel.s, &rcond,
+        &rank, od->mel.work, &lwork, &info);
+      #else
+      dgelss_(&(od->mal.hat_temp1_mat->m),
+        &(od->mal.hat_temp1_mat->n),
+        &(od->mal.hat_temp1_mat->m),
+        od->mal.hat_temp1_mat->base,
+        &(od->mal.hat_temp1_mat->m),
+        od->mal.hat_temp2_mat->base,
+        &hat_max, od->mel.s, &rcond,
+        &rank, od->mel.work, &lwork, &info);
+      #endif
+    }
+    if (!info) {
+      cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans,
+        od->mal.e_mat->m,
+        od->mal.e_mat->m,
+        od->mal.e_mat->n, 1.0,
+        od->mal.e_mat->base,
+        od->mal.e_mat->max_m,
+        od->mal.hat_temp2_mat->base,
+        hat_max, 0.0,
+        od->mal.hat_mat->base,
+        od->mal.hat_mat->max_m);
+    }
+    else {
+      memset(od->mal.hat_mat->base, 0, square(hat_max) * sizeof(double));
+    }
+    double_mat_free(od->mal.hat_temp1_mat);
+    od->mal.hat_temp1_mat = NULL;
+    double_mat_free(od->mal.hat_temp2_mat);
+    od->mal.hat_temp2_mat = NULL;
   }
   rewind(od->file[TEMP_CALC]->handle);
   if (od->file[TEMP_PLS_COEFF]->handle) {

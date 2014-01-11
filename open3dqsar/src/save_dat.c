@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ int save_dat(O3Data *od, int file_id)
   int i;
   int j;
   int k;
-  unsigned long valid;
+  uint64_t valid;
   float value;
   FileDescriptor mol_fd;
   fzPtr *dat_out;
@@ -160,8 +160,8 @@ int save_dat(O3Data *od, int file_id)
   then, write an unsigned long:
   - od->valid, after zeroing the PLS, CV, and PREDICT bits
   */
-  valid = (unsigned long)(od->valid & (~(PLS_BIT | CV_BIT | PREDICT_BIT)));
-  fzwrite(&valid, sizeof(unsigned long), 1, dat_out);
+  valid = (uint64_t)(od->valid & (~(PLS_BIT | CV_BIT | PREDICT_BIT)));
+  fzwrite(&valid, sizeof(uint64_t), 1, dat_out);
   
   /*
   then, write a number of XData structures equal to active_field_num
@@ -364,13 +364,13 @@ int save_dat(O3Data *od, int file_id)
   for (i = 0; i < od->field_num; ++i) {
     if (!get_field_attr(od, i, DELETE_BIT)) {
       fzwrite(&(od->mel.field_attr[i]),
-        sizeof(unsigned short), 1, dat_out);
+        sizeof(uint16_t), 1, dat_out);
     }
   }
   for (i = 0; i < od->grid.object_num; ++i) {
     if (!get_object_attr(od, i, DELETE_BIT)) {
       fzwrite(&(od->mel.object_attr[i]),
-        sizeof(unsigned short), 1, dat_out);
+        sizeof(uint16_t), 1, dat_out);
     }
   }
   for (i = 0; i < od->grid.object_num; ++i) {
@@ -382,7 +382,7 @@ int save_dat(O3Data *od, int file_id)
   for (i = 0; i < od->field_num; ++i) {
     if (!get_field_attr(od, i, DELETE_BIT)) {
       actual_len = fzwrite(od->mel.x_var_attr[i],
-      sizeof(unsigned short), od->x_vars, dat_out);
+      sizeof(uint16_t), od->x_vars, dat_out);
       if (actual_len != od->x_vars) {
         return PREMATURE_DAT_EOF;
       }
@@ -472,7 +472,7 @@ int save_dat(O3Data *od, int file_id)
     /*
     Now save y_var_attr attributes
     */
-    actual_len = fzwrite(od->mel.y_var_attr, sizeof(unsigned short),
+    actual_len = fzwrite(od->mel.y_var_attr, sizeof(uint16_t),
       od->y_vars, dat_out);
     if (actual_len != od->y_vars) {
       return PREMATURE_DAT_EOF;

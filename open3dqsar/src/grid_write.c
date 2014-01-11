@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ E-mail: paolo.tosco@unito.it
 #include <include/o3header.h>
 #include <include/interpolation_coefficients.h>
 #include <include/interpolated_value.h>
+#include <include/basis_set.h>
 
 
 void copy_plane_to_buffer(O3Data *od,
@@ -387,15 +388,21 @@ int write_grid_plane(O3Data *od, FILE *plane_file,
 }
 
 
-int write_header(O3Data *od, char *header, int format, int interpolate, int swap_endianness)
+int write_header(O3Data *od, int object_num, char *header,
+  int format, int interpolate, int swap_endianness)
 {
   int i;
   int j;
+  int elem_i;
   int len;
   int actual_len;
+  int result;
   int npts[3];
   int *int_meta_data;
   float *float_meta_data;
+  double *double_meta_data;
+  double incr[3];
+  AtomInfo *atom;
   
   
   for (i = 0; i < 3; ++i) {
@@ -595,26 +602,209 @@ int write_header(O3Data *od, char *header, int format, int interpolate, int swap
     break;
 
     case MAESTRO_FORMAT:
-    fprintf(od->file[GRD_OUT]->handle, "&plot\n");
-    fprintf(od->file[GRD_OUT]->handle, "iplot=  %12d\n", 1);
     fprintf(od->file[GRD_OUT]->handle,
-      "origin= %12.6f%12.6f%12.6f\n",
-      od->grid.start_coord[0] / BOHR_RADIUS,
-      od->grid.start_coord[1] / BOHR_RADIUS,
-      od->grid.start_coord[2] / BOHR_RADIUS);
-    fprintf(od->file[GRD_OUT]->handle,
-      "extentx=%12.6f%12.6f%12.6f\n",
-      od->grid.step[0] * od->grid.nodes[0] / BOHR_RADIUS, 0.0, 0.0);
-    fprintf(od->file[GRD_OUT]->handle,
-      "extenty=%12.6f%12.6f%12.6f\n",
-      0.0, od->grid.step[1] * od->grid.nodes[1] / BOHR_RADIUS, 0.0);
-    fprintf(od->file[GRD_OUT]->handle,
-      "extentz=%12.6f%12.6f%12.6f\n",
-      0.0, 0.0, od->grid.step[2] * od->grid.nodes[2] / BOHR_RADIUS);
-    fprintf(od->file[GRD_OUT]->handle,
-      "npts=   %12d%12d%12d\n", npts[0], npts[1], npts[2]);
-    fprintf(od->file[GRD_OUT]->handle, "&end\n");
+      "&plot\n"
+      "iplot=  %12d\n"
+      "origin= %12.6lf%12.6lf%12.6lf\n"
+      "extentx=%12.6lf%12.6lf%12.6lf\n"
+      "extenty=%12.6lf%12.6lf%12.6lf\n"
+      "extentz=%12.6lf%12.6lf%12.6lf\n"
+      "npts=   %12d%12d%12d\n"
+      "&end\n",
+      1, (double)(od->grid.start_coord[0]) / BOHR_RADIUS,
+      (double)(od->grid.start_coord[1]) / BOHR_RADIUS,
+      (double)(od->grid.start_coord[2]) / BOHR_RADIUS,
+      (double)(od->grid.step[0]) * (double)(od->grid.nodes[0]) / BOHR_RADIUS, 0.0, 0.0,
+      0.0, (double)(od->grid.step[1]) * (double)(od->grid.nodes[0]) / BOHR_RADIUS, 0.0,
+      0.0, 0.0, (double)(od->grid.step[2]) * (double)(od->grid.nodes[0]) / BOHR_RADIUS,
+      npts[0], npts[1], npts[2]);
     
+    break;
+    
+    case FORMATTED_CUBE_FORMAT:
+    fprintf(od->file[GRD_OUT]->handle,
+      "%s\n\n"
+      "%8d%16.6lf%16.6lf%16.6lf\n", CUBE_GRID_TITLE,
+      od->al.mol_info[object_num]->n_atoms,
+      (double)(od->grid.start_coord[0]) / BOHR_RADIUS,
+      (double)(od->grid.start_coord[1]) / BOHR_RADIUS,
+      (double)(od->grid.start_coord[2]) / BOHR_RADIUS);
+    for (i = 0; i < 3; ++i) {
+      memset(incr, 0, 3 * sizeof(double));
+      incr[i] = (double)(od->grid.step[i]) / BOHR_RADIUS;
+      fprintf(od->file[GRD_OUT]->handle, "%8d%16.6lf%16.6lf%16.6lf\n",
+        od->grid.nodes[i], incr[0], incr[1], incr[2]);
+    }
+    if (!(od->al.mol_info[object_num]->atom = (AtomInfo **)
+      alloc_array(od->al.mol_info[object_num]->n_atoms + 1, sizeof(AtomInfo)))) {
+      O3_ERROR_LOCATE(&(od->task));
+      free_atom_array(od);
+      return OUT_OF_MEMORY;
+    }
+    result = fill_atom_info(od, &(od->task),
+      od->al.mol_info[object_num]->atom, NULL, object_num, O3_MMFF94);
+    if (result) {
+      return result;
+    }
+    for (i = 0; i < od->al.mol_info[object_num]->n_atoms; ++i) {
+      elem_i = 0;
+      while (element_data[elem_i].atomic_number
+        && strcasecmp(od->al.mol_info[object_num]->atom[i]->element,
+        element_data[elem_i].atomic_symbol)) {
+        ++elem_i;
+      }
+      if (!(element_data[elem_i].atomic_number)) {
+        O3_ERROR_LOCATE(&(od->task));
+        return FL_UNKNOWN_ATOM_TYPE;
+      }
+      fprintf(od->file[GRD_OUT]->handle,
+        "%8d%16.6lf%16.6lf%16.6lf%16.6lf\n",
+        element_data[elem_i].atomic_number,
+        od->al.mol_info[object_num]->atom[i]->charge,
+        od->al.mol_info[object_num]->atom[i]->coord[0] / BOHR_RADIUS,
+        od->al.mol_info[object_num]->atom[i]->coord[1] / BOHR_RADIUS,
+        od->al.mol_info[object_num]->atom[i]->coord[2] / BOHR_RADIUS);
+    }
+    free_array(od->al.mol_info[object_num]->atom);
+    break;
+
+    case UNFORMATTED_CUBE_FORMAT:
+    int_meta_data = (int *)header;
+    /*
+    write two 80-byte headers
+    */
+    *int_meta_data = 80;
+    fix_endianness(int_meta_data, sizeof(int), 1, swap_endianness);
+    int_meta_data = (int *)(header + 80 + sizeof(int));
+    *int_meta_data = 80;
+    fix_endianness(int_meta_data, sizeof(int), 1, swap_endianness);
+    int_meta_data = (int *)header;
+    memset(&int_meta_data[1], ' ', 80);
+    memcpy(&int_meta_data[1], CUBE_GRID_TITLE, strlen(CUBE_GRID_TITLE));
+    actual_len = fwrite(header, 1, 2 * sizeof(int) + 80, od->file[GRD_OUT]->handle);
+    if (actual_len != (2 * sizeof(int) + 80)) {
+      O3_ERROR_STRING(&(od->task), od->file[TEMP_GRD]->name);
+      O3_ERROR_LOCATE(&(od->task));
+      return CANNOT_WRITE_TEMP_FILE;
+    }
+    memset(&int_meta_data[1], ' ', 80);
+    actual_len = fwrite(header, 1, 2 * sizeof(int) + 80, od->file[GRD_OUT]->handle);
+    if (actual_len != (2 * sizeof(int) + 80)) {
+      O3_ERROR_STRING(&(od->task), od->file[TEMP_GRD]->name);
+      O3_ERROR_LOCATE(&(od->task));
+      return CANNOT_WRITE_TEMP_FILE;
+    }
+    /*
+    now write a block constituted by:
+    - 1 int (number of atoms)
+    - 3 doubles (origin x, y, z)
+    */
+    int_meta_data[0] = sizeof(int) + 3 * sizeof(double);
+    int_meta_data[1] = od->al.mol_info[object_num]->n_atoms;
+    fix_endianness(int_meta_data, sizeof(int), 2, swap_endianness);
+    double_meta_data = (double *)&int_meta_data[2];
+    double_meta_data[0] = (double)(od->grid.start_coord[0]) / BOHR_RADIUS;
+    double_meta_data[1] = (double)(od->grid.start_coord[1]) / BOHR_RADIUS;
+    double_meta_data[2] = (double)(od->grid.start_coord[2]) / BOHR_RADIUS;
+    fix_endianness(double_meta_data, sizeof(double), 3, swap_endianness);
+    int_meta_data = (int *)&double_meta_data[3];
+    *int_meta_data = sizeof(int) + 3 * sizeof(double);
+    fix_endianness(int_meta_data, sizeof(int), 1, swap_endianness);
+    int_meta_data = (int *)header;
+    actual_len = fwrite(header, 1,
+      3 * sizeof(int) + 3 * sizeof(double), od->file[GRD_OUT]->handle);
+    if (actual_len != (3 * sizeof(int) + 3 * sizeof(double))) {
+      O3_ERROR_STRING(&(od->task), od->file[TEMP_GRD]->name);
+      O3_ERROR_LOCATE(&(od->task));
+      return CANNOT_WRITE_TEMP_FILE;
+    }
+    /*
+    now write 3 blocks constituted by:
+    - 1 int (number of [X,Y,Z]_nodes)
+    - 3 doubles (step size Xn,Yn,Zn)
+    */
+    for (i = 0; i < 3; ++i) {
+      int_meta_data[0] = sizeof(int) + 3 * sizeof(double);
+      int_meta_data[1] = od->grid.nodes[i];
+      fix_endianness(int_meta_data, sizeof(int), 2, swap_endianness);
+      double_meta_data = (double *)&int_meta_data[2];
+      memset(double_meta_data, 0, 3 * sizeof(double));
+      double_meta_data[i] = (double)(od->grid.step[i]) / BOHR_RADIUS;
+      fix_endianness(double_meta_data, sizeof(double), 3, swap_endianness);
+      int_meta_data = (int *)&double_meta_data[3];
+      *int_meta_data = sizeof(int) + 3 * sizeof(double);
+      fix_endianness(int_meta_data, sizeof(int), 1, swap_endianness);
+      int_meta_data = (int *)header;
+      actual_len = fwrite(header, 1,
+        3 * sizeof(int) + 3 * sizeof(double), od->file[GRD_OUT]->handle);
+      if (actual_len != (3 * sizeof(int) + 3 * sizeof(double))) {
+        O3_ERROR_STRING(&(od->task), od->file[TEMP_GRD]->name);
+        O3_ERROR_LOCATE(&(od->task));
+        return CANNOT_WRITE_TEMP_FILE;
+      }
+    }
+    /*
+    now write n_atoms blocks constituted by:
+    - 1 int (atom number)
+    - 4 doubles (charge, x_coord, y_coord, z_coord)
+    */
+    if (!(od->al.mol_info[object_num]->atom = (AtomInfo **)
+      alloc_array(od->al.mol_info[object_num]->n_atoms + 1, sizeof(AtomInfo)))) {
+      O3_ERROR_LOCATE(&(od->task));
+      free_atom_array(od);
+      return OUT_OF_MEMORY;
+    }
+    result = fill_atom_info(od, &(od->task),
+      od->al.mol_info[object_num]->atom, NULL, object_num, O3_MMFF94);
+    if (result) {
+      return result;
+    }
+    *int_meta_data = od->al.mol_info[object_num]->n_atoms
+      * (sizeof(int) + 4 * sizeof(double));
+    fix_endianness(int_meta_data, sizeof(int), 1, swap_endianness);
+    actual_len = fwrite(header, sizeof(int), 1, od->file[GRD_OUT]->handle);
+    if (actual_len != 1) {
+      O3_ERROR_STRING(&(od->task), od->file[TEMP_GRD]->name);
+      O3_ERROR_LOCATE(&(od->task));
+      return CANNOT_WRITE_TEMP_FILE;
+    }
+    for (i = 0; i < od->al.mol_info[object_num]->n_atoms; ++i) {
+      elem_i = 0;
+      while (element_data[elem_i].atomic_number
+        && strcasecmp(od->al.mol_info[object_num]->atom[i]->element,
+        element_data[elem_i].atomic_symbol)) {
+        ++elem_i;
+      }
+      if (!(element_data[elem_i].atomic_number)) {
+        O3_ERROR_LOCATE(&(od->task));
+        return FL_UNKNOWN_ATOM_TYPE;
+      }
+      *int_meta_data = (int)(element_data[elem_i].atomic_number);
+      fix_endianness(int_meta_data, sizeof(int), 1, swap_endianness);
+      double_meta_data = (double *)&int_meta_data[1];
+      double_meta_data[0] = od->al.mol_info[object_num]->atom[i]->charge;
+      double_meta_data[1] = od->al.mol_info[object_num]->atom[i]->coord[0] / BOHR_RADIUS;
+      double_meta_data[2] = od->al.mol_info[object_num]->atom[i]->coord[1] / BOHR_RADIUS;
+      double_meta_data[3] = od->al.mol_info[object_num]->atom[i]->coord[2] / BOHR_RADIUS;
+      fix_endianness(double_meta_data, sizeof(double), 4, swap_endianness);
+      actual_len = fwrite(header, 1,
+        sizeof(int) + 4 * sizeof(double), od->file[GRD_OUT]->handle);
+      if (actual_len != (sizeof(int) + 4 * sizeof(double))) {
+        O3_ERROR_STRING(&(od->task), od->file[TEMP_GRD]->name);
+        O3_ERROR_LOCATE(&(od->task));
+        return CANNOT_WRITE_TEMP_FILE;
+      }
+    }
+    *int_meta_data = od->al.mol_info[object_num]->n_atoms
+      * (sizeof(int) + 4 * sizeof(double));
+    fix_endianness(int_meta_data, sizeof(int), 1, swap_endianness);
+    actual_len = fwrite(header, sizeof(int), 1, od->file[GRD_OUT]->handle);
+    if (actual_len != 1) {
+      O3_ERROR_STRING(&(od->task), od->file[TEMP_GRD]->name);
+      O3_ERROR_LOCATE(&(od->task));
+      return CANNOT_WRITE_TEMP_FILE;
+    }
+    free_array(od->al.mol_info[object_num]->atom);
     break;
 
     default:
@@ -626,14 +816,12 @@ int write_header(O3Data *od, char *header, int format, int interpolate, int swap
         od->grid.end_coord[i]);
     }
     fprintf(od->file[GRD_OUT]->handle,
-      "X step, Y step, Z step:        %.4lf, %.4lf, %.4lf\n",
+      "X step, Y step, Z step:        %.4lf, %.4lf, %.4lf\n"
+      "X nodes, Y nodes, Z nodes:     %d, %d, %d\n\n",
       (double)((double)(od->grid.step[0]) / (double)(interpolate + 1)),
       (double)((double)(od->grid.step[1]) / (double)(interpolate + 1)),
-      (double)((double)(od->grid.step[2]) / (double)(interpolate + 1)));
-    fprintf(od->file[GRD_OUT]->handle,
-      "X nodes, Y nodes, Z nodes:     %d, %d, %d\n",
+      (double)((double)(od->grid.step[2]) / (double)(interpolate + 1)),
       npts[0], npts[1], npts[2]);
-    fprintf(od->file[GRD_OUT]->handle, "\n");
     break;
   }
 
@@ -689,6 +877,7 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
   int x;
   int y;
   int z;
+  int w = 0;
   int npts[3];
   int filename_len;
   int extension_len;
@@ -706,8 +895,8 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
   IntPerm *field_list = NULL;
   IntPerm *y_var_list = NULL;
   IntPerm *object_list = NULL;
-  unsigned short state = 0;
-  unsigned short bit = 0;
+  uint16_t state = 0;
+  uint16_t bit = 0;
   double value;
   float on_value;
   float float_value;
@@ -760,6 +949,26 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
       return CANNOT_WRITE_TEMP_FILE;
     }
     strcpy(extension, SYBYL_GRD_EXTENSION);
+    strcpy(write_mode, "wb+");
+    break;
+    
+    case FORMATTED_CUBE_FORMAT:
+    if (open_temp_file(od, od->file[TEMP_GRD], "formatted_cube")) {
+      O3_ERROR_STRING(&(od->task), od->file[TEMP_GRD]->name);
+      O3_ERROR_LOCATE(&(od->task));
+      return CANNOT_WRITE_TEMP_FILE;
+    }
+    strcpy(extension, CUBE_GRD_EXTENSION);
+    strcpy(write_mode, "wb+");
+    break;
+    
+    case UNFORMATTED_CUBE_FORMAT:
+    if (open_temp_file(od, od->file[TEMP_GRD], "unformatted_cube")) {
+      O3_ERROR_STRING(&(od->task), od->file[TEMP_GRD]->name);
+      O3_ERROR_LOCATE(&(od->task));
+      return CANNOT_WRITE_TEMP_FILE;
+    }
+    strcpy(extension, CUBE_GRD_EXTENSION);
     strcpy(write_mode, "wb+");
     break;
     
@@ -855,7 +1064,7 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
       }
     }
     break;
-  }  
+  }
   /*
   allocate a temporary x*y float array
   */
@@ -982,7 +1191,8 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
         /*
         write out the header
         */
-        result = write_header(od, header, format, interpolate, swap_endianness);
+        result = write_header(od, (object_list ? object_list->pe[j] - 1 : 0),
+          header, format, interpolate, swap_endianness);
         if (result) {
           O3_ERROR_LOCATE(&(od->task));
           return PREMATURE_EOF;
@@ -1089,14 +1299,25 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
             }
           }
         }
-        else if ((format == MAESTRO_FORMAT) || (format == MOE_FORMAT)) {
+        else if ((format == MAESTRO_FORMAT) || (format == MOE_FORMAT)
+          || (format == FORMATTED_CUBE_FORMAT) || (format == UNFORMATTED_CUBE_FORMAT)) {
           /*
           z is the fastest varying coordinate,
           followed by y; x is the slowest
           */
           for (x = 0; x < npts[0]; ++x) {
             for (y = 0; y < npts[1]; ++y) {
-              for (z = 0; z < npts[2]; ++z) {
+              if (format == UNFORMATTED_CUBE_FORMAT) {
+                n = npts[2] * sizeof(double);
+                fix_endianness(&n, sizeof(int), 1, swap_endianness);
+                temp_len = fwrite(&n, sizeof(int), 1,  grd_out);
+                if (temp_len != 1) {
+                  O3_ERROR_STRING(&(od->task), od->file[TEMP_GRD]->name);
+                  O3_ERROR_LOCATE(&(od->task));
+                  return CANNOT_WRITE_TEMP_FILE;
+                }
+              }
+              for (z = 0, w = 0; z < npts[2]; ++z) {
                 if (fseek(od->file[TEMP_GRD]->handle,
                   ((npts[0] + 2) * (npts[1] * z + y) + x + 1)
                   * sizeof(float), SEEK_SET)) {
@@ -1111,17 +1332,34 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
                   O3_ERROR_LOCATE(&(od->task));
                   return CANNOT_READ_TEMP_FILE;
                 }
-                if (format == MAESTRO_FORMAT) {
-                  fprintf(grd_out, "%16.6e\n", float_value);
+                if ((format == MAESTRO_FORMAT) || (format == FORMATTED_CUBE_FORMAT)) {
+                  ++w;
+                  fprintf(grd_out, "%16.6e", float_value);
+                  if ((format == MAESTRO_FORMAT) || (w == 6)) {
+                    fprintf(grd_out, "\n");
+                    w = 0;
+                  }
                 }
                 else {
                   double_value = (double)float_value;
+                  fix_endianness(&double_value, sizeof(double), 1, swap_endianness);
                   temp_len = fwrite(&double_value, sizeof(double), 1,  grd_out);
                   if (temp_len != 1) {
                     O3_ERROR_STRING(&(od->task), od->file[TEMP_GRD]->name);
                     O3_ERROR_LOCATE(&(od->task));
                     return CANNOT_WRITE_TEMP_FILE;
                   }
+                }
+              }
+              if ((format == FORMATTED_CUBE_FORMAT) && w) {
+                fprintf(grd_out, "\n");
+              }
+              else if (format == UNFORMATTED_CUBE_FORMAT) {
+                temp_len = fwrite(&n, sizeof(int), 1,  grd_out);
+                if (temp_len != 1) {
+                  O3_ERROR_STRING(&(od->task), od->file[TEMP_GRD]->name);
+                  O3_ERROR_LOCATE(&(od->task));
+                  return CANNOT_WRITE_TEMP_FILE;
                 }
               }
             }
@@ -1205,7 +1443,8 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
         /*
         write out the header
         */
-        result = write_header(od, header, format, interpolate, swap_endianness);
+        result = write_header(od, (object_list ? object_list->pe[j] - 1 : 0),
+          header, format, interpolate, swap_endianness);
         if (result) {
           O3_ERROR_LOCATE(&(od->task));
           return PREMATURE_EOF;
@@ -1326,10 +1565,21 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
             }
           }
         }
-        else if ((format == MAESTRO_FORMAT) || (format == MOE_FORMAT)) {
+        else if ((format == MAESTRO_FORMAT) || (format == MOE_FORMAT)
+          || (format == FORMATTED_CUBE_FORMAT) || (format == UNFORMATTED_CUBE_FORMAT)) {
           for (x = 0; x < npts[0]; ++x) {
             for (y = 0; y < npts[1]; ++y) {
-              for (z = 0; z < npts[2]; ++z) {
+              if (format == UNFORMATTED_CUBE_FORMAT) {
+                n = npts[2] * sizeof(double);
+                fix_endianness(&n, sizeof(int), 1, swap_endianness);
+                temp_len = fwrite(&n, sizeof(int), 1,  grd_out);
+                if (temp_len != 1) {
+                  O3_ERROR_STRING(&(od->task), od->file[TEMP_GRD]->name);
+                  O3_ERROR_LOCATE(&(od->task));
+                  return CANNOT_WRITE_TEMP_FILE;
+                }
+              }
+              for (z = 0, w = 0; z < npts[2]; ++z) {
                 if (fseek(od->file[TEMP_GRD]->handle,
                   ((npts[0] + 2) * (npts[1] * z + y) + x + 1)
                   * sizeof(float), SEEK_SET)) {
@@ -1342,16 +1592,33 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
                   O3_ERROR_LOCATE(&(od->task));
                   return CANNOT_READ_TEMP_FILE;
                 }
-                if (format == MAESTRO_FORMAT) {
-                  fprintf(grd_out, "%16.6e\n", float_value);
+                if ((format == MAESTRO_FORMAT) || (format == FORMATTED_CUBE_FORMAT)) {
+                  ++w;
+                  fprintf(grd_out, "%16.6e", float_value);
+                  if ((format == MAESTRO_FORMAT) || (w == 6)) {
+                    fprintf(grd_out, "\n");
+                    w = 0;
+                  }
                 }
                 else {
                   double_value = (double)float_value;
+                  fix_endianness(&double_value, sizeof(double), 1, swap_endianness);
                   temp_len = fwrite(&double_value, sizeof(double), 1, grd_out);
                   if (temp_len != 1) {
                     O3_ERROR_LOCATE(&(od->task));
                     return CANNOT_WRITE_TEMP_FILE;
                   }
+                }
+              }
+              if ((format == FORMATTED_CUBE_FORMAT) && w) {
+                fprintf(grd_out, "\n");
+              }
+              else if (format == UNFORMATTED_CUBE_FORMAT) {
+                temp_len = fwrite(&n, sizeof(int), 1,  grd_out);
+                if (temp_len != 1) {
+                  O3_ERROR_STRING(&(od->task), od->file[TEMP_GRD]->name);
+                  O3_ERROR_LOCATE(&(od->task));
+                  return CANNOT_WRITE_TEMP_FILE;
                 }
               }
             }

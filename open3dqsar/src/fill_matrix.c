@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ int fill_x_matrix(O3Data *od, int model_type, int use_srd_groups)
   int y;
   int actual_len;
   int result;
-  unsigned short bit[2] = {ACTIVE_BIT, PREDICT_BIT};
+  uint16_t bit[2] = {ACTIVE_BIT, PREDICT_BIT};
   double value;
   double sumweight;
   
@@ -284,7 +284,7 @@ int fill_y_matrix(O3Data *od)
   int y;
   int y_max;
   int n_bit;
-  unsigned short bit[2] = {ACTIVE_BIT, PREDICT_BIT};
+  uint16_t bit[2] = {ACTIVE_BIT, PREDICT_BIT};
   double sumweight;
   
   

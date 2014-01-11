@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -99,8 +99,14 @@ void parse_sdf_coord_line(int sdf_version, char *buffer, char *element, double *
     /*
     get formal charges (V3000 only)
     */
-    sscanf(buffer, "%*s %*s %*s %s %lf %lf %lf", element,
-      &coord[0], &coord[1], &coord[2]);
+    if (element) {
+      sscanf(buffer, "%*s %*s %*s %s %lf %lf %lf", element,
+        &coord[0], &coord[1], &coord[2]);
+    }
+    else {
+      sscanf(buffer, "%*s %*s %*s %*s %lf %lf %lf",
+        &coord[0], &coord[1], &coord[2]);
+    }
     if (sdf_charge && (ptr = strstr(buffer, "CHG="))) {
       sscanf(&ptr[4], "%d", sdf_charge);
     }
@@ -116,7 +122,7 @@ int get_n_atoms_bonds(MolInfo *mol_info, FILE *handle, char *buffer)
   int pos;
   
   
-  if (!strncasecmp(&buffer[34], "V2000", 5)) {
+  if ((strlen(buffer) <= 34) || (!strncasecmp(&buffer[34], "V2000", 5))) {
     mol_info->sdf_version = V2000;
     /*
     get number of atoms
@@ -133,7 +139,7 @@ int get_n_atoms_bonds(MolInfo *mol_info, FILE *handle, char *buffer)
     sscanf(&buffer[3], "%d", &(mol_info->n_bonds));
     buffer[6] = b;
   }
-  else if (!strncasecmp(&buffer[34], "V3000", 5)) {
+  else if ((strlen(buffer) > 34) && (!strncasecmp(&buffer[34], "V3000", 5))) {
     mol_info->sdf_version = V3000;
     /*
     get number of atoms and bonds
@@ -419,6 +425,7 @@ int update_mol(O3Data *od)
       O3_ERROR_STRING(&(od->task), mol_fd.name);
       return CANNOT_READ_TEMP_FILE;
     }
+    remove_newline(buffer);
     if (get_n_atoms_bonds(od->al.mol_info[object_num], mol_fd.handle, buffer)) {
       fclose(mol_fd.handle);
       O3_ERROR_LOCATE(&(od->task));

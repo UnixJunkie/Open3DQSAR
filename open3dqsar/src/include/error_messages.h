@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2013 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -290,6 +290,10 @@ char E_PC_ALLOWED_RANGE[] =
 char E_MISSING_CV_TYPE[] =
   "Please specify the type of CV which "
   "should be performed.\n%s";
+char E_MISMATCH_BETWEEN_LOADED_FILES[] =
+  "In the .dat file \"%s\" the number of %s "
+  "does not match the number of those currently "
+  "loaded.\n%s";
 char E_PROGRAM_EXIT[] =
   "\nPress ENTER to leave "PACKAGE_NAME".\n";
 char O3_FAILED[] =
