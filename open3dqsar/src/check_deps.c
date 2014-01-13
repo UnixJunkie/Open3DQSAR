@@ -394,7 +394,9 @@ void *check_readline()
   };
   while ((!dl_handle) && lib_array[i]) {
     dl_handle = LoadLibrary(lib_array[i]);
-    ++i;
+    if (!dl_handle) {
+      ++i;
+    }
   }
   #else
   void *dl_handle = NULL;
@@ -407,6 +409,7 @@ void *check_readline()
     "libedit.dylib",
     #else
     "libedit.so",
+    "libedit.so.0",
     "libreadline.so",
     "libreadline.so.6",
     "libreadline.so.5",
@@ -415,7 +418,9 @@ void *check_readline()
   };
   while ((!dl_handle) && lib_array[i]) {
     dl_handle = dlopen(lib_array[i], RTLD_NOW);
-    ++i;
+    if (!dl_handle) {
+      ++i;
+    }
   }
   #endif
   if (dl_handle) {
