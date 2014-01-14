@@ -69,13 +69,11 @@ typedef struct _hist_entry {
 #define rl_attempted_completion_over (*_dlsym_rl_attempted_completion_over)
 #define rl_completion_append_character (*_dlsym_rl_completion_append_character)
 #define rl_completion_matches (*_dlsym_rl_completion_matches)
-#define rl_delete_text (*_dlsym_rl_delete_text)
 #define rl_filename_completion_function (*_dlsym_rl_filename_completion_function)
-#define rl_free_line_state (*_dlsym_rl_free_line_state)
 #define rl_line_buffer (*_dlsym_rl_line_buffer)
 #define rl_point (*_dlsym_rl_point)
-#define rl_replace_line (*_dlsym_rl_replace_line)
-#define rl_reset_after_signal (*_dlsym_rl_reset_after_signal)
+#define rl_catch_signals (*_dlsym_rl_catch_signals)
+#define rl_delete_text (*_dlsym_rl_delete_text)
 #else
 #ifdef HAVE_GNU_READLINE
 #include <readline/readline.h>
@@ -99,12 +97,10 @@ extern void *(*_dlsym_rl_user_completion_entry_free_function);
 extern int *_dlsym_rl_attempted_completion_over;
 extern int *_dlsym_rl_completion_append_character;
 extern char **(*_dlsym_rl_completion_matches)();
-extern int (*_dlsym_rl_delete_text)();
-extern void (*_dlsym_rl_free_line_state)();
-extern void (*_dlsym_rl_replace_line)();
-extern void (*_dlsym_rl_reset_after_signal)();
 extern char *(*_dlsym_rl_filename_completion_function)();
 extern char *(*_dlsym_rl_line_buffer);
 extern int *_dlsym_rl_point;
+extern int *_dlsym_rl_catch_signals;
+extern int *_dlsym_rl_delete_text;
 extern char have_editline;
 extern char have_gnu_readline;

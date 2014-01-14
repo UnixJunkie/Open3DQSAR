@@ -1,6 +1,15 @@
 Open3DQSAR's ChangeLog
 ----------------------
 
+*** January 14, 2014: Open3DQSAR 2.271 ***
+
+  Changes with respect to the previous version include:
+  
+  - Now pressing CTRL+c while typing commands in interactive mode aborts
+    the command line which is being typed and brings up a new prompt;
+    pressing CTRL+c with an empty command line quits the program
+
+
 *** January 10, 2014: Open3DQSAR 2.27 ***
 
   Changes with respect to the previous version include:
