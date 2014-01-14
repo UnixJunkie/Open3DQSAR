@@ -836,6 +836,14 @@ typedef struct GnuplotInfo GnuplotInfo;
 typedef struct fzPtr fzPtr;
 #ifdef WIN32
 typedef unsigned __int64 uint64_t;
+#else
+typedef struct EditLineData EditLineData;
+struct EditLineData {
+  char *prompt;
+  char *line;
+  int status;
+  pthread_t thread_id;
+};
 #endif
 
 struct fzPtr {
@@ -1936,9 +1944,3 @@ int x_var_buw(O3Data *od);
 int xyz_to_var(O3Data *od, VarCoord *varcoord);
 int y_var_buw(O3Data *od);
 int zero(O3Data *od, int type, double level);
-#if (defined HAVE_EDITLINE_FUNCTIONALITY && (!defined HAVE_GNU_READLINE))
-int rl_delete_text(int start, int end);
-void rl_free_line_state();
-void rl_replace_line(const char *text, int clear_undo);
-void rl_reset_after_signal();
-#endif

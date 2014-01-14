@@ -58,6 +58,18 @@ E-mail: paolo.tosco@unito.it
 #endif
 
 
+#ifndef WIN32
+extern EditLineData el_data;
+
+void *el_thread(void *pointer)
+{
+  ((EditLineData *)pointer)->line = readline(((EditLineData *)pointer)->prompt);
+
+  pthread_exit(pointer);
+}
+#endif
+
+
 int parse_input(O3Data *od, FILE *input_stream, int run_type)
 {
   char *ptr;
@@ -170,6 +182,8 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
   int des = 0;
   pid_t pid1;
   struct rlimit rlp;
+  pthread_attr_t el_thread_attr;
+  int el_thread_result;
   #endif
   
 
@@ -308,10 +322,26 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
           if (rl_line_buffer && rl_line_buffer[0]) {
             memset(rl_line_buffer, 0, strlen(rl_line_buffer));
           }
-          od->mel.line = readline(prompt);
-          if (rl_line_buffer) {
-            rl_line_buffer[0] = '\0';
+          #ifndef WIN32
+          pthread_attr_init(&el_thread_attr);
+          pthread_attr_setdetachstate(&el_thread_attr, PTHREAD_CREATE_JOINABLE);
+          el_data.prompt = prompt;
+          el_data.line = NULL;
+          el_thread_result = pthread_create(&(el_data.thread_id), &el_thread_attr,
+            (void *(*)(void *))el_thread, (void *)&el_data);
+          if (el_thread_result) {
+            tee_printf(od, "Error in creating readline thread.\n\n");
+            return CANNOT_CREATE_THREAD;
           }
+          el_thread_result = pthread_join(el_data.thread_id, NULL);
+          if (el_thread_result) {
+            tee_printf(od, "Error in joining readline thread.\n\n");
+            return CANNOT_JOIN_THREAD;
+          }
+          od->mel.line = el_data.line;
+          #else
+          od->mel.line = readline(prompt);
+          #endif
           eof = od->mel.line;
         }
         else {

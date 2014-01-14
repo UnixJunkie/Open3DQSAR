@@ -405,8 +405,8 @@ void *check_readline()
     #ifdef __APPLE__
     "libreadline.6.dylib",
     "libreadline.5.dylib",
-    "libreadline.dylib",
     "libedit.dylib",
+    "libreadline.dylib",
     #else
     "libedit.so",
     "libedit.so.0",
@@ -437,13 +437,11 @@ void *check_readline()
     _dlsym_rl_attempted_completion_over = dlsym(dl_handle, "rl_attempted_completion_over");
     _dlsym_rl_completion_append_character = dlsym(dl_handle, "rl_completion_append_character");
     _dlsym_rl_completion_matches = (char **(*)())dlsym(dl_handle, "rl_completion_matches");
-    _dlsym_rl_delete_text = (int (*)())dlsym(dl_handle, "rl_delete_text");
-    _dlsym_rl_free_line_state = (void (*)())dlsym(dl_handle, "rl_free_line_state");
-    _dlsym_rl_replace_line = (void (*)())dlsym(dl_handle, "rl_free_line_state");
-    _dlsym_rl_reset_after_signal = (void (*)())dlsym(dl_handle, "rl_reset_after_signal");
     _dlsym_rl_filename_completion_function = (char *(*)())dlsym(dl_handle, "rl_filename_completion_function");
     _dlsym_rl_line_buffer = dlsym(dl_handle, "rl_line_buffer");
     _dlsym_rl_point = dlsym(dl_handle, "rl_point");
+    _dlsym_rl_catch_signals = dlsym(dl_handle, "rl_catch_signals");
+    _dlsym_rl_delete_text = dlsym(dl_handle, "rl_delete_text");
     #else
     _dlsym_add_history = (void *(__cdecl *)(const char *))
       GetProcAddress(dl_handle, "add_history");
@@ -471,14 +469,6 @@ void *check_readline()
       GetProcAddress(dl_handle, "rl_completion_append_character");
     _dlsym_rl_completion_matches = (char **(__cdecl *)(const char *, void *))
       GetProcAddress(dl_handle, "rl_completion_matches");
-    _dlsym_rl_delete_text = (int (__cdecl *)(int, int))
-      GetProcAddress(dl_handle, "rl_delete_text");
-    _dlsym_rl_free_line_state = (void (__cdecl *)(void))
-      GetProcAddress(dl_handle, "rl_free_line_state");
-    _dlsym_rl_replace_line = (void (__cdecl *)(const char *, int))
-      GetProcAddress(dl_handle, "rl_free_line_state");
-    _dlsym_rl_reset_after_signal = (void (__cdecl *)(void))
-      GetProcAddress(dl_handle, "rl_reset_after_signal");
     _dlsym_rl_filename_completion_function = (char *(__cdecl *)(const char *, int))
       GetProcAddress(dl_handle, "rl_filename_completion_function");
     _dlsym_rl_line_buffer = (char **)GetProcAddress(dl_handle, "rl_line_buffer");
@@ -499,26 +489,10 @@ void *check_readline()
       && _dlsym_rl_completion_matches
       && _dlsym_rl_filename_completion_function
       && _dlsym_rl_line_buffer && _dlsym_rl_point);
-    have_gnu_readline = (have_editline && _dlsym_rl_delete_text
-      && _dlsym_rl_free_line_state && _dlsym_rl_replace_line
-      && _dlsym_rl_reset_after_signal);
+    have_gnu_readline = (have_editline
+      && _dlsym_rl_catch_signals && _dlsym_rl_delete_text);
   }
   #endif
   
   return dl_handle;
 }
-#if (defined HAVE_EDITLINE_FUNCTIONALITY && (!defined HAVE_GNU_READLINE))
-int rl_delete_text(int start, int end)
-{
-  return 0;
-}
-void rl_free_line_state()
-{
-}
-rl_replace_line(const char *text, int clear_undo)
-{
-}
-void rl_reset_after_signal()
-{
-}
-#endif

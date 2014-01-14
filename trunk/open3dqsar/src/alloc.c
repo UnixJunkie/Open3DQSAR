@@ -616,9 +616,6 @@ int alloc_y_var_array(O3Data *od)
 
 int realloc_y_var_array(O3Data *od, int old_object_num)
 {
-  int i;
-  
-  
   /*
   reserve RAM for the y variable array
   */
