@@ -54,6 +54,12 @@ char M_EXECUTABLE_PATH[] =
 char M_INPUT_OUTPUT_LOG_DIR[] =
   "The %s directory where input, output and log "
   "files will be put is:\n\"%s\"\n\n";
+char M_STDOUT_STDERR_OUTPUT[] =
+  "The command generated the following output on %s:\n\n";
+char E_CANNOT_READ_OUT_LOG_FILE[] =
+  "Cannot read the command's %s; hence, it is not "
+  "possible to determine if the command "
+  "has completed successfully or not.\n%s";
 char E_CANNOT_CHANGE_DIR[] =
   "Cannot change directory to \"%s\".\n%s";
 char E_DIR_NOT_EXISTING[] =
@@ -376,3 +382,5 @@ char SRD_FAILED[] =
   "SRD failed.\n";
 char PLOT_FAILED[] =
   "PLOT failed.\n";
+char SYSTEM_FAILED[] =
+  "SYSTEM failed.\n";

@@ -56,6 +56,7 @@ int load_dat(O3Data *od, int file_id, int options)
   char buffer[LARGE_BUF_LEN];
   char header[BUF_LEN];
   char o3_header[TITLE_LEN + 1];
+  char use_dummy_y_vars = 0;
   int actual_len;
   int object_num = 0;
   int old_object_num = 0;
@@ -148,8 +149,22 @@ int load_dat(O3Data *od, int file_id, int options)
       return WRONG_NUMBER_OF_X_VARS;
     }
     if (od->y_vars != fields_objects_x_y_vars[Y_VARS_NUM]) {
-      O3_ERROR_LOCATE(&(od->task));
-      return WRONG_NUMBER_OF_Y_VARS;
+      if (!fields_objects_x_y_vars[Y_VARS_NUM]) {
+        /*
+        if there are no Y vars in the loaded .dat file,
+        we assume that the user does not know their value
+        so we place a fake activity of 1.00
+        (suggested by Claus Erhardt)
+        */
+        tee_printf(od,
+          "Since y variables are not present in the appended dataset, while they were present\n"
+          "in the pre-existing dataset, a dummy value of %.4lf will be assumed\n\n", DUMMY_Y_VAR_VALUE);
+        use_dummy_y_vars = 1;
+      }
+      else {
+        O3_ERROR_LOCATE(&(od->task));
+        return WRONG_NUMBER_OF_Y_VARS;
+      }
     }
   }
   /* then, read 6 float:
@@ -232,7 +247,9 @@ int load_dat(O3Data *od, int file_id, int options)
       return OUT_OF_MEMORY;
     }
   }
-  od->y_vars = fields_objects_x_y_vars[Y_VARS_NUM];
+  if (!use_dummy_y_vars) {
+    od->y_vars = fields_objects_x_y_vars[Y_VARS_NUM];
+  }
   if (alloc_object_attr(od, old_object_num)) {
     O3_ERROR_LOCATE(&(od->task));
     return OUT_OF_MEMORY;
@@ -714,100 +731,110 @@ int load_dat(O3Data *od, int file_id, int options)
         return OUT_OF_MEMORY;
       }
     }
-    /*
-    read the DAT_HEADER string
-    */
-    actual_len = fzread(header, 1, MAX_NAME_LEN, dat_in);
-    if (actual_len != MAX_NAME_LEN) {
-      O3_ERROR_LOCATE(&(od->task));
-      return PREMATURE_DAT_EOF;
-    }
-    if (strncmp(header, DAT_HEADER, 6)) {
-      O3_ERROR_LOCATE(&(od->task));
-      return PREMATURE_DAT_EOF;
-    }
-    for (i = 0; i < od->y_vars; ++i) {
+    if (!use_dummy_y_vars) {
       /*
-      read dependent variable names
+      read the DAT_HEADER string
       */
       actual_len = fzread(header, 1, MAX_NAME_LEN, dat_in);
       if (actual_len != MAX_NAME_LEN) {
         O3_ERROR_LOCATE(&(od->task));
         return PREMATURE_DAT_EOF;
       }
-      if (!(options & APPEND_BIT)) {
-        j = 0;
-        while ((header[j] != ' ') && (j < MAX_NAME_LEN)) {
-          ++j;
+      if (strncmp(header, DAT_HEADER, 6)) {
+        O3_ERROR_LOCATE(&(od->task));
+        return PREMATURE_DAT_EOF;
+      }
+      for (i = 0; i < od->y_vars; ++i) {
+        /*
+        read dependent variable names
+        */
+        actual_len = fzread(header, 1, MAX_NAME_LEN, dat_in);
+        if (actual_len != MAX_NAME_LEN) {
+          O3_ERROR_LOCATE(&(od->task));
+          return PREMATURE_DAT_EOF;
         }
-        header[j] = '\0';
-        strcpy(od->cimal.y_var_name->me[i], header);
-      }
-    }
-    /*
-    then, read a number of YData structures equal to y_vars
-    */
-    if (options & APPEND_BIT) {
-      if (fzseek(dat_in, sizeof(YData) * od->y_vars, SEEK_CUR)) {
-        O3_ERROR_LOCATE(&(od->task));
-        return PREMATURE_DAT_EOF;
-      }
-    }
-    else {
-      actual_len = fzread(od->mel.y_data,
-        sizeof(YData), od->y_vars, dat_in);
-      if (actual_len != od->y_vars) {
-        O3_ERROR_LOCATE(&(od->task));
-        return PREMATURE_DAT_EOF;
-      }
-    }
-    object_num = -1;
-    while (object_num != (od->grid.object_num - 1)) {
-      /*
-      read 1 int:
-      - object number
-      */
-      actual_len = fzread(&object_num, sizeof(int), 1, dat_in);
-      fix_endianness(&object_num, sizeof(int), 1, endianness_switch);
-      if (actual_len != 1) {
-        O3_ERROR_LOCATE(&(od->task));
-        return PREMATURE_DAT_EOF;
-      }
-      object_num += old_object_num;
-      if ((object_num < old_object_num) || (object_num >= od->grid.object_num)) {
-        O3_ERROR_LOCATE(&(od->task));
-        return PREMATURE_DAT_EOF;
+        if (!(options & APPEND_BIT)) {
+          j = 0;
+          while ((header[j] != ' ') && (j < MAX_NAME_LEN)) {
+            ++j;
+          }
+          header[j] = '\0';
+          strcpy(od->cimal.y_var_name->me[i], header);
+        }
       }
       /*
-      read y_vars
+      then, read a number of YData structures equal to y_vars
       */
-      for (j = 0; j < od->y_vars; ++j) {
-        actual_len = fzread(&value, sizeof(float), 1, dat_in);
+      if (options & APPEND_BIT) {
+        if (fzseek(dat_in, sizeof(YData) * od->y_vars, SEEK_CUR)) {
+          O3_ERROR_LOCATE(&(od->task));
+          return PREMATURE_DAT_EOF;
+        }
+      }
+      else {
+        actual_len = fzread(od->mel.y_data,
+          sizeof(YData), od->y_vars, dat_in);
+        if (actual_len != od->y_vars) {
+          O3_ERROR_LOCATE(&(od->task));
+          return PREMATURE_DAT_EOF;
+        }
+      }
+      object_num = -1;
+      while (object_num != (od->grid.object_num - 1)) {
+        /*
+        read 1 int:
+        - object number
+        */
+        actual_len = fzread(&object_num, sizeof(int), 1, dat_in);
+        fix_endianness(&object_num, sizeof(int), 1, endianness_switch);
         if (actual_len != 1) {
           O3_ERROR_LOCATE(&(od->task));
           return PREMATURE_DAT_EOF;
         }
-        fix_endianness(&value, sizeof(float), 1, endianness_switch);
-        set_y_value(od, object_num, j, (double)value);
+        object_num += old_object_num;
+        if ((object_num < old_object_num) || (object_num >= od->grid.object_num)) {
+          O3_ERROR_LOCATE(&(od->task));
+          return PREMATURE_DAT_EOF;
+        }
+        /*
+        read y_vars
+        */
+        for (j = 0; j < od->y_vars; ++j) {
+          actual_len = fzread(&value, sizeof(float), 1, dat_in);
+          if (actual_len != 1) {
+            O3_ERROR_LOCATE(&(od->task));
+            return PREMATURE_DAT_EOF;
+          }
+          fix_endianness(&value, sizeof(float), 1, endianness_switch);
+          set_y_value(od, object_num, j, (double)value);
+        }
       }
-    }
-    /*
-    Now load y_var_attr attributes
-    */
-    if (options & APPEND_BIT) {
-      if (fzseek(dat_in, sizeof(uint16_t) * od->y_vars, SEEK_CUR)) {
-        O3_ERROR_LOCATE(&(od->task));
-        return PREMATURE_DAT_EOF;
+      /*
+      Now load y_var_attr attributes
+      */
+      if (options & APPEND_BIT) {
+        if (fzseek(dat_in, sizeof(uint16_t) * od->y_vars, SEEK_CUR)) {
+          O3_ERROR_LOCATE(&(od->task));
+          return PREMATURE_DAT_EOF;
+        }
+      }
+      else {
+        actual_len = fzread(od->mel.y_var_attr, sizeof(uint16_t),
+          od->y_vars, dat_in);
+        fix_endianness(od->mel.y_var_attr, sizeof(float),
+          od->y_vars, endianness_switch);
+        if (actual_len != od->y_vars) {
+          O3_ERROR_LOCATE(&(od->task));
+          return PREMATURE_DAT_EOF;
+        }
       }
     }
     else {
-      actual_len = fzread(od->mel.y_var_attr, sizeof(uint16_t),
-        od->y_vars, dat_in);
-      fix_endianness(od->mel.y_var_attr, sizeof(float),
-        od->y_vars, endianness_switch);
-      if (actual_len != od->y_vars) {
-        O3_ERROR_LOCATE(&(od->task));
-        return PREMATURE_DAT_EOF;
+      for (object_num = old_object_num;
+        object_num < od->grid.object_num; ++object_num) {
+        for (j = 0; j < od->y_vars; ++j) {
+          set_y_value(od, object_num, j, DUMMY_Y_VAR_VALUE);
+        }
       }
     }
   }

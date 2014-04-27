@@ -1,6 +1,19 @@
 Open3DQSAR's ChangeLog
 ----------------------
 
+*** April 27, 2014: Open3DQSAR 2.28 ***
+
+  Changes with respect to the previous version include:
+  
+  - A bug in the "source" keyword which prevented its use in non-
+    interactive sessions was fixed
+  - If DAT files with no Y variables are loaded with mode=APPEND, and
+    Y variables are present in the pre-existing dataset, a value of
+    1.0000 will be assumed for the Y variables in the appended dataset
+  - The "system" keyword was implemented to enable the execution of shell
+    commands
+
+
 *** January 14, 2014: Open3DQSAR 2.271 ***
 
   Changes with respect to the previous version include:

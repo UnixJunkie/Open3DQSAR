@@ -94,6 +94,7 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
   char name_list[BUF_LEN];
   char comma_hyphen_list[BUF_LEN];
   char buffer[BUF_LEN];
+  char shell[BUF_LEN];
   char *turbodir = NULL;
   char *parameter = NULL;
   char *point;
@@ -420,22 +421,22 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
     pretreat the line:
     - removing comments
     - converting tabs into spaces
-    - converting ' ' into ';' provided it is not
+    - converting ' ' into '\036' provided it is not
       enclosed between quotes
     - converting '\ ' into ' ' provided it is not
       enclosed between quotes
     */
     len = strlen(whole_line);
     while (i < len) {
-      if (isspace(whole_line[i]) && (!quote)) {
-        whole_line[i] = ';';
-      }
       if (!isprint(whole_line[i])) {
         for (j = i; j < len; ++j) {
           whole_line[j] = whole_line[j + 1];
         }
         --len;
         continue;
+      }
+      if (isspace(whole_line[i]) && (!quote)) {
+        whole_line[i] = '\036';
       }
       if (whole_line[i] == '#') {
         whole_line[i] = '\0';
@@ -472,22 +473,22 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
     copy command line arguments in the "arg"
     array until MAX_ARG is reached
     */
-    ptr = strtok_r(whole_line, ";", &context);
+    ptr = strtok_r(whole_line, "\036", &context);
     while (ptr && (argn < MAX_ARG)) {
       strcpy(arg->me[argn], ptr);
       if (argn) {
-        strcat(line_orig, ";");
+        strcat(line_orig, "\036");
       }
       strcat(line_orig, ptr);
       ++argn;
-      ptr = strtok_r(NULL, ";", &context);
+      ptr = strtok_r(NULL, "\036", &context);
     }
     len = strlen(line_orig);
     i = 0;
     quote = 0;
     /*
     regenerate the original line:
-    - converting ';' into ' ' provided it is not
+    - converting '\036' into ' ' provided it is not
       enclosed between quotes
     - converting ' ' into '\ ' provided it is not
       enclosed between quotes
@@ -506,7 +507,7 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
         ++i;
         ++len;
       }
-      else if ((line_orig[i] == ';') && (!quote)) {
+      else if ((line_orig[i] == '\036') && (!quote)) {
         line_orig[i] = ' ';
       }
       ++i;
@@ -6401,9 +6402,6 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
         fail = !(run_type & INTERACTIVE_RUN);
         continue;
       }
-      ++command;
-      tee_printf(od, M_TOOL_INVOKE, nesting, command, "SOURCE", line_orig);
-      tee_flush(od);
       if (run_type & DRY_RUN) {
         result = parse_input(od, (*source)->handle, DRY_RUN);
         if (result) {
@@ -6414,11 +6412,16 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
           continue;
         }
       }
-      result = parse_input(od, (*source)->handle, 0);
-      if (result) {
-        tee_error(od, run_type, overall_line_num,
-          E_WHILE_SOURCING, (*source)->name,
-          SOURCE_FAILED);
+      else {
+        ++command;
+        tee_printf(od, M_TOOL_INVOKE, nesting, command, "SOURCE", line_orig);
+        tee_flush(od);
+        result = parse_input(od, (*source)->handle, 0);
+        if (result) {
+          tee_error(od, run_type, overall_line_num,
+            E_WHILE_SOURCING, (*source)->name,
+            SOURCE_FAILED);
+        }
       }
       fclose((*source)->handle);
       (*source)->handle = NULL;
@@ -6433,8 +6436,10 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
         return PARSE_INPUT_ERROR;
 
         default:
-        tee_printf(od, M_TOOL_SUCCESS, nesting, command, "SOURCE");
-        tee_flush(od);
+        if (!(run_type & DRY_RUN)) {
+          tee_printf(od, M_TOOL_SUCCESS, nesting, command, "SOURCE");
+          tee_flush(od);
+        }
       }
       continue;
     }
@@ -6446,6 +6451,106 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
       calc_active_vars(od, FULL_MODEL);
       tee_printf(od, M_TOOL_SUCCESS, nesting, command, "DATASET");
       tee_flush(od);
+    }
+    else if (!strcasecmp(arg->me[0], "system")) {
+      memset(file_basename, 0, BUF_LEN);
+      memset(shell, 0, BUF_LEN);
+      if ((parameter = get_args(od, "cmd"))) {
+        strcpy(buffer, parameter);
+      }
+      else {
+        tee_error(od, run_type, overall_line_num,
+          "Please supply a \"cmd\" parameter "
+          "with the shell command to be executed",
+          SYSTEM_FAILED);
+        fail = !(run_type & INTERACTIVE_RUN);
+        continue;
+      }
+      if ((parameter = get_args(od, "exedir"))) {
+        strcpy(file_basename, parameter);
+      }
+      if ((parameter = get_args(od, "shell"))) {
+        strcpy(shell, parameter);
+      }
+      if (!(run_type & DRY_RUN)) {
+        ++command;
+        tee_printf(od, M_TOOL_INVOKE, nesting, command, "SYSTEM", line_orig);
+        tee_flush(od);
+        result = exe_shell_cmd(od, buffer, file_basename[0]
+          ? file_basename : NULL, shell[0] ? shell : NULL);
+        switch (result) {
+          case OUT_FILE_NOT_EMPTY:
+          if ((od->file[TEMP_OUT]->handle = fopen
+            (od->file[TEMP_OUT]->name, "rb"))) {
+            tee_printf(od, M_STDOUT_STDERR_OUTPUT, "STDOUT");
+            while (fgets(buffer, BUF_LEN,
+              od->file[TEMP_OUT]->handle)) {
+              buffer[BUF_LEN - 1] = '\0';
+              tee_printf(od, "%s", buffer);
+            }
+            fclose(od->file[TEMP_OUT]->handle);
+            od->file[TEMP_OUT]->handle = NULL;
+            tee_printf(od, "\n");
+            result = 0;
+          }
+          else {
+            result = CANNOT_READ_OUT_FILE;
+          }
+          break;
+          
+          case LOG_FILE_NOT_EMPTY:
+          if ((od->file[TEMP_LOG]->handle = fopen
+            (od->file[TEMP_LOG]->name, "rb"))) {
+            tee_printf(od, M_STDOUT_STDERR_OUTPUT, "STDERR");
+            while (fgets(buffer, BUF_LEN,
+              od->file[TEMP_LOG]->handle)) {
+              buffer[BUF_LEN - 1] = '\0';
+              tee_printf(od, "%s", buffer);
+            }
+            fclose(od->file[TEMP_LOG]->handle);
+            od->file[TEMP_LOG]->handle = NULL;
+            tee_printf(od, "\n");
+            result = 0;
+          }
+          else {
+            result = CANNOT_READ_LOG_FILE;
+          }
+          break;
+        }
+        switch (result) {
+          case CANNOT_READ_OUT_FILE:
+          tee_error(od, run_type, overall_line_num,
+          E_CANNOT_READ_OUT_LOG_FILE, "STDOUT", "");
+          result = 0;
+          break;
+
+          case CANNOT_READ_LOG_FILE:
+          tee_error(od, run_type, overall_line_num,
+          E_CANNOT_READ_OUT_LOG_FILE, "STDERR", "");
+          result = 0;
+          break;
+
+          case FL_CANNOT_CREATE_CHANNELS:
+          tee_error(od, run_type, overall_line_num,
+            E_CANNOT_CREATE_PIPE, SYSTEM_FAILED);
+          break;
+
+          case FL_CANNOT_CHDIR:
+          tee_error(od, run_type, overall_line_num,
+            E_CANNOT_CHANGE_DIR, file_basename[0] ? file_basename
+            : "current working directory", SYSTEM_FAILED);
+          break;
+
+          case FL_CANNOT_CREATE_PROCESS:
+          tee_error(od, run_type, overall_line_num,
+            E_CANNOT_CREATE_PROCESS, "OpenBabel", SYSTEM_FAILED);
+          break;
+        }
+        if (!result) {
+          tee_printf(od, M_TOOL_SUCCESS, nesting, command, "SYSTEM");
+          tee_flush(od);
+        }
+      }
     }
     else if ((!strcasecmp(arg->me[0], "exit"))
       || (!strcasecmp(arg->me[0], "quit"))
@@ -8160,9 +8265,11 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
         }
       }
     }
-    od->valid = 0;
-    od->object_num = 0;
-    od->field_num = 0;
+    if (!nesting) {
+      od->valid = 0;
+      od->object_num = 0;
+      od->field_num = 0;
+    }
     rewind(input_stream);
   }
     
