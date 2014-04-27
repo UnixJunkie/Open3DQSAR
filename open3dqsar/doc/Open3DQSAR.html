@@ -329,17 +329,18 @@ href="#rototrans">rototrans</a></li> <li><a href="#save">save</a></li>
 <li><a href="#scale_y_vars">scale_y_vars</a></li> <li><a
 href="#scramble">scramble</a></li> <li><a href="#sdcut">sdcut</a></li>
 <li><a href="#set">set</a></li> <li><a href="#source">source</a></li>
-<li><a href="#srd">srd</a></li> <li><a href="#stop">stop</a></li>
-<li><a href="#tanimoto">tanimoto</a></li> <li><a
-href="#transform">transform</a></li> <li><a href="#uvepls">uvepls</a></li>
-<li><a href="#zero">zero</a></li></ul> <br><br><br><a href="#Contents">
-<p align="right">Back to Contents</p></a><br> <hr color="#dbe5f1"
-align="center" width="95%" size="2"><br><h3><a name="box"></a>box</h3><br>
-<h4>SYNOPSIS</h4> <code>box&nbsp; [mode={GET | SET; defaults to
-SET}]&nbsp; \<br> &nbsp;&nbsp;&nbsp; {[outgap=&lt;number of &Aring;
-by which the grid box exceeds the largest molecule in all directions;
-defaults to 5.0&gt;]&nbsp; \<br> &nbsp;&nbsp;&nbsp; [step=&lt;grid step
-size in &Aring;; defaults to 1.0&gt;]&nbsp; \<br> &nbsp;&nbsp;&nbsp; |
+<li><a href="#srd">srd</a></li> <li><a href="#stop">stop</a></li> <li><a
+href="#system">system</a></li> <li><a href="#tanimoto">tanimoto</a></li>
+<li><a href="#transform">transform</a></li> <li><a
+href="#uvepls">uvepls</a></li> <li><a href="#zero">zero</a></li></ul>
+<br><br><br><a href="#Contents"> <p align="right">Back to
+Contents</p></a><br> <hr color="#dbe5f1" align="center" width="95%"
+size="2"><br><h3><a name="box"></a>box</h3><br> <h4>SYNOPSIS</h4>
+<code>box&nbsp; [mode={GET | SET; defaults to SET}]&nbsp; \<br>
+&nbsp;&nbsp;&nbsp; {[outgap=&lt;number of &Aring; by which the grid
+box exceeds the largest molecule in all directions; defaults to
+5.0&gt;]&nbsp; \<br> &nbsp;&nbsp;&nbsp; [step=&lt;grid step size
+in &Aring;; defaults to 1.0&gt;]&nbsp; \<br> &nbsp;&nbsp;&nbsp; |
 [x_start=&lt;top left x coordinate&gt;&nbsp; \<br> &nbsp;&nbsp;&nbsp;
 {x_end=&lt;bottom right x coordinate&gt; | x_nodes=&lt;number
 of nodes on the x coordinate&gt;}&nbsp; \<br> &nbsp;&nbsp;&nbsp;
@@ -2564,11 +2565,39 @@ target="_blank">DOI</a></li></ol> <br><br><br><a
 href="#Contents"> <p align="right">Back to Contents</p></a><br>
 <hr color="#dbe5f1" align="center" width="95%" size="2"><br><h3><a
 name="stop"></a>stop</h3><br> <h4>SYNOPSIS</h4> <code>stop | exit |
-quit</code><br><br> <h4>DESCRIPTION</h4> The <code>stop</code> keyword,
-as well as its synonyms <code>exit</code> and <code>quit</code>,
-is used to abandon an <B>Open3DQSAR</B> input file ignoring all
-keywords eventually present downstream the <code>stop</code>
-command.  <br><br><br><a href="#Contents"> <p align="right">Back
+quit</code><br><br> <h4>DESCRIPTION</h4> The <code>stop</code> keyword, as
+well as its synonyms <code>exit</code> and <code>quit</code>, is used to
+abandon an <B>Open3DQSAR</B> input file ignoring all keywords eventually
+present downstream the <code>stop</code> command.  <br><br><br><a
+href="#Contents"> <p align="right">Back to Contents</p></a><br>
+<hr color="#dbe5f1" align="center" width="95%" size="2"><br><h3><a
+name="system"></a>system</h3><br> <h4>SYNOPSIS</h4> <code>system&nbsp;
+cmd=&lt;shell command to be executed&gt;&nbsp; \<br> &nbsp;&nbsp;&nbsp;
+[exedir=&lt;directory from which the command should be executed; defaults
+to the current working directory&gt;]&nbsp; \<br> &nbsp;&nbsp;&nbsp;
+[shell=&lt;shell to be used to execute the command; defaults to BASH
+(Linux, Mac, Solaris, FreeBSD) or CMD (Windows)&gt;] </code><br><br>
+<h4>DESCRIPTION</h4> The <code>system</code> keyword allows
+executing shell commands entered through the <code>cmd</code>
+parameter. Remember to enclose commands which contain spaces between
+quotes, or to prepend a backspace before the space. If the command
+has a special requirement in terms of the directory from which it
+should be executed (<I>e.g.</I>, because it requires a DLL which is
+stored in a certain directory), the latter can be specified through
+the <code>exedir</code> parameter; in its absence, the command will
+be run from the current working directory.  By default, under Linux,
+Mac, Solaris, FreeBSD the <code>shell</code> parameter defaults to
+<code>"/usr/bin/env bash -c"</code>, while under Windows the default
+value is <code>"cmd.exe /c"</code>.<br><br> <h4>EXAMPLES</h4> <code>
+# the following command removes the file intermediate.dat from the
+current working directory (Linux, Mac, Solaris, FreeBSD)<br> system
+cmd="rm intermediate.dat"<br><br> # the following command removes the
+file intermediate.dat from the current working directory (Windows)<br>
+system cmd="del intermediate.dat"<br><br> # the following command makes a
+copy of dummy.txt only if it exists; the csh shell is used as the command
+interpreter (Linux, Mac, Solaris, FreeBSD)<br> system shell="/usr/bin/env
+csh -c" cmd="if ( -e dummy.txt ) cp dummy.txt dummy_copy.txt; endif"
+</code> <br><br><br><a href="#Contents"> <p align="right">Back
 to Contents</p></a><br> <hr color="#dbe5f1" align="center"
 width="95%" size="2"><br><h3><a name="tanimoto"></a>tanimoto</h3><br>
 <h4>SYNOPSIS</h4> <code>tanimoto&nbsp; ref_struct=&lt;reference structure
@@ -2782,19 +2811,33 @@ and 0.00 in field 1<br>zero&nbsp; type=NEG&nbsp; field_list=1&nbsp;
 level=0.25</code> <br><br><br><a href="#Contents"> <p align="right">Back
 to Contents</p></a><br> <hr color="#dbe5f1" align="center" width="95%"
 size="2"><br><h2><a name="ChangeLog">ChangeLog</a></h2><br><br>
-<ul><li>January 10, 2014: release of <B>Open3DQSAR</B> 2.27</li></ul>
+<ul><li>April 27, 2014: release of <B>Open3DQSAR</B> 2.28</li></ul>
 <ul>Changes with respect to the previous version include:</ul>
-<ul><ul><li>Added the possibility to print grid box settings
-with the <code>mode=GET</code> parameter, as opposed to the
-default <code>mode=SET</code></li></ul></ul> <ul><ul><li>Added the
-<code>mode=APPEND</code> parameter to the <code>load</code> keyword
-to allow appending a dataset to an already loaded one</li></ul></ul>
-<ul><ul><li>Removed the dependency from <code>libedit</code>;
-now the program attempts to open the <code>libedit</code>
-(or <code>libreadline</code>, if <code>libedit</code> is
-not available) dynamic library at runtime. The dependency
-from <code>libedit</code>/<code>libreadline</code> can still be
-introduced at compile time using the <code>--with-editline</code>
+<ul><ul><li>A bug in the <code>source</code> keyword which prevented its
+use in non- interactive sessions was fixed</li></ul></ul> <ul><ul><li>If
+<code>DAT</code> files with no <I>Y</I> variables are loaded with
+<code>mode=APPEND</code>, and <I>Y</I> variables are present in the
+pre-existing dataset, a value of 1.0000 will be assumed for the <I>Y</I>
+variables in the appended dataset</li></ul></ul> <ul><ul><li>The
+<code>system</code> keyword was implemented to enable the execution of
+shell commands</li></ul></ul> <br> <ul><li>January 14, 2014: release of
+<B>Open3DQSAR</B> 2.271</li></ul> <ul>Changes with respect to the previous
+version include:</ul> <ul><ul><li>Now pressing <code>CTRL+c</code> while
+typing commands in interactive mode aborts the command line which is being
+typed and brings up a new prompt; pressing <code>CTRL+c</code> with an
+empty command line quits the program</li></ul></ul> <br> <ul><li>January
+10, 2014: release of <B>Open3DQSAR</B> 2.27</li></ul> <ul>Changes with
+respect to the previous version include:</ul> <ul><ul><li>Added the
+possibility to print grid box settings with the <code>mode=GET</code>
+parameter, as opposed to the default <code>mode=SET</code></li></ul></ul>
+<ul><ul><li>Added the <code>mode=APPEND</code> parameter to
+the <code>load</code> keyword to allow appending a dataset to
+an already loaded one</li></ul></ul> <ul><ul><li>Removed the
+dependency from <code>libedit</code>; now the program attempts
+to open the <code>libedit</code> (or <code>libreadline</code>, if
+<code>libedit</code> is not available) dynamic library at runtime. The
+dependency from <code>libedit</code>/<code>libreadline</code> can still
+be introduced at compile time using the <code>--with-editline</code>
 configure switch</li></ul></ul> <ul><ul><li>Fixed a regression
 introduced in version 2.26 which under certain circumstances
 might cause a segmentation fault using the <code>export</code>

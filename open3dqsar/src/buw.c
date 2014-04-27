@@ -96,7 +96,7 @@ int x_var_buw(O3Data *od)
         }
       }
       od->mel.x_data[i].temp_x_weight_coefficient = ((od->vel.ss->ve[i] > 0.0)
-        ? sqrt(od->vel.ss->ve[ref_field] / od->vel.ss->ve[i]) : 0.0);
+        ? sqrt(od->vel.ss->ve[ref_field] / od->vel.ss->ve[i]) : 1.0);
       sum_x_var_buw +=
         od->mel.x_data[i].temp_x_weight_coefficient;
     }

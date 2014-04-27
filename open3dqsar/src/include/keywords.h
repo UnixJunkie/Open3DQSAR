@@ -1384,6 +1384,27 @@ O3KeywordData keyword_data[] =
       }
     }
   }, {
+    "system",
+    {
+      {
+        O3_PARAM_STRING, "cmd", {
+          NULL
+        }
+      }, {
+        O3_PARAM_DIRECTORY, "exedir", {
+          NULL
+        }
+      }, {
+        O3_PARAM_STRING, "shell", {
+          NULL
+        }
+      }, {  // this is the terminator
+        0, NULL, {
+          NULL
+        }
+      }
+    }
+  }, {
     "transform",
     {
       {

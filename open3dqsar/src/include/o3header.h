@@ -160,6 +160,7 @@ E-mail: paolo.tosco@unito.it
 #define MERSENNE_N      624
 #define MERSENNE_M      397
 #define DUMMY_COST      100000
+#define DUMMY_Y_VAR_VALUE      1.0
 #define MAX_H_BINS      20
 #define SYMMETRY_H_BINS      5
 #define MATRIX_A      0x9908b0dfUL   /* constant vector a */
@@ -242,6 +243,8 @@ E-mail: paolo.tosco@unito.it
 #define PARSE_NLEVEL_TYPE_ERROR    160
 #define CANNOT_WRITE_TEMP_FILE    170
 #define CANNOT_READ_TEMP_FILE    180
+#define CANNOT_READ_OUT_FILE    181
+#define CANNOT_READ_LOG_FILE    182
 #define Y_VAR_LOW_SD      190
 #define STATUS_INCONSISTENCY    230
 #define ONE_FIELD_AT_A_TIME    270
@@ -289,6 +292,8 @@ E-mail: paolo.tosco@unito.it
 #define CANNOT_CREATE_DIRECTORY    560
 #define CS3D_ERROR      570
 #define CANNOT_SEND_JMOL_COMMAND      580
+#define OUT_FILE_NOT_EMPTY      590
+#define LOG_FILE_NOT_EMPTY      591
 #define FL_CANNOT_CREATE_CHANNELS  (1<<0)
 #define FL_CANNOT_CREATE_PROCESS  (1<<1)
 #define FL_CANNOT_READ_OUT_FILE    (1<<2)
@@ -415,6 +420,7 @@ E-mail: paolo.tosco@unito.it
 #define APPDATA        "APPDATA"
 #define HOMEDIR        PACKAGE_NAME
 #define HISTORY_FILE      ".history"
+#define DEFAULT_SHELL_CMD      "cmd.exe /c"
 #define EXE_PATH      "PATH"
 #define BABEL_EXE      "babel.exe"
 #define TINKER_ANALYZE_EXE    "analyze.exe"
@@ -476,6 +482,7 @@ E-mail: paolo.tosco@unito.it
 #define APPDATA        "HOME"
 #define HOMEDIR        "."PACKAGE_NAME_LOWERCASE
 #define HISTORY_FILE      ".history"
+#define DEFAULT_SHELL_CMD      "/usr/bin/env bash -c"
 #define EXE_PATH      "PATH"
 #define BABEL_EXE      "babel"
 #define TINKER_ANALYZE_EXE    "analyze"
@@ -942,6 +949,7 @@ struct AtomPair {
   int score;
   int cost;
   double dist;
+  double weight;
 };
 
 struct RotoTransList {
@@ -1909,6 +1917,7 @@ char *strtok_r(char *s1, const char *s2, char **lasts);
 int superpose_conf_lap(LAPInfo *li, ConfInfo *moved_conf, ConfInfo *template_conf, ConfInfo *fitted_conf, ConfInfo *progress_conf, AtomPair *temp_sdm, AtomPair *fitted_sdm, char **used, double *rt_mat, double *heavy_msd, double *original_heavy_msd, int *pairs);
 int superpose_conf_syst(ConfInfo *moved_conf, ConfInfo *template_conf, ConfInfo *fitted_conf, ConfInfo *progress_conf, ConfInfo *cand_conf, AtomPair *sdm, AtomPair *local_best_sdm, AtomPair *fitted_sdm, char **used, double *rt_mat, int angle_step, double *heavy_msd, double *original_heavy_msd, int *pairs);
 void sync_field_mmap(O3Data *od);
+int exe_shell_cmd(O3Data *od, char *command, char *exedir, char *shell);
 int tanimoto(O3Data *od, int ref_struct);
 void tee_error(O3Data *od, int run_type, int overall_line_num, char *fmt, ...);
 void tee_flush(O3Data *od);

@@ -573,6 +573,54 @@ void print_debug_info(O3Data *od, TaskInfo *task)
 }
 
 
+int exe_shell_cmd(O3Data *od, char *command, char *exedir, char *shell)
+{
+  char buffer[BUF_LEN];
+  char cwd[BUF_LEN];
+  int result;
+  int pid;
+  ProgExeInfo prog_exe_info;
+  struct stat file_stat;
+  
+  
+  memset(buffer, 0, BUF_LEN);
+  memset(cwd, 0, BUF_LEN);
+  memset(&prog_exe_info, 0, sizeof(ProgExeInfo));
+  prog_exe_info.stdout_fd = od->file[TEMP_OUT];
+  prog_exe_info.stderr_fd = od->file[TEMP_LOG];
+  if (!exedir) {
+    exedir = getcwd(cwd, BUF_LEN - 1);
+    if (!exedir) {
+      return CANNOT_CHANGE_DIR;
+    }
+  }
+  prog_exe_info.exedir = exedir;
+  prog_exe_info.sep_proc_grp = 1;
+  sprintf(prog_exe_info.command_line, "%s \"%s\"", shell
+    ? shell : DEFAULT_SHELL_CMD, command);
+  pid = ext_program_exe(&prog_exe_info, &result);
+  if (result) {
+    return result;
+  }
+  ext_program_wait(&prog_exe_info, pid);
+  if (stat(od->file[TEMP_LOG]->name, &file_stat) == -1) {
+    return CANNOT_READ_LOG_FILE;
+  }
+  if (file_stat.st_size) {
+    return LOG_FILE_NOT_EMPTY;
+  }
+  if (stat(od->file[TEMP_OUT]->name, &file_stat) == -1) {
+    return CANNOT_READ_OUT_FILE;
+  }
+  if (file_stat.st_size) {
+    return OUT_FILE_NOT_EMPTY;
+  }
+
+  return 0;
+  
+}
+
+
 #ifndef HAVE_STRTOK_R
 char *strtok_r(char *s1, const char *s2, char **lasts)
 {
