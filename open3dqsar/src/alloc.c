@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2015 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -337,6 +337,14 @@ int alloc_x_var_array(O3Data *od, int num_fields)
   }
   memset(&(od->mel.x_var_array[od->field_num]), 0,
     sizeof(float *) * num_fields);
+  od->mel.field_contrib = (double *)realloc
+    (od->mel.field_contrib,
+    sizeof(double) * (od->field_num + num_fields));
+  if (!(od->mel.field_contrib)) {
+    return OUT_OF_MEMORY;
+  }
+  memset(&(od->mel.field_contrib[od->field_num]), 0,
+    sizeof(int) * num_fields);
   for (i = 0; i < num_fields; ++i) {
     od->mel.x_var_array[od->field_num + i] =
       (float **)malloc(sizeof(float *) * od->object_num);

@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2015 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -122,6 +122,10 @@ char E_PROGRAM_ERROR[] =
   "%s reported the error message which follows:\n";
 char E_CANNOT_READ_PROGRAM_LOG[] =
   "Cannot read %s log file.\n%s";
+char E_UNEVEN_GRID_STEPS[] =
+  "This field calculation does not support uneven "
+  "grid step sizes; please make sure that the grid step "
+  "has the same size for all coordinates.\n%s";
 char E_CS3D_EXE[] =
   "Please set the O3_CS3D environment variable "
   "or use the \"env cs3d\" keyword to the absolute "

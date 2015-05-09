@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2015 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -57,8 +57,8 @@ E-mail: paolo.tosco@unito.it
 #include <stddef.h>
 #include <sys/types.h>
 #include <sys/time.h>
-#ifndef WIN32
 #include <sys/stat.h>
+#ifndef WIN32
 #include <sys/wait.h>
 #include <sys/resource.h>
 #include <sys/utsname.h>
@@ -294,6 +294,7 @@ E-mail: paolo.tosco@unito.it
 #define CANNOT_SEND_JMOL_COMMAND      580
 #define OUT_FILE_NOT_EMPTY      590
 #define LOG_FILE_NOT_EMPTY      591
+#define BAD_DX_HEADER      600
 #define FL_CANNOT_CREATE_CHANNELS  (1<<0)
 #define FL_CANNOT_CREATE_PROCESS  (1<<1)
 #define FL_CANNOT_READ_OUT_FILE    (1<<2)
@@ -639,6 +640,8 @@ E-mail: paolo.tosco@unito.it
 #define FOUR_LEVEL_BIT      (1<<12)
 #define SCRAMBLE_BIT      (1<<13)
 #define SDF_BIT        (1<<14)
+#define CALC_LEVERAGE_BIT      (1<<0)
+#define CALC_FIELD_CONTRIB_BIT      (1<<1)
 #define QMD_KEEP_INITIAL    (1<<0)
 #define QMD_GBSA      (1<<1)
 #define QMD_REMOVE_FOLDER    (1<<2)
@@ -786,7 +789,8 @@ E-mail: paolo.tosco@unito.it
 #define MOLDEN_INPUT_FILE    3
 #define MOE_GRID_INPUT_FILE    4
 #define GRID_ASCII_INPUT_FILE    5
-#define COSMO_INPUT_FILE    6
+#define GRID_DX_INPUT_FILE    6
+#define COSMO_INPUT_FILE    7
 #define GAUSSIAN_UNIT_NUMBER    30
 #define DONT_USE_WEIGHTS    0
 #define USE_MMFF_WEIGHTS    1
@@ -1261,6 +1265,7 @@ struct MemList {
   double *object_weight;
   double *weighted_value;
   double *score_temp;
+  double *field_contrib;
   float ***x_var_array;
   float *float_xy_mat;
   float *buf_float_xy_mat[4];
@@ -1589,7 +1594,7 @@ int call_cs3d_program(O3Data *od);
 int call_md_grid_program(O3Data *od);
 int call_obenergy(O3Data *od, int force_field);
 int calc_p_vectors(O3Data *od, int field_num, int seed_num);
-int calc_y_values(O3Data *od, int calc_leverage);
+int calc_y_values(O3Data *od, int options);
 int check_babel(O3Data *od, char *bin);
 int check_bond_type(AtomInfo **atom, int *tinker_types, int *a, int i, BondInfo *bond_info, int value);
 int check_conf_db(O3Data *od, char *conf_dir, int type, int *wrong_object_id, int *wrong_conf_num);
@@ -1753,6 +1758,7 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type, int sign, int f
 int import_dependent(O3Data *od, char *name_list);
 int import_free_format(O3Data *od, char *name_list, int skip_header, int *n_values);
 int import_grid_ascii(O3Data *od, char *regex_name);
+int import_grid_dx(O3Data *od, char *regex_name);
 int import_grid_formatted_cube(O3Data *od, int mo);
 int import_grid_unformatted_cube(O3Data *od, int mo);
 int import_gridkont(O3Data *od, int replace_object_name);
@@ -1836,7 +1842,7 @@ void prep_moe_grid_input(O3Data *od);
 int prep_molden_input(O3Data *od, int object_num);
 int prep_qm_input(O3Data *od, TaskInfo *task, AtomInfo **atom, int object_num);
 void prep_sybyl_input(O3Data *od);
-int print_calc_values(O3Data *od, int calc_leverage);
+int print_calc_values(O3Data *od, int options);
 void print_debug_info(O3Data *od, TaskInfo *task);
 int print_ext_pred_values(O3Data *od);
 void print_grid_comparison(O3Data *od);
@@ -1856,6 +1862,7 @@ void *qmd_thread(void *pointer);
 #else
 DWORD qmd_thread(void *pointer);
 #endif
+int read_dx_header(O3Data *od, FileDescriptor *inp_fd, int object_num);
 void read_tinker_xyz_n_atoms_energy(char *line, int *n_atoms, double *energy);
 int realloc_x_var_array(O3Data *od, int old_object_num);
 int realloc_y_var_array(O3Data *od, int old_object_num);

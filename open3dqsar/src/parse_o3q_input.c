@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2015 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -53,7 +53,9 @@ E-mail: paolo.tosco@unito.it
 #include <readline/history.h>
 #else
 #include <editline/readline.h>
+#ifndef WIN32
 #include <histedit.h>
+#endif
 #endif
 #endif
 
@@ -81,6 +83,7 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
     "MOLDEN",
     "MOE_GRID",
     "GRID_ASCII",
+    "GRID_DX",
     "COSMO"
   };
   char prompt[TITLE_LEN];
@@ -119,7 +122,6 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
   int import_y_vars = 0;
   int pc;
   int max_pc;
-  int calc_leverage;
   int mo;
   int format;
   int type = 0;
@@ -631,7 +633,9 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
       }
       if ((parameter = get_args(od, "mode"))) {
         if (!strncasecmp(parameter, "get", 3)) {
-          print_grid_coordinates(od, &(od->grid));
+          if (!(run_type & DRY_RUN)) {
+            print_grid_coordinates(od, &(od->grid));
+          }
           continue;
         }
       }
@@ -644,6 +648,8 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
       }
       memset(grid_fill, 0, MAX_NAME_LEN);
       temp_grid.step[0] = 1.0;
+      temp_grid.step[1] = 1.0;
+      temp_grid.step[2] = 1.0;
       outgap = 5.0;
       from_file = 0;
       if ((parameter = get_args(od, "file"))) {
@@ -701,6 +707,20 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
         if ((parameter = get_args(od, "step"))) {
           grid_fill[6] = 1;
           sscanf(parameter, "%f", &(temp_grid.step[0]));
+          temp_grid.step[1] = temp_grid.step[0];
+          temp_grid.step[2] = temp_grid.step[0];
+        }
+        if ((parameter = get_args(od, "x_step"))) {
+          grid_fill[6] = 1;
+          sscanf(parameter, "%f", &(temp_grid.step[0]));
+        }
+        if ((parameter = get_args(od, "y_step"))) {
+          grid_fill[6] = 1;
+          sscanf(parameter, "%f", &(temp_grid.step[1]));
+        }
+        if ((parameter = get_args(od, "z_step"))) {
+          grid_fill[6] = 1;
+          sscanf(parameter, "%f", &(temp_grid.step[2]));
         }
         if ((parameter = get_args(od, "outgap"))) {
           grid_fill[7] = 1;
@@ -709,7 +729,7 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
         if (grid_fill[7]) {
           /*
           if the outgap parameter is given, no other parameters
-          should be given except step (which defaults to 1.0)
+          should be given except step(s) (which default to 1.0)
           */
           for (i = 0, j = 0; ((i <= 5) && !j); ++i) {
             j += (int)grid_fill[i];
@@ -717,7 +737,7 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
           if (j) {
             tee_error(od, run_type, overall_line_num,
               "When the outgap parameter is input, "
-              "only the step parameter may be "
+              "only the step parameter(s) may be "
               "present.\n%s",
               BOX_FAILED);
             fail = !(run_type & INTERACTIVE_RUN);
@@ -746,9 +766,11 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
             outgap = -1.0;
           }
         }
-        if (temp_grid.step[0] < ALMOST_ZERO) {
+        if ((temp_grid.step[0] < ALMOST_ZERO)
+          || (temp_grid.step[1] < ALMOST_ZERO)
+          || (temp_grid.step[2] < ALMOST_ZERO)) {
           tee_error(od, run_type, overall_line_num,
-            "The step value must "
+            "The step value(s) must "
             "be greater than 0.0.\n%s",
             BOX_FAILED);
           fail = !(run_type & INTERACTIVE_RUN);
@@ -1484,12 +1506,16 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
         multi_file_type = GRID_ASCII_INPUT_FILE;
         multi_file_fd = NULL;
       }
+      else if (!strcasecmp(parameter, "grid_dx")) {
+        multi_file_type = GRID_DX_INPUT_FILE;
+        multi_file_fd = NULL;
+      }
       else {
         tee_error(od, run_type, overall_line_num,
           "Only \"SDF\", \"MOL2\", \"FREE_FORMAT\", \"GRIDKONT\", "
           "\"DEPENDENT\", \"GAMESS_CUBE\", \"FORMATTED_CUBE\", "
-          "\"GAUSSIAN_CUBE\", \"UNFORMATTED_CUBE\", "
-          "\"MOLDEN\", \"MOE_GRID\" and \"GRID_ASCII\" "
+          "\"GAUSSIAN_CUBE\", \"UNFORMATTED_CUBE\", \"MOLDEN\", "
+          "\"MOE_GRID\", \"GRID_ASCII\" and \"GRID_DX\" "
           "types are allowed for the IMPORT keyword.\n%s",
           IMPORT_FAILED);
         fail = !(run_type & INTERACTIVE_RUN);
@@ -1551,13 +1577,14 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
           fail = !(run_type & INTERACTIVE_RUN);
           continue;
         }
-        if (!(od->grid.nodes[0])) {
+        if ((multi_file_type != GRID_DX_INPUT_FILE) && (!(od->grid.nodes[0]))) {
           tee_error(od, run_type, overall_line_num,
             E_GRID_BOX_FIRST, IMPORT_FAILED);
           fail = !(run_type & INTERACTIVE_RUN);
           continue;
         }
         if ((multi_file_type == GRID_ASCII_INPUT_FILE)
+          || (multi_file_type == GRID_DX_INPUT_FILE)
           || (multi_file_type == MOE_GRID_INPUT_FILE)) {
           if (check_regex_name(regex_name[0], 1)) {
             tee_error(od, run_type, overall_line_num,
@@ -1655,6 +1682,10 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
             result = import_grid_moe(od, regex_name[0]);
             break;
 
+            case GRID_DX_INPUT_FILE:
+            result = import_grid_dx(od, regex_name[0]);
+            break;
+
             default:
             result = import_grid_ascii(od, regex_name[0]);
             break;
@@ -1735,6 +1766,14 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
               od->newgrid.start_coord[2],
               buffer, "is out of bounds",
               IMPORT_FAILED);
+            return PARSE_INPUT_ERROR;
+            
+            case BAD_DX_HEADER:
+            sprintf(buffer, regex_name[0], od->newgrid.object_num + 1);
+            tee_error(od, run_type, overall_line_num,
+              "The header information in file %s is corrupted or "
+              "not consistent with the grid box definitions.\n%s",
+              buffer, IMPORT_FAILED);
             return PARSE_INPUT_ERROR;
 
             case CANNOT_FIND_MO:
@@ -1882,6 +1921,13 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
         if (!(od->field.cs3d_exe[0])) {
           tee_error(od, run_type, overall_line_num,
             E_CS3D_EXE, CALC_FIELD_FAILED);
+          fail = !(run_type & INTERACTIVE_RUN);
+          continue;
+        }
+        if ((fabs(od->grid.step[0] - od->grid.step[1]) > ALMOST_ZERO)
+          || (fabs(od->grid.step[0] - od->grid.step[2]) > ALMOST_ZERO)) {
+          tee_error(od, run_type, overall_line_num,
+            E_UNEVEN_GRID_STEPS, CALC_FIELD_FAILED);
           fail = !(run_type & INTERACTIVE_RUN);
           continue;
         }
@@ -2086,6 +2132,13 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
             strcpy(od->field.qm_software, "gaussian");
           }
           else if (!strncasecmp(od->field.qm_exe, "gamess", 6)) {
+            if ((fabs(od->grid.step[0] - od->grid.step[1]) > ALMOST_ZERO)
+              || (fabs(od->grid.step[0] - od->grid.step[2]) > ALMOST_ZERO)) {
+              tee_error(od, run_type, overall_line_num,
+                E_UNEVEN_GRID_STEPS, CALC_FIELD_FAILED);
+              fail = !(run_type & INTERACTIVE_RUN);
+              continue;
+            }
             od->field.type |= PREP_GAMESS_INPUT;
             strcpy(od->field.qm_software, "gamess");
             #ifdef WIN32
@@ -6324,6 +6377,26 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
           O3_ERROR_PRINT(&(od->task));
           return PARSE_INPUT_ERROR;
 
+          case OPENBABEL_ERROR:
+          tee_error(od, run_type, overall_line_num,
+            E_PROGRAM_ERROR, "OpenBabel");
+          if ((od->file[TEMP_LOG]->handle = fopen
+            (od->file[TEMP_LOG]->name, "rb"))) {
+            while (fgets(buffer, BUF_LEN,
+              od->file[TEMP_LOG]->handle)) {
+              buffer[BUF_LEN - 1] = '\0';
+              tee_printf(od, "%s", buffer);
+            }
+            fclose(od->file[TEMP_LOG]->handle);
+            od->file[TEMP_LOG]->handle = NULL;
+            tee_printf(od, "\n%s", EXPORT_FAILED);
+          }
+          else {
+            tee_error(od, run_type, overall_line_num,
+              E_CANNOT_READ_PROGRAM_LOG, "OpenBabel", EXPORT_FAILED);
+          }
+          return PARSE_INPUT_ERROR;
+
           case FL_CANNOT_READ_OB_OUTPUT:
           tee_error(od, run_type, overall_line_num,
             E_ERROR_IN_READING_OB_OUTPUT,
@@ -6587,10 +6660,15 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
           fail = !(run_type & INTERACTIVE_RUN);
           continue;
         }
-        calc_leverage = 0;
+        options = 0;
         if ((parameter = get_args(od, "calc_leverage"))) {
           if (!strncasecmp(parameter, "y", 1)) {
-            calc_leverage = 1;
+            options |= CALC_LEVERAGE_BIT;
+          }
+        }
+        if ((parameter = get_args(od, "calc_field_contrib"))) {
+          if (!strncasecmp(parameter, "y", 1)) {
+            options |= CALC_FIELD_CONTRIB_BIT;
           }
         }
         if (!(od->y_vars)) {
@@ -6688,7 +6766,7 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
             od->file[TEMP_PLS_COEFF]->name, PLS_FAILED);
           return PARSE_INPUT_ERROR;
         }
-        result = calc_y_values(od, calc_leverage);
+        result = calc_y_values(od, options);
         if (od->file[TEMP_PLS_COEFF]->handle) {
           fclose(od->file[TEMP_PLS_COEFF]->handle);
           od->file[TEMP_PLS_COEFF]->handle = NULL;
@@ -6704,7 +6782,7 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
             E_ERROR_IN_READING_TEMP_FILE, "TEMP_FIELD", PLS_FAILED);
           return PARSE_INPUT_ERROR;
         }
-        result = print_calc_values(od, calc_leverage);
+        result = print_calc_values(od, options);
         switch (result) {
           case CANNOT_READ_TEMP_FILE:
           tee_error(od, run_type, overall_line_num,
