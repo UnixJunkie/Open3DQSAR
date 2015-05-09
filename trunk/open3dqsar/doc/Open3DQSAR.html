@@ -2811,14 +2811,14 @@ and 0.00 in field 1<br>zero&nbsp; type=NEG&nbsp; field_list=1&nbsp;
 level=0.25</code> <br><br><br><a href="#Contents"> <p align="right">Back
 to Contents</p></a><br> <hr color="#dbe5f1" align="center" width="95%"
 size="2"><br><h2><a name="ChangeLog">ChangeLog</a></h2><br><br>
-<ul><li>April 27, 2014: release of <B>Open3DQSAR</B> 2.28</li></ul>
+<ul><li>June 22, 2014: release of <B>Open3DQSAR</B> 2.28</li></ul>
 <ul>Changes with respect to the previous version include:</ul>
-<ul><ul><li>A bug in the <code>source</code> keyword which prevented its
-use in non- interactive sessions was fixed</li></ul></ul> <ul><ul><li>If
-<code>DAT</code> files with no <I>Y</I> variables are loaded with
-<code>mode=APPEND</code>, and <I>Y</I> variables are present in the
-pre-existing dataset, a value of 1.0000 will be assumed for the <I>Y</I>
-variables in the appended dataset</li></ul></ul> <ul><ul><li>The
+<ul><ul><li>A bug in the <code>source</code> keyword which prevented
+its use in non- interactive sessions was fixed</li></ul></ul>
+<ul><ul><li>If <code>DAT</code> files with no <I>Y</I> variables are
+loaded with <code>mode=APPEND</code>, and <I>Y</I> variables are present
+in the pre-existing dataset, a value of 1.0000 will be assumed for the
+<I>Y</I> variables in the appended dataset</li></ul></ul> <ul><ul><li>The
 <code>system</code> keyword was implemented to enable the execution of
 shell commands</li></ul></ul> <br> <ul><li>January 14, 2014: release of
 <B>Open3DQSAR</B> 2.271</li></ul> <ul>Changes with respect to the previous
@@ -2839,35 +2839,35 @@ to open the <code>libedit</code> (or <code>libreadline</code>, if
 dependency from <code>libedit</code>/<code>libreadline</code> can still
 be introduced at compile time using the <code>--with-editline</code>
 configure switch</li></ul></ul> <ul><ul><li>Fixed a regression
-introduced in version 2.26 which under certain circumstances
-might cause a segmentation fault using the <code>export</code>
-keyword</li></ul></ul> <ul><ul><li>Minor bug fixes</li></ul></ul>
-<br> <ul><li>November 24, 2013: release of <B>Open3DQSAR</B>
-2.26</li></ul> <ul>Changes with respect to the previous version
-include:</ul> <ul><ul><li>Added the possibility to export formatted
-and unformatted <code>CUBE</code> files via the <code>export</code>
-keyword</li></ul></ul> <br> <ul><li>November 17, 2013: release of
-<B>Open3DQSAR</B> 2.252</li></ul> <ul>Changes with respect to the previous
-version include:</ul> <ul><ul><li>Fixed a bug in parsing V2000 SDF files
-missing the <code>V2000</code> keyword in the header line</li></ul></ul>
-<ul><ul><li>Fixed a bug in parsing V3000 SDF files</li></ul></ul> <br>
-<ul><li>October 31, 2013: release of <B>Open3DQSAR</B> 2.251</li></ul>
-<ul>Changes with respect to the previous version include:</ul>
-<ul><ul><li>Added the <code>calc_leverage</code> parameter to the
-<code>pls</code> keyword to compute object leverages</li></ul></ul> <br>
-<ul><li>August 5, 2013: release of <B>Open3DQSAR</B> 2.25</li></ul>
-<ul>Changes with respect to the previous version include:</ul>
-<ul><ul><li>Added the <code>tanimoto</code> keyword to compute
-Tanimoto similarity between MIFs</li></ul></ul> <ul><ul><li>Added
-the <code>export type=sd_x_coefficient</code> and <code>export
-type=mean_x_coefficient</code> keywords to export <code>PLS coefficient
-&times; standard deviation</code> and <code>PLS coefficient &times;
-mean</code> grid maps, respectively</li></ul></ul> <ul><ul><li>Fixed a bug
-which prevented exporting <code>field_sd</code> and <code>group</code>
-grid maps</li></ul></ul> <ul><ul><li>Fixed a bug which caused the
-<code>plot</code> keyword to fail after loading a <code>DAT</code> file
-from disk; now also <code>CV</code> and <code>PREDICT</code> bits are
-cleared in addition to <code>PLS</code> before saving</li></ul></ul>
+introduced in version 2.26 which under certain circumstances might cause
+a segmentation fault using the <code>export</code> keyword</li></ul></ul>
+<ul><ul><li>Minor bug fixes</li></ul></ul> <br> <ul><li>November 24, 2013:
+release of <B>Open3DQSAR</B> 2.26</li></ul> <ul>Changes with respect to
+the previous version include:</ul> <ul><ul><li>Added the possibility
+to export formatted and unformatted <code>CUBE</code> files via the
+<code>export</code> keyword</li></ul></ul> <br> <ul><li>November 17,
+2013: release of <B>Open3DQSAR</B> 2.252</li></ul> <ul>Changes with
+respect to the previous version include:</ul> <ul><ul><li>Fixed a
+bug in parsing V2000 SDF files missing the <code>V2000</code> keyword
+in the header line</li></ul></ul> <ul><ul><li>Fixed a bug in parsing
+V3000 SDF files</li></ul></ul> <br> <ul><li>October 31, 2013: release of
+<B>Open3DQSAR</B> 2.251</li></ul> <ul>Changes with respect to the previous
+version include:</ul> <ul><ul><li>Added the <code>calc_leverage</code>
+parameter to the <code>pls</code> keyword to compute object
+leverages</li></ul></ul> <br> <ul><li>August 5, 2013: release of
+<B>Open3DQSAR</B> 2.25</li></ul> <ul>Changes with respect to the previous
+version include:</ul> <ul><ul><li>Added the <code>tanimoto</code>
+keyword to compute Tanimoto similarity between MIFs</li></ul></ul>
+<ul><ul><li>Added the <code>export type=sd_x_coefficient</code>
+and <code>export type=mean_x_coefficient</code> keywords to export
+<code>PLS coefficient &times; standard deviation</code> and <code>PLS
+coefficient &times; mean</code> grid maps, respectively</li></ul></ul>
+<ul><ul><li>Fixed a bug which prevented exporting <code>field_sd</code>
+and <code>group</code> grid maps</li></ul></ul> <ul><ul><li>Fixed
+a bug which caused the <code>plot</code> keyword to fail
+after loading a <code>DAT</code> file from disk; now also
+<code>CV</code> and <code>PREDICT</code> bits are cleared
+in addition to <code>PLS</code> before saving</li></ul></ul>
 <ul><ul><li>Modified <code>configure.ac</code> to allow fallback
 to GNU <code>libreadline</code> in case <code>libedit</code> is not
 available</li></ul></ul> <ul><ul><li>Added a few <code>memset()</code>
@@ -3073,13 +3073,13 @@ previous version include:</ul> <ul><ul><li>More efficient integration
 with OpenBabel, which results in faster loading and visualization in
 PyMOL of imported molecules, particularly on Windows</li></ul></ul>
 <ul><ul><li>Added the <code>XYZ</code> format to the <code>export</code>
-keyword; the <code>XYZ</code> format is like <code>ASCII</code>,
-but with explicit indication of the Cartesian coordinates of the grid
-point the energy value refers to</li></ul></ul> <br> <ul><li>January
-31, 2011: release of <B>Open3DQSAR</B> 1.5</li></ul> <ul>Changes
-with respect to the previous version include:</ul> <ul><ul><li>Better
-integration with OpenBabel, gnuplot, QM software, Molecular Discovery
-GRID, which are searched for in the executable path.  Additionally,
+keyword; the <code>XYZ</code> format is like <code>ASCII</code>, but
+with explicit indication of the Cartesian coordinates of the grid point
+the energy value refers to</li></ul></ul> <br> <ul><li>January 31, 2011:
+release of <B>Open3DQSAR</B> 1.5</li></ul> <ul>Changes with respect
+to the previous version include:</ul> <ul><ul><li>Better integration
+with OpenBabel, gnuplot, QM software, Molecular Discovery GRID,
+which are searched for in the executable path.	Additionally,
 pre-built binary distributions now include OpenBabel</li></ul></ul>
 <ul><ul><li>Better support for GAMESS/Firefly CUBE files. MOLDEN is
 not needed anymore when using GAMESS</li></ul></ul> <ul><ul><li>Added
@@ -3108,43 +3108,43 @@ to supported operating systems</li></ul></ul> <br> <ul><li>August 26,
 2010: release of <B>Open3DQSAR</B> 1.303</li></ul> <ul>Changes with
 respect to the previous version include:</ul> <ul><ul><li>Fixed an
 issue which is occasionally raised when running several GRID jobs at
-once on a multi-CPU machine; since GRID appears to read/write on a file
-with a hardcoded path and name, a data race by the different jobs may
-take place, leading to failures; a workaround has been implemented which
-solves the problem</li></ul></ul> <br> <ul><li>August 24, 2010: release of
-<B>Open3DQSAR</B> 1.302</li></ul> <ul>Changes with respect to the previous
-version include:</ul> <ul><ul><li>New layout for the output of results
-obtained through FFDSEL and UVE-PLS variable selection</li></ul></ul>
-<ul><ul><li>Fixed two bugs resulting in the inability by the
-<code>calc_field</code> keyword to assign GRID force-field atom types
-in some particular cases</li></ul></ul> <br> <ul><li>August 17, 2010:
-release of <B>Open3DQSAR</B> 1.301</li></ul> <ul>Changes with respect to
-the previous version include:</ul> <ul><ul><li>Fixed a bug which might
-cause QM computations with GAUSSIAN to fail under particular conditions
-due to incorrect setting of environment variables</li></ul></ul> <br>
-<ul><li>August 16, 2010: release of <B>Open3DQSAR</B> 1.3</li></ul>
+once on a multi-CPU machine; since GRID appears to read/write on a
+file with a hardcoded path and name, a data race by the different jobs
+may take place, leading to failures; a workaround has been implemented
+which solves the problem</li></ul></ul> <br> <ul><li>August 24, 2010:
+release of <B>Open3DQSAR</B> 1.302</li></ul> <ul>Changes with respect
+to the previous version include:</ul> <ul><ul><li>New layout for
+the output of results obtained through FFDSEL and UVE-PLS variable
+selection</li></ul></ul> <ul><ul><li>Fixed two bugs resulting in
+the inability by the <code>calc_field</code> keyword to assign GRID
+force-field atom types in some particular cases</li></ul></ul> <br>
+<ul><li>August 17, 2010: release of <B>Open3DQSAR</B> 1.301</li></ul>
 <ul>Changes with respect to the previous version include:</ul>
-<ul><ul><li>The possibility to import multi-MOL2 files was removed. It
-was verified that OpenBabel is not always able to assign correct
-atom types to MOL2 files, since they lack explicit formal charges,
-which instead are included in MOL/SDF files. Please note that this is
-definitely not a failure in OpenBabel: simply, in the absence of explicit
-formal charges, some structures carry an intrinsic ambiguity which cannot
-be univocally solved. Instead, OpenBabel makes an outstanding job in
-assigning atom types to SDF/MOL files. Therefore, since correct atom
-typing is of the utmost importance in force-field-based computations,
-we decided to stick to SDF format for structure importation. Since
-the majority of 3D structure building tools available (MOE, Maestro,
-ecc.) can export structures in SDF/MOL format, we believe this does not
-represent an issue.<br> As a consequence of this choice, also the internal
-format used by <B>Open3DQSAR</B> to deal with 3D molecular coordinates
-has been changed from MOL2 to MOL. This means that <code>.DAT</code>
-files saved with <B>Open3DQSAR</B> 1.3 (and upper) cannot be read by
-previous versions. On the contrary, <code>.DAT</code> files saved with
-previous versions can be read by <B>Open3DQSAR</B> 1.3</li></ul></ul>
-<ul><ul><li>The <code>calc_field</code> keyword now supports an
-additional MIF type, namely <code>md_grid</code>. This allows to
-calculate MIFs with <a href="http://www.moldiscovery.com/soft_grid.php"
+<ul><ul><li>Fixed a bug which might cause QM computations with
+GAUSSIAN to fail under particular conditions due to incorrect setting
+of environment variables</li></ul></ul> <br> <ul><li>August 16, 2010:
+release of <B>Open3DQSAR</B> 1.3</li></ul> <ul>Changes with respect
+to the previous version include:</ul> <ul><ul><li>The possibility to
+import multi-MOL2 files was removed. It was verified that OpenBabel is
+not always able to assign correct atom types to MOL2 files, since they
+lack explicit formal charges, which instead are included in MOL/SDF
+files. Please note that this is definitely not a failure in OpenBabel:
+simply, in the absence of explicit formal charges, some structures
+carry an intrinsic ambiguity which cannot be univocally solved. Instead,
+OpenBabel makes an outstanding job in assigning atom types to SDF/MOL
+files. Therefore, since correct atom typing is of the utmost importance
+in force-field-based computations, we decided to stick to SDF format for
+structure importation. Since the majority of 3D structure building tools
+available (MOE, Maestro, ecc.) can export structures in SDF/MOL format,
+we believe this does not represent an issue.<br> As a consequence of this
+choice, also the internal format used by <B>Open3DQSAR</B> to deal with
+3D molecular coordinates has been changed from MOL2 to MOL. This means
+that <code>.DAT</code> files saved with <B>Open3DQSAR</B> 1.3 (and upper)
+cannot be read by previous versions. On the contrary, <code>.DAT</code>
+files saved with previous versions can be read by <B>Open3DQSAR</B>
+1.3</li></ul></ul> <ul><ul><li>The <code>calc_field</code> keyword now
+supports an additional MIF type, namely <code>md_grid</code>. This allows
+to calculate MIFs with <a href="http://www.moldiscovery.com/soft_grid.php"
 target="_blank">Molecular Discovery GRID</a> program from inside
 <B>Open3DQSAR</B>, so that integration of GRID fields with other MM or
 QM fields computed in <B>Open3DQSAR</B> is even more straightforward.
@@ -3155,9 +3155,9 @@ called automatically, so that the user only needs to choose the probe type
 and the dielectric constant.<br> Before version 1.3, <B>Open3DQSAR</B>
 users had to assign proper atom types and compute MIFs outside
 <B>Open3DQSAR</B> using the <code>GREATER</code> program, then import
-MIFs with the <code>import type=gridkont</code> keyword. The need for an
-interactive step somehow hampered <B>Open3DQSAR</B>'s main goal, that is
-high-throughput automated generation of 3D-QSAR models</li></ul></ul>
+MIFs with the <code>import type=gridkont</code> keyword. The need for
+an interactive step somehow hampered <B>Open3DQSAR</B>'s main goal, that
+is high-throughput automated generation of 3D-QSAR models</li></ul></ul>
 <ul><ul><li>The subroutine which imports <code>GRIDKONT</code>
 binary files has been completely rewritten in order to be much more
 robust. As a consequence of the new implementation, when using the
@@ -3224,35 +3224,34 @@ the <code>exclude</code> keyword</li></ul></ul> <ul><ul><li>Addition
 of the <code>box</code> keyword to build a grid box around ligands
 instead of the cumbersome <code>import type=grid_def</code> keyword,
 which has been suppressed</li></ul></ul> <ul><ul><li>Addition
-of the <code>dataset</code> keyword to show statistics about
-the currently loaded dataset</li></ul></ul> <ul><ul><li>The
-prefix on environment variables controlling <B>Open3DQSAR</B>
-was shortened from <code>OPEN3DQSAR</code> to <code>O3Q</code>;
-some additional environment variables have been added, as well
-as <code>env</code> parameters</li></ul></ul> <ul><ul><li>Windows
-version: the dependency from the <code>Win32-Pthreads</code> library
-was dropped in favour of native Windows Threads</li></ul></ul>
-<ul><ul><li>Minor bugfixes all over</li></ul></ul> <br>
-<ul><li>April 13, 2010: release of <B>Open3DQSAR</B> 1.0</li></ul>
-<br><br><br><br><br><a href="#Contents"> <p align="right">Back to
-Contents</p></a><br> <hr color="#dbe5f1" align="center" width="95%"
-size="2"><br><h1><a name="License"></a>License</h1><br><br>
-<B>Open3DQSAR version 2.x</B><br><br> <I> An open-source software
-aimed at high-throughput<br> chemometric analysis of molecular
-interaction fields</I><br><br> Copyright &copy; 2009-2013 <a
-href="http://www.personalweb.unito.it/paolo.tosco/" target="_blank">Paolo
-Tosco</a>, <a href="http://www.farma.ku.dk/index.php?id=8857"
-target="_blank">Thomas Balle</a><br>All rights reserved<br><br><br>
-This program is free software: you can redistribute it and/or
-modify<br> it under the terms of the GNU General Public License as
-published by<br> the Free Software Foundation, either version 3 of
-the License, or<br> (at your option) any later version.<br> <br>
-This program is distributed in the hope that it will be useful,<br>
-but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the<br>
-GNU General Public License for more details.<br> <br> You should
-have received a copy of the GNU General Public License<br> along with
-this program. If not, see &lt;<a href="http://www.gnu.org/licenses/"
+of the <code>dataset</code> keyword to show statistics about the
+currently loaded dataset</li></ul></ul> <ul><ul><li>The prefix on
+environment variables controlling <B>Open3DQSAR</B> was shortened
+from <code>OPEN3DQSAR</code> to <code>O3Q</code>; some additional
+environment variables have been added, as well as <code>env</code>
+parameters</li></ul></ul> <ul><ul><li>Windows version: the
+dependency from the <code>Win32-Pthreads</code> library was dropped
+in favour of native Windows Threads</li></ul></ul> <ul><ul><li>Minor
+bugfixes all over</li></ul></ul> <br> <ul><li>April 13, 2010:
+release of <B>Open3DQSAR</B> 1.0</li></ul> <br><br><br><br><br><a
+href="#Contents"> <p align="right">Back to Contents</p></a><br>
+<hr color="#dbe5f1" align="center" width="95%" size="2"><br><h1><a
+name="License"></a>License</h1><br><br> <B>Open3DQSAR version
+2.x</B><br><br> <I> An open-source software aimed at high-throughput<br>
+chemometric analysis of molecular interaction fields</I><br><br> Copyright
+&copy; 2009-2013 <a href="http://www.personalweb.unito.it/paolo.tosco/"
+target="_blank">Paolo Tosco</a>, <a
+href="http://www.farma.ku.dk/index.php?id=8857" target="_blank">Thomas
+Balle</a><br>All rights reserved<br><br><br> This program is free
+software: you can redistribute it and/or modify<br> it under the terms
+of the GNU General Public License as published by<br> the Free Software
+Foundation, either version 3 of the License, or<br> (at your option) any
+later version.<br> <br> This program is distributed in the hope that it
+will be useful,<br> but WITHOUT ANY WARRANTY; without even the implied
+warranty of<br> MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the<br> GNU General Public License for more details.<br> <br> You
+should have received a copy of the GNU General Public License<br> along
+with this program. If not, see &lt;<a href="http://www.gnu.org/licenses/"
 target="_blank">http://www.gnu.org/licenses/</a>&gt;.  <br><br><br>
 For further information, please contact:<br><br> Paolo Tosco,
 PhD<br> Dipartimento di Scienza e Tecnologia del Farmaco<br>
@@ -3328,9 +3327,9 @@ B. M.; Sterna, C.  <I>Anal. Chem.</I> <B>1996</B>, <I>68</I>,
 target="_blank">DOI</a></li> <li><a name="credits_ref6"></a>Gieleciak,
 R.; Polanski, J.  <I>J. Chem. Inf. Model.</I> <B>2007</B>, <I>47</I>,
 547-556.  &nbsp; <a href="http://dx.doi.org/10.1021/ci600295z"
-target="_blank">DOI</a></li> <li><a name="credits_ref7"></a>Grohmann, R.;
-Schindler, T.  <I>J. Comput. Chem.</I> <B>2008</B>, <I>29</I>, 847-860.
-&nbsp; <a href="http://dx.doi.org/10.1002/jcc.20831"
+target="_blank">DOI</a></li> <li><a name="credits_ref7"></a>Grohmann,
+R.; Schindler, T.  <I>J. Comput. Chem.</I> <B>2008</B>, <I>29</I>,
+847-860.  &nbsp; <a href="http://dx.doi.org/10.1002/jcc.20831"
 target="_blank">DOI</a></li> <li><a name="credits_ref8"></a>Clark, R. D.;
 Fox, P. C.  <I>J. Comput.-Aided Mol. Des.</I> <B>2004</B>, <I>18</I>,
 563-576.  &nbsp; <a href="http://dx.doi.org/10.1007/s10822-004-4077-z"

@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2015 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -426,8 +426,20 @@ int srd(O3Data *od, int pc_num, int seed_num, int type,
         /*
         get distance from this seed to the current x_var
         */
+        #if 0
+        /*
+        This is how it used to be back in 2009 to reproduce the results
+        obtained with GOLPE. However, I don't think this is correct since
+        GOLPE documentation states that  the distance should be in angstrom
+        and not in grid units. So I am changing it to be a plain euclidean
+        distance instead.
+        */
         distance = sqrt(squared_euclidean_distance
           (var_coord.cart, current_seed_coord.cart)) / od->grid.step[0];
+        #else
+        distance = sqrt(squared_euclidean_distance
+          (var_coord.cart, current_seed_coord.cart));
+        #endif
         /*
         if the distance is the lowest until now record the
         distance and the overall seed number
@@ -645,9 +657,21 @@ int srd(O3Data *od, int pc_num, int seed_num, int type,
           if (voronoi_fill[overall_seed_count + j] != -1) {
             for (k = j + 1; k < seed_count[i]; ++k) {
               if (voronoi_fill[overall_seed_count + k] != -1) {
+                #if 0
+                /*
+                This is how it used to be back in 2009 to reproduce the results
+                obtained with GOLPE. However, I don't think this is correct since
+                GOLPE documentation states that  the distance should be in angstrom
+                and not in grid units. So I am changing it to be a plain euclidean
+                distance instead.
+                */
                 distance = sqrt(squared_euclidean_distance
                   (od->al.seed_coord[j]->cart, od->al.seed_coord[k]->cart))
                    / od->grid.step[0];
+                #else
+                distance = sqrt(squared_euclidean_distance
+                  (od->al.seed_coord[j]->cart, od->al.seed_coord[k]->cart));
+                #endif
                 if (distance <= collapse_distance) {
                   od->al.nearest_mat[elem]->dist = distance;
                   od->al.nearest_mat[elem]->seed[0] = j;

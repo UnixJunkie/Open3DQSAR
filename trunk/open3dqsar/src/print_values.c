@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2015 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -80,23 +80,27 @@ int mol_to_sdf(O3Data *od, int object_num, double actual_value)
 }
 
 
-int print_calc_values(O3Data *od, int calc_leverage)
+int print_calc_values(O3Data *od, int options)
 {
   char format[MAX_NAME_LEN];
   char buffer[BUF_LEN];
   int i;
   int j;
+  int k;
   int pos1;
   int pos2;
   int x;
   int y;
+  int n;
   int object_num;
   int struct_num;
   int conf_num;
   int n_conf;
   int n_hat;
+  int x_max_x;
   int x_max_y;
   int y_max;
+  int result;
   int pc_num;
   int opt_pc_n;
   int actual_len;
@@ -211,7 +215,7 @@ int print_calc_values(O3Data *od, int calc_leverage)
     tee_printf(od, "Calculated values for dependent variable %2d (%s)\n",
       x + 1, od->cimal.y_var_name->me[x]);
     tee_printf(od, "-------------------------------------------------------------------");
-    for (i = 0; i < (pc_num + 1 + calc_leverage); ++i) {
+    for (i = 0; i < (pc_num + 1 + ((options & CALC_LEVERAGE_BIT) ? 1 : 0)); ++i) {
       tee_printf(od, "------------");
     }
     tee_printf(od, "\n%5s%5s%5s    %-36s%12s", "N", "ID", "Str", "Name", "Actual");
@@ -219,11 +223,11 @@ int print_calc_values(O3Data *od, int calc_leverage)
       tee_printf(od, "%12d", i + 1);
     }
     tee_printf(od, "%12s", "Opt PC n");
-    if (calc_leverage) {
+    if (options & CALC_LEVERAGE_BIT) {
       tee_printf(od, "%12s", "Leverage");
     }
     tee_printf(od, "\n-------------------------------------------------------------------");
-    for (i = 0; i < (pc_num + 1 + calc_leverage); ++i) {
+    for (i = 0; i < (pc_num + 1 + ((options & CALC_LEVERAGE_BIT) ? 1 : 0)); ++i) {
       tee_printf(od, "------------");
     }
     object_num = 0;
@@ -245,7 +249,7 @@ int print_calc_values(O3Data *od, int calc_leverage)
             active_value_ave += actual_value;
             ++active_struct_num;
           }
-          if (calc_leverage) {
+          if (options & CALC_LEVERAGE_BIT) {
             leverage += M_PEEK(od->mal.hat_mat, n_hat, n_hat);
           }
           ++n_hat;
@@ -330,7 +334,7 @@ int print_calc_values(O3Data *od, int calc_leverage)
           (actual_value - od->mel.weighted_value[j]);
       }
       tee_printf(od, "%12d", opt_pc_n);
-      if (calc_leverage) {
+      if (options & CALC_LEVERAGE_BIT) {
         tee_printf(od, "%12.4lf", leverage);
       }
       if (od->file[ASCII_IN]->handle) {
@@ -358,16 +362,75 @@ int print_calc_values(O3Data *od, int calc_leverage)
       return CANNOT_READ_TEMP_FILE;
     }
   }
-  tee_printf(od, "\n\n\nPC%12s%12s\n", "SDEC", "r2");
-  tee_printf(od, "--------------------------\n");
+  tee_printf(od, "\n\n\nPC%12s%12s%12s\n", "SDEC", "r2", "F-test");
+  tee_printf(od, "--------------------------------------\n");
   for (i = 0; i <= pc_num; ++i) {
     od->vel.r2->ve[i] = 1.0 - od->vel.ave_sdec->ve[i] / tss;
     od->vel.ave_sdec->ve[i] = sqrt
       (od->vel.ave_sdec->ve[i] / (double)active_struct_num);
-    tee_printf(od, "%2d%12.4lf%12.4lf\n", i,
-      od->vel.ave_sdec->ve[i], od->vel.r2->ve[i]);
+    if (i) {
+      sprintf(buffer, "%12.4lf", (double)(od->active_object_num - i - 1)
+        * od->vel.r2->ve[i] / ((double)i * (1.0 - od->vel.r2->ve[i])));
+    }
+    else {
+      sprintf(buffer, "%12s", "-");
+    }
+    tee_printf(od, "%2d%12.4lf%12.4lf%12s\n", i,
+      od->vel.ave_sdec->ve[i], od->vel.r2->ve[i], buffer);
   }
   tee_printf(od, "\n");
+  if (options & CALC_FIELD_CONTRIB_BIT) {
+    tee_printf(od, "\nRelative field contributions\n--");
+    for (i = 0; i < od->field_num; ++i) {
+      if (get_field_attr(od, i, ACTIVE_BIT)) {
+        tee_printf(od, "------------");
+      }
+    }
+    tee_printf(od, "\nPC");
+    for (i = 0; i < od->field_num; ++i) {
+      if (get_field_attr(od, i, ACTIVE_BIT)) {
+        sprintf(buffer, "x%d", i + 1);
+        tee_printf(od, "%12s", buffer);
+      }
+    }
+    tee_printf(od, "\n--");
+    for (i = 0; i < od->field_num; ++i) {
+      if (get_field_attr(od, i, ACTIVE_BIT)) {
+        tee_printf(od, "------------");
+      }
+    }
+    for (i = 0; i <= pc_num; ++i) {
+      tee_printf(od, "\n%2d", i);
+      result = reload_coefficients(od, i);
+      if (result) {
+        return result;
+      }
+      memset(od->mel.field_contrib, 0, sizeof(double) * od->field_num);
+      value = 0.0;
+      n = 0;
+      for (j = 0; j < od->field_num; ++j) {
+        if (get_field_attr(od, j, ACTIVE_BIT)) {
+          for (x = 0; x < od->x_vars; ++x) {
+            if (get_x_var_attr(od, j, x, ACTIVE_BIT)) {
+              for (k = 0; k < od->y_vars; ++k) {
+                od->mel.field_contrib[j] += (fabs(M_PEEK(od->mal.b_coefficients, n, k))
+                  * get_x_var_buf(od, j, x, STDDEV_BUF));
+              }
+              ++n;
+            }
+          }
+        }
+        value += od->mel.field_contrib[j];
+      }
+      for (j = 0; j < od->field_num; ++j) {
+        if (get_field_attr(od, j, ACTIVE_BIT)) {
+          tee_printf(od, "%12.4lf", ((value > 0.0)
+            ? od->mel.field_contrib[j] / value : 0.0));
+        }
+      }
+    }
+    tee_printf(od, "\n\n\n");
+  }
   if (od->mal.hat_mat) {
     double_mat_free(od->mal.hat_mat);
     od->mal.hat_mat = NULL;

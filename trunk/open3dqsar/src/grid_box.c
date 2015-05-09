@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2015 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ int create_box(O3Data *od, GridInfo *temp_grid, double outgap, int from_file)
     od->grid.x_vars = 1;
     for (i = 0; i < 3; ++i) {
       od->grid.nodes[i] = 1;
-      od->grid.step[i] = temp_grid->step[0];
+      od->grid.step[i] = temp_grid->step[i];
       if (outgap < 0.0) {
         start_coord[i] = (double)(temp_grid->start_coord[i]);
         end_coord[i] = (double)(temp_grid->start_coord[i]);
@@ -99,13 +99,13 @@ int create_box(O3Data *od, GridInfo *temp_grid, double outgap, int from_file)
       }
       if (!(temp_grid->nodes[i])) {
         while (((double)(temp_grid->end_coord[i]) - end_coord[i]) > GRID_TOLERANCE) {
-          end_coord[i] += (double)(temp_grid->step[0]);
+          end_coord[i] += (double)(temp_grid->step[i]);
           ++(od->grid.nodes[i]);
         }
       }
       else {
         while (od->grid.nodes[i] < temp_grid->nodes[i]) {
-          end_coord[i] += (double)(temp_grid->step[0]);
+          end_coord[i] += (double)(temp_grid->step[i]);
           ++(od->grid.nodes[i]);
         }
       }

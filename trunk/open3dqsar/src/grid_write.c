@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2015 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -641,9 +641,14 @@ int write_header(O3Data *od, int object_num, char *header,
       free_atom_array(od);
       return OUT_OF_MEMORY;
     }
+    result = call_obenergy(od, O3_MMFF94);
+    if (result) {
+      return result;
+    }
     result = fill_atom_info(od, &(od->task),
       od->al.mol_info[object_num]->atom, NULL, object_num, O3_MMFF94);
     if (result) {
+      O3_ERROR_PRINT(&(od->task));
       return result;
     }
     for (i = 0; i < od->al.mol_info[object_num]->n_atoms; ++i) {
@@ -753,6 +758,10 @@ int write_header(O3Data *od, int object_num, char *header,
       O3_ERROR_LOCATE(&(od->task));
       free_atom_array(od);
       return OUT_OF_MEMORY;
+    }
+    result = call_obenergy(od, O3_MMFF94);
+    if (result) {
+      return result;
     }
     result = fill_atom_info(od, &(od->task),
       od->al.mol_info[object_num]->atom, NULL, object_num, O3_MMFF94);

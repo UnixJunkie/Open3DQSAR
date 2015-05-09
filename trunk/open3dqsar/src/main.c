@@ -10,7 +10,7 @@ Open3DQSAR
 An open-source software aimed at high-throughput
 chemometric analysis of molecular interaction fields
 
-Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
+Copyright (C) 2009-2015 Paolo Tosco, Thomas Balle
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -74,7 +74,9 @@ E-mail: paolo.tosco@unito.it
 #include <readline/history.h>
 #else
 #include <editline/readline.h>
+#ifndef WIN32
 #include <histedit.h>
+#endif
 #endif
 #endif
 #define EL_RC_FILE      ".editrc"
@@ -666,7 +668,7 @@ int main(int argc, char **argv)
     "\n"
     PACKAGE_NAME" version " VERSION "\n"
     #ifdef O3Q
-    "Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle\n"
+    "Copyright (C) 2009-2015 Paolo Tosco, Thomas Balle\n"
     #else
     "Copyright (C) 2010-2014 Paolo Tosco, Thomas Balle\n"
     #endif
@@ -693,7 +695,7 @@ int main(int argc, char **argv)
     "\n"
     "Version " VERSION "\n"
     #ifdef O3Q
-    "Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle\n"
+    "Copyright (C) 2009-2015 Paolo Tosco, Thomas Balle\n"
     #else
     "Copyright (C) 2010-2014 Paolo Tosco, Thomas Balle\n"
     #endif
@@ -1712,6 +1714,7 @@ int main(int argc, char **argv)
     #endif
   }
   free_mem(&od);
+  #ifndef HAVE_EDITLINE_FUNCTIONALITY
   if (dl_handle) {
     #ifndef WIN32
     dlclose(dl_handle);
@@ -1719,6 +1722,7 @@ int main(int argc, char **argv)
     FreeLibrary(dl_handle);
     #endif
   }
+  #endif
 
   return result;
 }

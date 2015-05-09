@@ -8,7 +8,7 @@
 # An open-source software aimed at high-throughput
 # chemometric analysis of molecular interaction fields
 # 
-# Copyright (C) 2009-2014 Paolo Tosco, Thomas Balle
+# Copyright (C) 2009-2015 Paolo Tosco, Thomas Balle
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,14 +38,14 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(Open3DQSAR, 2.28, <paolo.tosco@unito.it>)
+AC_INIT(Open3DQSAR, 2.281, <paolo.tosco@unito.it>)
 AC_DEFINE([PACKAGE_NAME_LOWERCASE], ["open3dqsar"], [Package name in lowercase])
 AC_DEFINE([PACKAGE_NAME_UPPERCASE], ["OPEN3DQSAR"], [Package name in uppercase])
 AC_DEFINE([O3Q], [1], [Open3DQSAR])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADER([config.h])
-AC_CONFIG_MACRO_DIR([m4])
+#AC_CONFIG_MACRO_DIR([m4])
 m4_pattern_allow([AC_USE_SYSTEM_EXTENSIONS])
 AC_CANONICAL_HOST
 AS_IF([test `echo "${host_os}" | cut -c -7` = "solaris"], [AC_USE_SYSTEM_EXTENSIONS])
