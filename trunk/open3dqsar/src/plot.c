@@ -81,6 +81,7 @@ int plot(O3Data *od, char *filename, int type,
   FILE *temp_handle = NULL;
   
   
+  memset(with_labels, 0, BUF_LEN);
   if (type & VS_EXP_PLOT) {
     if ((type & EXT_PRED_VS_EXP) || (type & RECALC_VS_EXP)) {
       /*
@@ -178,9 +179,6 @@ int plot(O3Data *od, char *filename, int type,
               "offset 0.5,0.2 lt -1 ,\\\n\t",
               od->file[PLT_DAT_OUT]->name);
           }
-          else {
-            memset(with_labels, 0, BUF_LEN);
-          }
           fprintf(plt_cmd_out,
             "unset key\n"
             "unset parametric\n"
@@ -240,9 +238,6 @@ int plot(O3Data *od, char *filename, int type,
                     "offset 0.5,0.2 lt -1 ,\\\n\t",
                     od->file[PLT_DAT_OUT]->name);
                 }
-              }
-              else {
-                memset(with_labels, 0, BUF_LEN);
               }
               if (label == NAME_LABEL) {
                 fprintf(plt_dat_out, "%-40s",
@@ -342,6 +337,13 @@ int plot(O3Data *od, char *filename, int type,
             sprintf(fx,
               "f(x) = m * x + b\n"
               "fit f(x) \"%s\" using 2:3 via m, b\n",
+              od->file[PLT_DAT_OUT]->name);
+          }
+          if (label) {
+            sprintf(with_labels,
+              "\"%s\" \\\n\t"
+              "using 2:3:1 with labels left "
+              "offset 0.5,0.2 lt -1 ,\\\n\t",
               od->file[PLT_DAT_OUT]->name);
           }
           fprintf(plt_cmd_out,
@@ -489,9 +491,6 @@ int plot(O3Data *od, char *filename, int type,
                     od->file[PLT_DAT_OUT]->name);
                 }
               }
-              else {
-                memset(with_labels, 0, BUF_LEN);
-              }
               if (label == NAME_LABEL) {
                 fprintf(plt_dat_out, "%-40s",
                   od->al.mol_info[i]->object_name);
@@ -603,9 +602,6 @@ int plot(O3Data *od, char *filename, int type,
             "using 2:3:1 with labels left "
             "offset 0.5,0.2 lt -1 ,\\\n\t",
             od->file[PLT_DAT_OUT]->name);
-        }
-        else {
-          memset(with_labels, 0, BUF_LEN);
         }
         if (label == NAME_LABEL) {
           fprintf(plt_dat_out, "%-40s",
@@ -799,9 +795,6 @@ int plot(O3Data *od, char *filename, int type,
             ++n;
           }
         }
-      }
-      else {
-        memset(with_labels, 0, BUF_LEN);
       }
       if (label == NAME_LABEL) {
         fprintf(plt_dat_out, "%-40s",

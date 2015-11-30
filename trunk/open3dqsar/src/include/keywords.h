@@ -84,6 +84,10 @@ O3KeywordData keyword_data[] =
           NULL
         }
       }, {
+        O3_PARAM_NUMERIC, "x_nodes", {
+          NULL
+        }
+      }, {
         O3_PARAM_NUMERIC, "y_start", {
           NULL
         }
@@ -92,11 +96,19 @@ O3KeywordData keyword_data[] =
           NULL
         }
       }, {
+        O3_PARAM_NUMERIC, "y_nodes", {
+          NULL
+        }
+      }, {
         O3_PARAM_NUMERIC, "z_start", {
           NULL
         }
       }, {
         O3_PARAM_NUMERIC, "z_end", {
+          NULL
+        }
+      }, {
+        O3_PARAM_NUMERIC, "z_nodes", {
           NULL
         }
       }, {
@@ -561,6 +573,7 @@ O3KeywordData keyword_data[] =
           "SYBYL",
           "FORMATTED_CUBE",
           "UNFORMATTED_CUBE",
+          "OPENDX",
           "ASCII",
           "XYZ",
           NULL
@@ -672,7 +685,7 @@ O3KeywordData keyword_data[] =
           "MOLDEN",
           "MOE_GRID",
           "GRID_ASCII",
-          "GRID_DX",
+          "OPENDX",
           "FREE_FORMAT",
           NULL
         }
@@ -805,7 +818,7 @@ O3KeywordData keyword_data[] =
           NULL
         }
       }, {
-        O3_PARAM_STRING, "labels", {
+        O3_PARAM_STRING, "label", {
           "NONE",
           "NUMBER",
           "ID",

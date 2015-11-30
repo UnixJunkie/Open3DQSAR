@@ -176,44 +176,26 @@ char *fill_env(O3Data *od, EnvList personalized_env[], char *bin, int object_num
     len = strlen(&curr_environ[i]) + 1;
     if (len > max_len) {
       max_len = len;
-      string = realloc(string, len);
-      if (!string) {
-        return NULL;
-      }
-      memset(string, 0, len);
-    }
-    strcpy(string, &curr_environ[i]);
-    if ((equal_sign = strchr(string, '='))) {
-      *equal_sign = '\0';
-    }
-    k = 0;
-    len = strlen(&curr_environ[i]) + 1;
-    found = 0;
-    while (personalized_env[k].name && (!found)) {
-      /*
-      Windows environment variables are not
-      case-sensitive
-      */
-      found = (!strcasecmp(string, personalized_env[k].name));
-      ++k;
-    }
-    if (!found) {
-      j += len;
     }
     i += len;
   }
+  string = malloc(max_len);
+  if (!string) {
+    return NULL;
+  }
+  memset(string, 0, max_len);
   k = 0;
   len = 0;
   while (personalized_env[k].name) {
     len += BUF_LEN;
     ++k;
   }
-  proc_env = malloc(j + len + 1);
+  proc_env = malloc(i + len + 1);
   if (!proc_env) {
     free(string);
     return NULL;
   }
-  memset(proc_env, 0, j + len + 1);
+  memset(proc_env, 0, i + len + 1);
   /*
   copy the current environment, excluding
   variables included in personalized_env

@@ -857,6 +857,8 @@ void *calc_mm_thread(void *pointer)
 DWORD calc_mm_thread(void *pointer)
 #endif
 {
+  char donor_i;
+  char donor_j;
   int i;
   int j;
   int n;
@@ -875,16 +877,20 @@ DWORD calc_mm_thread(void *pointer)
   double r_ij6 = 0.0;
   double r_ij7 = 0.0;
   double energy = 0.0;
+  double f;
   double probe_coord[3];
   VarCoord pc;
   AtomInfo **atom = NULL;
+  FFParm *probe_parm;
+  FFParm *atom_parm;
   ThreadInfo *ti;
   
 
   ti = (ThreadInfo *)pointer;
-  R_j = ff_parm[O3_MMFF94][ti->od.field.probe.atom_type].vdw_parm[MMFF94_A]
-    * pow(ff_parm[O3_MMFF94][ti->od.field.probe.atom_type].vdw_parm[MMFF94_ALPHA],
-    MMFF94_POWER);
+  probe_parm = get_mmff_parm(ti->od.field.probe.atom_type);
+  R_j = probe_parm->vdw_parm[MMFF94_A]
+    * pow(probe_parm->vdw_parm[MMFF94_ALPHA], MMFF94_POWER);
+  donor_j = (probe_parm->da == 'D');
   memset(&pc, 0, sizeof(VarCoord));
   /*
   allocate memory for AtomInfo structure array
@@ -934,26 +940,28 @@ DWORD calc_mm_thread(void *pointer)
     n_atoms = ti->od.al.mol_info[object_num]->n_atoms;
     for (i = 0; i < n_atoms; ++i) {
       if (ti->od.field.type & VDW_FIELD) {
-        R_i = ff_parm[O3_MMFF94][atom[i]->atom_type].vdw_parm[MMFF94_A]
-          * pow(ff_parm[O3_MMFF94][atom[i]->atom_type].vdw_parm[MMFF94_ALPHA],
-          MMFF94_POWER);
+        atom_parm = get_mmff_parm(atom[i]->atom_type);
+        donor_i = (atom_parm->da == 'D');
+        R_i = atom_parm->vdw_parm[MMFF94_A]
+          * pow(atom_parm->vdw_parm[MMFF94_ALPHA], MMFF94_POWER);
         gamma_ij = (R_i - R_j) / (R_i + R_j);
+        f = ((donor_i || donor_j) ? 0.0 : MMFF94_B
+          * (1.0 - exp(-MMFF94_BETA * square(gamma_ij))));
         atom[i]->parm[MMFF94_RIJ] =
-          MMFF94_DAEPS * (R_i + R_j) * (1.0 + MMFF94_B
-          * (1 - exp(-MMFF94_BETA * square(gamma_ij))));
+          MMFF94_DAEPS * (R_i + R_j) * (1.0 + f);
         R_ij2 = square(atom[i]->parm[MMFF94_RIJ]);
         R_ij6 = R_ij2 * R_ij2 * R_ij2;
         atom[i]->parm[MMFF94_RIJ7] =
           R_ij6 * atom[i]->parm[MMFF94_RIJ];
         atom[i]->parm[MMFF94_EIJ] =
-          181.16 * ff_parm[O3_MMFF94][atom[i]->atom_type].vdw_parm[MMFF94_G]
-          * ff_parm[O3_MMFF94][ti->od.field.probe.atom_type].vdw_parm[MMFF94_G]
-          * ff_parm[O3_MMFF94][atom[i]->atom_type].vdw_parm[MMFF94_ALPHA]
-          * ff_parm[O3_MMFF94][ti->od.field.probe.atom_type].vdw_parm[MMFF94_ALPHA]
-          / ((pow(ff_parm[O3_MMFF94][atom[i]->atom_type].vdw_parm[MMFF94_ALPHA]
-          / ff_parm[O3_MMFF94][atom[i]->atom_type].vdw_parm[MMFF94_N], 0.5)
-          + pow(ff_parm[O3_MMFF94][ti->od.field.probe.atom_type].vdw_parm[MMFF94_ALPHA]
-          / ff_parm[O3_MMFF94][ti->od.field.probe.atom_type].vdw_parm[MMFF94_N], 0.5)) * R_ij6);
+          181.16 * atom_parm->vdw_parm[MMFF94_G]
+          * probe_parm->vdw_parm[MMFF94_G]
+          * atom_parm->vdw_parm[MMFF94_ALPHA]
+          * probe_parm->vdw_parm[MMFF94_ALPHA]
+          / ((sqrt(atom_parm->vdw_parm[MMFF94_ALPHA]
+          / atom_parm->vdw_parm[MMFF94_N])
+          + sqrt(probe_parm->vdw_parm[MMFF94_ALPHA]
+          / probe_parm->vdw_parm[MMFF94_N])) * R_ij6);
       }
     }
     result = 0;
@@ -983,7 +991,7 @@ DWORD calc_mm_thread(void *pointer)
                         * pow(1.07 * atom[i]->parm[MMFF94_RIJ]
                         / (r_ij + 0.07 * atom[i]->parm[MMFF94_RIJ]), 7.0)
                         * (1.12 * atom[i]->parm[MMFF94_RIJ7]
-                        / (r_ij7 + 0.12 * atom[i]->parm[MMFF94_RIJ]) - 2.0));
+                        / (r_ij7 + 0.12 * atom[i]->parm[MMFF94_RIJ7]) - 2.0));
                     }
                   }
                   else {

@@ -106,7 +106,8 @@ void copy_plane_to_buffer(O3Data *od,
 
 
 int write_grid_plane(O3Data *od, FILE *plane_file,
-  int z, int interpolate, int swap_endianness)
+  int z, int interpolate, int swap_endianness,
+  float *minVal, float *maxVal)
 {
   int i;
   int actual_len;
@@ -125,6 +126,7 @@ int write_grid_plane(O3Data *od, FILE *plane_file,
   int out_xy_width;
   int out_xy_height;
   int *int_matrix;
+  float val;
   float *float_xy_mat;
   float *buf_float_xy_mat[4];
   float *out_float_xy_mat = NULL;
@@ -136,6 +138,30 @@ int write_grid_plane(O3Data *od, FILE *plane_file,
 
   
   float_xy_mat = od->mel.float_xy_mat;
+  if (minVal) {
+    i = 0;
+    for (y = 0; y < od->grid.nodes[1]; ++y) {
+      for (x = 0; x < od->grid.nodes[0]; ++x) {
+        val = float_xy_mat[(od->grid.nodes[0] + 2) * y + x + 1];
+        if ((!i) || (val < *minVal)) {
+          i = 1;
+          *minVal = val;
+        }
+      }
+    }
+  }
+  if (maxVal) {
+    i = 0;
+    for (y = 0; y < od->grid.nodes[1]; ++y) {
+      for (x = 0; x < od->grid.nodes[0]; ++x) {
+        val = float_xy_mat[(od->grid.nodes[0] + 2) * y + x + 1];
+        if ((!i) || (val > *maxVal)) {
+          i = 1;
+          *maxVal = val;
+        }
+      }
+    }
+  }
   if (!interpolate) {
     /*
     write meta-data
@@ -315,11 +341,17 @@ int write_grid_plane(O3Data *od, FILE *plane_file,
                 /*
                 write the interpolated value in the grid
                 */
+                val = (float)interpolated_value
+                  (ic_vec, x_incr, y_incr, z_incr);
                 out_float_xy_mat[out_xy_width
                   * ((y - 1) * (interpolate + 1) + yy)
-                  + (x - 1) * (interpolate + 1) + xx] =
-                  (float)interpolated_value
-                  (ic_vec, x_incr, y_incr, z_incr);
+                  + (x - 1) * (interpolate + 1) + xx] = val;
+                if (minVal && (val < *minVal)) {
+                  *minVal = val;
+                }
+                if (maxVal && (val > *maxVal)) {
+                  *maxVal = val;
+                }
               }
             }
           }
@@ -416,7 +448,7 @@ int write_header(O3Data *od, int object_num, char *header,
     write in the header all information present
     in the od structure
     (see INSIGHT .grd format documentation,
-    http://www.scripps.edu/rc/softwaredocs/msi/insight2K/insight/Utilities.html)
+    http://www.ifm.liu.se/compchem/msi/doc/life/insight2K/insight/Utilities.html)
     */
     /*
     this integer is useful to determine data endianness;
@@ -450,15 +482,15 @@ int write_header(O3Data *od, int object_num, char *header,
     /*
     Cell_x_length
     */
-    float_meta_data[21] = od->grid.end_coord[0];
+    float_meta_data[21] = od->grid.end_coord[0] - od->grid.start_coord[0];
     /*
     Cell_y_length
     */
-    float_meta_data[22] = od->grid.end_coord[1];
+    float_meta_data[22] = od->grid.end_coord[1] - od->grid.start_coord[1];
     /*
     Cell_z_length
     */
-    float_meta_data[23] = od->grid.end_coord[2];
+    float_meta_data[23] = od->grid.end_coord[2] - od->grid.start_coord[2];
     /*
     Cell_x_angle
     */
@@ -474,27 +506,27 @@ int write_header(O3Data *od, int object_num, char *header,
     /*
     Cell_x_start
     */
-    float_meta_data[27] = od->grid.start_coord[0] / od->grid.end_coord[0];
+    float_meta_data[27] = od->grid.start_coord[0] / float_meta_data[21];
     /*
     Cell_x_end
     */
-    float_meta_data[28] = 1.0;
+    float_meta_data[28] = od->grid.end_coord[0] / float_meta_data[21];
     /*
     Cell_y_start
     */
-    float_meta_data[29] = od->grid.start_coord[1] / od->grid.end_coord[1];
+    float_meta_data[29] = od->grid.start_coord[1] / float_meta_data[22];
     /*
     Cell_y_end
     */
-    float_meta_data[30] = 1.0;
+    float_meta_data[30] = od->grid.end_coord[1] / float_meta_data[22];
     /*
     Cell_z_start
     */
-    float_meta_data[31] = od->grid.start_coord[2] / od->grid.end_coord[2];
+    float_meta_data[31] = od->grid.start_coord[2] / float_meta_data[23];
     /*
     Cell_z_end
     */
-    float_meta_data[32] = 1.0;
+    float_meta_data[32] = od->grid.end_coord[2] / float_meta_data[23];
     /*
     Cell_x_intervals
     */
@@ -598,7 +630,6 @@ int write_header(O3Data *od, int object_num, char *header,
     }
     fprintf(od->file[GRD_OUT]->handle,
       "%12.1f%12.1f%12.1f\n", 90.0, 90.0, 90.0);
-    
     break;
 
     case MAESTRO_FORMAT:
@@ -615,10 +646,26 @@ int write_header(O3Data *od, int object_num, char *header,
       (double)(od->grid.start_coord[1]) / BOHR_RADIUS,
       (double)(od->grid.start_coord[2]) / BOHR_RADIUS,
       (double)(od->grid.step[0]) * (double)(od->grid.nodes[0]) / BOHR_RADIUS, 0.0, 0.0,
-      0.0, (double)(od->grid.step[1]) * (double)(od->grid.nodes[0]) / BOHR_RADIUS, 0.0,
-      0.0, 0.0, (double)(od->grid.step[2]) * (double)(od->grid.nodes[0]) / BOHR_RADIUS,
+      0.0, (double)(od->grid.step[1]) * (double)(od->grid.nodes[1]) / BOHR_RADIUS, 0.0,
+      0.0, 0.0, (double)(od->grid.step[2]) * (double)(od->grid.nodes[2]) / BOHR_RADIUS,
       npts[0], npts[1], npts[2]);
+    break;
     
+    case OPENDX_FORMAT:
+    fprintf(od->file[GRD_OUT]->handle,
+      "object 1 class gridpositions counts %d %d %d\n"
+      "origin %.6e %.6e %.6e\n"
+      "delta %.6le %.6le %.6le\n"
+      "delta %.6le %.6le %.6le\n"
+      "delta %.6le %.6le %.6le\n"
+      "object 2 class gridconnections counts %d %d %d\n"
+      "object 3 class array type double rank 0 items %d data follows\n",
+      npts[0], npts[1], npts[2],
+      od->grid.start_coord[0], od->grid.start_coord[1], od->grid.start_coord[2],
+      (double)((double)(od->grid.step[0]) / (double)(interpolate + 1)), 0.0, 0.0,
+      0.0, (double)((double)(od->grid.step[1]) / (double)(interpolate + 1)), 0.0,
+      0.0, 0.0, (double)((double)(od->grid.step[2]) / (double)(interpolate + 1)),
+      npts[0], npts[1], npts[2], npts[0] * npts[1] * npts[2]);
     break;
     
     case FORMATTED_CUBE_FORMAT:
@@ -880,6 +927,8 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
   char basename[BUF_LEN];
   char extension[TITLE_LEN];
   char write_mode[TITLE_LEN];
+  char haveGlobMinVal = 0;
+  char haveGlobMaxVal = 0;
   int i;
   int j;
   int n;
@@ -910,6 +959,10 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
   float on_value;
   float float_value;
   float *float_xy_mat = NULL;
+  float locMinVal = 0.0;
+  float locMaxVal = 0.0;
+  float globMinVal = 0.0;
+  float globMaxVal = 0.0;
   double double_value;
   FILE *grd_out = NULL;
   FILE *plane_file = NULL;
@@ -938,6 +991,16 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
       return CANNOT_WRITE_TEMP_FILE;
     }
     strcpy(extension, MAESTRO_GRD_EXTENSION);
+    strcpy(write_mode, "wb+");
+    break;
+    
+    case OPENDX_FORMAT:
+    if (open_temp_file(od, od->file[TEMP_GRD], "opendx")) {
+      O3_ERROR_STRING(&(od->task), od->file[TEMP_GRD]->name);
+      O3_ERROR_LOCATE(&(od->task));
+      return CANNOT_WRITE_TEMP_FILE;
+    }
+    strcpy(extension, OPENDX_GRD_EXTENSION);
     strcpy(write_mode, "wb+");
     break;
     
@@ -1228,11 +1291,19 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
           while (x_var_count != x_var) {
             var_to_xyz(od, x_var_count, &varcoord);
             if ((int)(varcoord.node[2]) > z_plane) {
-              result = write_grid_plane(od, plane_file,
-                z_plane, interpolate, swap_endianness);
+              result = write_grid_plane(od, plane_file, z_plane,
+                interpolate, swap_endianness, &locMinVal, &locMaxVal);
               if (result) {
                 O3_ERROR_LOCATE(&(od->task));
                 return PREMATURE_EOF;
+              }
+              if ((!haveGlobMinVal) || (locMinVal < globMinVal)) {
+                haveGlobMinVal = 1;
+                globMinVal = locMinVal;
+              }
+              if ((!haveGlobMaxVal) || (locMaxVal > globMaxVal)) {
+                haveGlobMaxVal = 1;
+                globMaxVal = locMaxVal;
               }
               ++z_plane;
             }
@@ -1241,11 +1312,19 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
           }
           var_to_xyz(od, x_var_count, &varcoord);
           if ((int)(varcoord.node[2]) > z_plane) {
-            result = write_grid_plane(od, plane_file,
-              z_plane, interpolate, swap_endianness);
+            result = write_grid_plane(od, plane_file, z_plane,
+              interpolate, swap_endianness, &locMinVal, &locMaxVal);
             if (result) {
               O3_ERROR_LOCATE(&(od->task));
               return PREMATURE_EOF;
+            }
+            if ((!haveGlobMinVal) || (locMinVal < globMinVal)) {
+              haveGlobMinVal = 1;
+              globMinVal = locMinVal;
+            }
+            if ((!haveGlobMaxVal) || (locMaxVal > globMaxVal)) {
+              haveGlobMaxVal = 1;
+              globMaxVal = locMaxVal;
             }
             ++z_plane;
           }
@@ -1308,7 +1387,7 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
             }
           }
         }
-        else if ((format == MAESTRO_FORMAT) || (format == MOE_FORMAT)
+        else if ((format == MAESTRO_FORMAT) || (format == MOE_FORMAT) || (format == OPENDX_FORMAT)
           || (format == FORMATTED_CUBE_FORMAT) || (format == UNFORMATTED_CUBE_FORMAT)) {
           /*
           z is the fastest varying coordinate,
@@ -1341,10 +1420,12 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
                   O3_ERROR_LOCATE(&(od->task));
                   return CANNOT_READ_TEMP_FILE;
                 }
-                if ((format == MAESTRO_FORMAT) || (format == FORMATTED_CUBE_FORMAT)) {
+                if ((format == MAESTRO_FORMAT) || (format == FORMATTED_CUBE_FORMAT)
+                  || (format == OPENDX_FORMAT)) {
                   ++w;
                   fprintf(grd_out, "%16.6e", float_value);
-                  if ((format == MAESTRO_FORMAT) || (w == 6)) {
+                  if ((format == MAESTRO_FORMAT) || ((format == OPENDX_FORMAT) && (w == 3))
+                    || ((format != OPENDX_FORMAT) && (w == 6))) {
                     fprintf(grd_out, "\n");
                     w = 0;
                   }
@@ -1360,7 +1441,7 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
                   }
                 }
               }
-              if ((format == FORMATTED_CUBE_FORMAT) && w) {
+              if (((format == FORMATTED_CUBE_FORMAT) || (format != OPENDX_FORMAT)) && w) {
                 fprintf(grd_out, "\n");
               }
               else if (format == UNFORMATTED_CUBE_FORMAT) {
@@ -1518,11 +1599,19 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
             if (x_var_count == (od->x_vars - 1)) {
               set_grid_point(od, float_xy_mat, &varcoord, value);
             }
-            result = write_grid_plane(od, plane_file,
-              z_plane, interpolate, swap_endianness);
+            result = write_grid_plane(od, plane_file, z_plane,
+              interpolate, swap_endianness, &locMinVal, &locMaxVal);
             if (result) {
               O3_ERROR_LOCATE(&(od->task));
               return PREMATURE_EOF;
+            }
+            if ((!haveGlobMinVal) || (locMinVal < globMinVal)) {
+              haveGlobMinVal = 1;
+              globMinVal = locMinVal;
+            }
+            if ((!haveGlobMaxVal) || (locMaxVal > globMaxVal)) {
+              haveGlobMaxVal = 1;
+              globMaxVal = locMaxVal;
             }
             ++z_plane;
           }
@@ -1574,7 +1663,7 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
             }
           }
         }
-        else if ((format == MAESTRO_FORMAT) || (format == MOE_FORMAT)
+        else if ((format == MAESTRO_FORMAT) || (format == MOE_FORMAT) || (format == OPENDX_FORMAT)
           || (format == FORMATTED_CUBE_FORMAT) || (format == UNFORMATTED_CUBE_FORMAT)) {
           for (x = 0; x < npts[0]; ++x) {
             for (y = 0; y < npts[1]; ++y) {
@@ -1601,10 +1690,12 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
                   O3_ERROR_LOCATE(&(od->task));
                   return CANNOT_READ_TEMP_FILE;
                 }
-                if ((format == MAESTRO_FORMAT) || (format == FORMATTED_CUBE_FORMAT)) {
+                if ((format == MAESTRO_FORMAT) || (format == FORMATTED_CUBE_FORMAT)
+                  || (format == OPENDX_FORMAT)) {
                   ++w;
                   fprintf(grd_out, "%16.6e", float_value);
-                  if ((format == MAESTRO_FORMAT) || (w == 6)) {
+                  if ((format == MAESTRO_FORMAT) || ((format == OPENDX_FORMAT) && (w == 3))
+                    || ((format != OPENDX_FORMAT) && (w == 6))) {
                     fprintf(grd_out, "\n");
                     w = 0;
                   }
@@ -1619,7 +1710,7 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
                   }
                 }
               }
-              if ((format == FORMATTED_CUBE_FORMAT) && w) {
+              if (((format == FORMATTED_CUBE_FORMAT) || (format != OPENDX_FORMAT)) && w) {
                 fprintf(grd_out, "\n");
               }
               else if (format == UNFORMATTED_CUBE_FORMAT) {
@@ -1668,6 +1759,8 @@ int grid_write(O3Data *od, char *filename, int pc_num, int type,
     double_vec_free(od->vel.b);
     od->vel.b = NULL;
   }
+  tee_printf(od, "Minimum grid value: %.4e\n"
+    "Maximum grid value: %.4e\n", globMinVal, globMaxVal);
 
   return 0;
 }
