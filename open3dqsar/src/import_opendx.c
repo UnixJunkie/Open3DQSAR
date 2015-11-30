@@ -1,6 +1,6 @@
 /*
 
-import_grid_dx.c
+import_opendx.c
 
 is part of
 
@@ -134,7 +134,7 @@ int read_dx_header(O3Data *od, FileDescriptor *inp_fd, int object_num)
 }
 
 
-int import_grid_dx(O3Data *od, char *regex_name)
+int import_opendx(O3Data *od, char *regex_name)
 {
   char line[BUF_LEN];
   char parsed_line[BUF_LEN];

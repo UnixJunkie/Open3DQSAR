@@ -76,7 +76,7 @@ grid_write.c \
 import_dependent.c \
 import_free_format.c \
 import_grid_ascii.c \
-import_grid_dx.c \
+import_opendx.c \
 import_grid_formatted_cube.c \
 import_grid_moe.c \
 import_grid_unformatted_cube.c \

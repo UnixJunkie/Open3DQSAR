@@ -83,7 +83,7 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
     "MOLDEN",
     "MOE_GRID",
     "GRID_ASCII",
-    "GRID_DX",
+    "OPENDX",
     "COSMO"
   };
   char prompt[TITLE_LEN];
@@ -1506,8 +1506,8 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
         multi_file_type = GRID_ASCII_INPUT_FILE;
         multi_file_fd = NULL;
       }
-      else if (!strcasecmp(parameter, "grid_dx")) {
-        multi_file_type = GRID_DX_INPUT_FILE;
+      else if (!strcasecmp(parameter, "opendx")) {
+        multi_file_type = OPENDX_INPUT_FILE;
         multi_file_fd = NULL;
       }
       else {
@@ -1515,7 +1515,7 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
           "Only \"SDF\", \"MOL2\", \"FREE_FORMAT\", \"GRIDKONT\", "
           "\"DEPENDENT\", \"GAMESS_CUBE\", \"FORMATTED_CUBE\", "
           "\"GAUSSIAN_CUBE\", \"UNFORMATTED_CUBE\", \"MOLDEN\", "
-          "\"MOE_GRID\", \"GRID_ASCII\" and \"GRID_DX\" "
+          "\"MOE_GRID\", \"GRID_ASCII\" and \"OPENDX\" "
           "types are allowed for the IMPORT keyword.\n%s",
           IMPORT_FAILED);
         fail = !(run_type & INTERACTIVE_RUN);
@@ -1577,14 +1577,14 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
           fail = !(run_type & INTERACTIVE_RUN);
           continue;
         }
-        if ((multi_file_type != GRID_DX_INPUT_FILE) && (!(od->grid.nodes[0]))) {
+        if ((multi_file_type != OPENDX_INPUT_FILE) && (!(od->grid.nodes[0]))) {
           tee_error(od, run_type, overall_line_num,
             E_GRID_BOX_FIRST, IMPORT_FAILED);
           fail = !(run_type & INTERACTIVE_RUN);
           continue;
         }
         if ((multi_file_type == GRID_ASCII_INPUT_FILE)
-          || (multi_file_type == GRID_DX_INPUT_FILE)
+          || (multi_file_type == OPENDX_INPUT_FILE)
           || (multi_file_type == MOE_GRID_INPUT_FILE)) {
           if (check_regex_name(regex_name[0], 1)) {
             tee_error(od, run_type, overall_line_num,
@@ -1682,8 +1682,8 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
             result = import_grid_moe(od, regex_name[0]);
             break;
 
-            case GRID_DX_INPUT_FILE:
-            result = import_grid_dx(od, regex_name[0]);
+            case OPENDX_INPUT_FILE:
+            result = import_opendx(od, regex_name[0]);
             break;
 
             default:
@@ -2106,7 +2106,7 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
       }
       if (od->field.type & (VDW_FIELD | MM_ELE_FIELD)) {
         od->field.force_field = O3_MMFF94;
-        od->field.probe.atom_type = i;
+        od->field.probe.atom_type = ff_parm[(int)(od->field.force_field)][i].type_num;
         od->field.smooth_probe_flag = 0;
         if ((parameter = get_args(od, "smooth_probe"))) {
           if (!strncasecmp(parameter, "y", 1)) {
@@ -5945,12 +5945,15 @@ int parse_input(O3Data *od, FILE *input_stream, int run_type)
         else if (!strncasecmp(parameter, "unformatted_cube", 16)) {
           format = UNFORMATTED_CUBE_FORMAT;
         }
+        else if (!strncasecmp(parameter, "opendx", 6)) {
+          format = OPENDX_FORMAT;
+        }
         else if (strncasecmp(parameter, "insight", 7)) {
           tee_error(od, run_type, overall_line_num,
             "Allowed values for format are \"INSIGHT\", "
             "\"MAESTRO\", \"MOE\", \"SYBYL\", "
             "\"FORMATTED_CUBE\", \"UNFORMATTED_CUBE\", "
-            "\"ASCII\" and \"XYZ\".\n%s",
+            "\"OPENDX\", \"ASCII\" and \"XYZ\".\n%s",
             EXPORT_FAILED);
           fail = !(run_type & INTERACTIVE_RUN);
           continue;

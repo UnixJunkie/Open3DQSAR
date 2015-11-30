@@ -38,7 +38,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(Open3DQSAR, 2.281, <paolo.tosco@unito.it>)
+AC_INIT(Open3DQSAR, 2.3, <paolo.tosco@unito.it>)
 AC_DEFINE([PACKAGE_NAME_LOWERCASE], ["open3dqsar"], [Package name in lowercase])
 AC_DEFINE([PACKAGE_NAME_UPPERCASE], ["OPEN3DQSAR"], [Package name in uppercase])
 AC_DEFINE([O3Q], [1], [Open3DQSAR])

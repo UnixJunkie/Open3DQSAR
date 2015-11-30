@@ -831,6 +831,20 @@ int call_obenergy(O3Data *od, int force_field)
 }
 
 
+FFParm *get_mmff_parm(unsigned int num)
+{
+  FFParm *ptr = NULL;
+  if (((num >= 1) && (num <= 82))
+    || ((num >= 87) && (num <= 100))) {
+    if ((num >= 87) && (num <= 100)) {
+      num -= 4;
+    }
+    --num;
+    ptr = &ff_parm[O3_MMFF94][num];
+  }
+  return ptr;
+}
+
 int fill_atom_info(O3Data *od, TaskInfo *task, AtomInfo **atom, BondList **bond_list, int object_num, char force_field)
 {
   char b = 0;
@@ -850,6 +864,7 @@ int fill_atom_info(O3Data *od, TaskInfo *task, AtomInfo **atom, BondList **bond_
   int a[2];
   int order;
   int result = 0;
+  FFParm *ff_ptr;
   FileDescriptor mol_fd;
   FileDescriptor out_fd;
 
@@ -969,17 +984,12 @@ int fill_atom_info(O3Data *od, TaskInfo *task, AtomInfo **atom, BondList **bond_
     unknown = 1;
     memset(ring_type, 0, MAX_FF_TYPE_LEN);
     sscanf(buffer, "%*s %d %s", &j, ring_type);
-    i = 0;
-    while (ff_parm[O3_MMFF94][i].type_num
-      && (unknown = (j != ff_parm[O3_MMFF94][i].type_num))) {
-      ++i;
-    }
-    if (unknown) {
-      --i;
+    ff_ptr = get_mmff_parm(j);
+    if (!ff_ptr) {
       result = FL_UNKNOWN_ATOM_TYPE;
     }
     else {
-      atom[n]->atom_type = ff_parm[(int)force_field][i].type_num;
+      atom[n]->atom_type = ff_ptr->type_num;
       atom[n]->atom_num = n + 1;
       switch (ring_type[1]) {
         case 'R':
@@ -994,7 +1004,7 @@ int fill_atom_info(O3Data *od, TaskInfo *task, AtomInfo **atom, BondList **bond_
         atom[n]->ring = 0;
         break;
       }
-      strcpy(atom[n]->atom_name, ff_parm[(int)force_field][i].type_chr);
+      strcpy(atom[n]->atom_name, ff_ptr->type_chr);
     }
     ++n;
   }

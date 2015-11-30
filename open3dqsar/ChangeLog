@@ -1,6 +1,29 @@
 Open3DQSAR's ChangeLog
 ----------------------
 
+*** November 29, 2015: Open3DQSAR 2.3 ***
+
+  Changes with respect to the previous version include:
+  
+  - Corrected the implementation of the van der Waals term to be
+    adherent to the original MMFF94 papers
+  - Fixed a bug in the way environment variables were dealt with under
+    Windows (which under certain conditions could trigger segmentation
+    faults in launching external programs)
+  - Added missing entries and fixed a typo in keywords.h
+  - Labels can now be exported in PRED_VS_EXP plots
+  - The import type=GRID_DX format was renamed to OPENDX
+  - The OPENDX format was added to the "export" keyword
+
+
+*** May 31, 2015: Open3DQSAR 2.282 ***
+
+  Changes with respect to the previous version include:
+  
+  - Fixed a bug in the code to export INSIGHT format grid files
+  - Minimum and maximum values are now output upon exporting a grid file
+
+
 *** April 18, 2015: Open3DQSAR 2.281 ***
 
   Changes with respect to the previous version include:
