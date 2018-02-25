@@ -85,6 +85,9 @@ E-mail: paolo.tosco@unito.it
 #include <clapack.h>
 #endif
 #endif
+#ifdef HAVE_LAPACKE_H
+#include <lapacke.h>
+#endif
 #ifdef HAVE_CBLAS_H
 #if ((!defined(HAVE_MKL_CBLAS_H)) && (!defined(HAVE_SUNPERF_H)))
 #include <cblas.h>

@@ -1,7 +1,14 @@
 Open3DQSAR's ChangeLog
 ----------------------
 
-*** November 29, 2015: Open3DQSAR 2.3 ***
+*** February 25, 2018: Open3DQSAR 2.31 ***
+
+  Changes with respect to the previous version include:
+  
+  - building against the LAPACKE library is now supported
+
+
+  *** November 29, 2015: Open3DQSAR 2.3 ***
 
   Changes with respect to the previous version include:
   

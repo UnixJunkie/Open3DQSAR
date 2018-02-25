@@ -188,6 +188,45 @@ AS_IF([test "x$with_atlas" != xno && test -z "$LIBLAPACK_F77"],
 	[AC_MSG_FAILURE(
 	[--with-atlas was given, but test for F77 LAPACK failed])])
 
+AC_ARG_WITH([lapacke],
+	[AC_HELP_STRING([--with-lapacke],
+	[link against CBLAS and LAPACKE math libraries])],
+	[],
+	[with_lapacke=no])
+
+LIBBLAS=
+LIBLAPACKE=
+AS_IF([test "x$with_lapacke" != xno],
+	[AC_CHECK_HEADER([lapacke.h],
+	AC_DEFINE([HAVE_LAPACKE_H], [1], [Use lapacke.h header]),
+	[AC_MSG_FAILURE(
+	[--with-lapacke was given, but test for lapacke.h failed])],
+	[AC_INCLUDES_DEFAULT])])
+AS_IF([test "x$with_lapacke" != xno],
+	[AC_CHECK_HEADER([cblas.h],
+	AC_DEFINE([HAVE_CBLAS_H], [1], [Use cblas.h header]),
+	[AC_MSG_FAILURE(
+	[--with-lapacke was given, but test for cblas.h failed])],
+	[AC_INCLUDES_DEFAULT])])
+AS_IF([test "x$with_lapacke" != xno],
+	[AC_CHECK_LIB([cblas -lblas], [cblas_dgemm],
+	[AC_SUBST([LIBBLAS], ["-lcblas -lblas"])
+	AC_DEFINE([HAVE_LIBBLAS], [1], [Use CBLAS library])])])
+AS_IF([test "x$with_lapacke" != xno],
+	[AC_CHECK_LIB([gfortran -llapacke -llapack -lblas], [LAPACKE_dgetrf],
+	[AC_SUBST([LIBLAPACKE], ["-lgfortran -llapacke -llapack"])
+	AC_DEFINE([HAVE_LIBLAPACKE], [1], [Use LAPACKE library])])])
+AS_IF([test "x$with_lapacke" != xno],
+	[AC_CHECK_LIB([gfortran -l:liblapacke.a -llapack -lblas], [LAPACKE_dgetrf],
+	[AC_SUBST([LIBLAPACKE], ["-lgfortran -l:liblapacke.a -llapack"])
+	AC_DEFINE([HAVE_LIBLAPACKE], [1], [Use LAPACKE library])])])
+AS_IF([test "x$with_lapacke" != xno && test -z "$LIBBLAS"],
+	[AC_MSG_FAILURE(
+	[--with-lapacke was given, but test for BLAS failed])])
+AS_IF([test "x$with_lapacke" != xno && test -z "$LIBLAPACKE"],
+	[AC_MSG_FAILURE(
+	[--with-lapacke was given, but test for LAPACKE failed])])
+
 AC_ARG_WITH([intel-mkl],
 	[AC_HELP_STRING([--with-intel-mkl],
 	[link against Intel Math Kernel Library])],
@@ -302,11 +341,12 @@ AS_IF([test "x$with_accelerate" != xno],
 	[--with-accelerate was given, but test for Accelerate Framework failed])])])
 
 AS_IF([test "x$with_atlas" = xno] \
+	&& [test "x$with_lapacke" = xno] \
 	&& [test "x$with_intel_mkl" = xno] \
 	&& [test "x$with_sunperf" = xno] \
 	&& [test "x$with_accelerate" = xno],
 	[AC_MSG_FAILURE( \
-	[please indicate one of the following: --with-atlas, --with-intel-mkl, \
+	[please indicate one of the following: --with-atlas, --with-lapacke, --with-intel-mkl, \
 --with-sunperf, --with-accelerate])])
 
 # Checks for buggy rint()
