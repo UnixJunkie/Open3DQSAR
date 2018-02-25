@@ -7,11 +7,11 @@ Report bugs to <paolo.tosco@unito.it>
 
 System information
 ------------------
-Hostname: q7linux
-x86_64 Linux 3.10.0-123.20.1.el7.x86_64 #1 SMP Thu Jan 29 18:05:33 UTC 2015
-This machine has 8 CPUs.
+Hostname: linux
+x86_64 Linux 4.4.76-1-default #1 SMP Fri Jul 14 08:48:13 UTC 2017 (9a2885c)
+This machine has 4 CPUs.
 
-The number of CPUs used by Open3DQSAR has been set to 8.
+The number of CPUs used by Open3DQSAR has been set to 4.
 
 The nice value has been set to 20.
 
@@ -19,7 +19,9 @@ The directory for temporary storage is:
 /tmp
 
 The current working directory is:
-/data/build/common/open3dqsar/open3dqsar_svn/trunk/open3dqsar/test/test_results
+/home/ptosco/open3dqsar-2.3/test/test_results
+
+Since Open3DQSAR was not linked against libminizip, support for ZIP files will not be available.
 
 OpenBabel binaries are in:
 /home/ptosco/open3dtools/bin
@@ -40,13 +42,13 @@ The path to GNUPLOT can be set through the O3_GNUPLOT environment variable or by
 PyMOL will not be used.
 The path to PyMOL can be set through the O3_PYMOL environment variable or by the "env pymol" keyword.
 
-Job started on Sun Nov 29 22:09:38 2015
+Job started on Sun Feb 25 11:15:29 2018
 
 BGN COMMAND #00.0001 - IMPORT SDF tool was invoked as follows:
 > import type=sdf file=ref_e2.sdf
 
 
-Elapsed time: 0.0053 seconds.
+Elapsed time: 0.0038 seconds.
 
 
 Number of fields:      0
@@ -180,7 +182,7 @@ Active x variables:           0 (  0%)
 Active y variables:           0
 
 
-Elapsed time: 0.0048 seconds.
+Elapsed time: 0.0061 seconds.
 
 END COMMAND #00.0002 - REMOVE_OBJECT tool succeeded.
 BGN COMMAND #00.0003 - BOX tool was invoked as follows:
@@ -353,7 +355,7 @@ Zero x values:                0 (  0%)
 Active y variables:           0
 
 
-Elapsed time: 0.0190 seconds.
+Elapsed time: 0.0193 seconds.
 
 END COMMAND #00.0006 - CUTOFF tool succeeded.
 BGN COMMAND #00.0007 - CUTOFF tool was invoked as follows:
@@ -375,7 +377,7 @@ Zero x values:                0 (  0%)
 Active y variables:           0
 
 
-Elapsed time: 0.0190 seconds.
+Elapsed time: 0.0194 seconds.
 
 END COMMAND #00.0007 - CUTOFF tool succeeded.
 BGN COMMAND #00.0008 - IMPORT DEPENDENT tool was invoked as follows:
@@ -452,14 +454,14 @@ Active y variables:           1
 Zero y values:                0 (  0%)
 
 
-Elapsed time: 0.0079 seconds.
+Elapsed time: 0.0075 seconds.
 
 END COMMAND #00.0008 - IMPORT DEPENDENT tool succeeded.
 BGN COMMAND #00.0009 - SAVE tool was invoked as follows:
 > save file=binding.dat
 
 
-Elapsed time: 0.0009 seconds.
+Elapsed time: 0.0019 seconds.
 
 END COMMAND #00.0009 - SAVE tool succeeded.
 BGN COMMAND #00.0010 - ZERO tool was invoked as follows:
@@ -483,7 +485,7 @@ Active y variables:           1
 Zero y values:                0 (  0%)
 
 
-Elapsed time: 0.0203 seconds.
+Elapsed time: 0.0215 seconds.
 
 END COMMAND #00.0010 - ZERO tool succeeded.
 BGN COMMAND #00.0011 - SET tool was invoked as follows:
@@ -581,7 +583,7 @@ Active y variables:           1
 Zero y values:                0 (  0%)
 
 
-Elapsed time: 0.0107 seconds.
+Elapsed time: 0.0100 seconds.
 
 END COMMAND #00.0012 - SDCUT tool succeeded.
 BGN COMMAND #00.0013 - NLEVEL tool was invoked as follows:
@@ -611,7 +613,7 @@ Active y variables:           1
 Zero y values:                0 (  0%)
 
 
-Elapsed time: 0.0108 seconds.
+Elapsed time: 0.0101 seconds.
 
 END COMMAND #00.0013 - NLEVEL tool succeeded.
 BGN COMMAND #00.0014 - REMOVE_X_VARS tool was invoked as follows:
@@ -636,7 +638,7 @@ Field          Number of 4-level variables removed
 --------------------------------------------------
 
 
-Elapsed time: 0.0044 seconds.
+Elapsed time: 0.0043 seconds.
 
 END COMMAND #00.0014 - REMOVE_X_VARS tool succeeded.
 BGN COMMAND #00.0015 - SCALE_X_VARS tool was invoked as follows:
@@ -649,7 +651,7 @@ Field          BUW coefficient
     2                   1.1558
 ------------------------------
 
-Elapsed time: 0.0079 seconds.
+Elapsed time: 0.0075 seconds.
 
 END COMMAND #00.0015 - SCALE_X_VARS tool succeeded.
 
@@ -679,7 +681,7 @@ PC    var. X %    var. X %    var. Y %    var. Y %        SDEC          r2
  4      9.4438     59.3040      1.8310     95.4897      0.2140      0.9549
  5      4.2736     63.5776      1.8333     97.3230      0.1649      0.9732
 
-Elapsed time: 0.0069 seconds.
+Elapsed time: 0.0066 seconds.
 
 Calculated values for dependent variable  1 (affinity)
 -------------------------------------------------------------------------------------------------------------------------------------------
@@ -752,7 +754,7 @@ PC        SDEP    r2(pred)
  5      0.2969      0.9179
 
 
-Elapsed time: 0.0005 seconds.
+Elapsed time: 0.0008 seconds.
 
 END COMMAND #00.0017 - PREDICT tool succeeded.
 BGN COMMAND #00.0018 - CV tool was invoked as follows:
@@ -802,7 +804,7 @@ PC        SDEP          q2
  4      0.6283      0.6112
  5      0.6008      0.6445
 
-Elapsed time: 0.0032 seconds.
+Elapsed time: 0.0082 seconds.
 
 END COMMAND #00.0018 - CV tool succeeded.
 BGN COMMAND #00.0019 - CV tool was invoked as follows:
@@ -852,7 +854,7 @@ PC        SDEP          q2
  4      0.6332      0.6052
  5      0.6118      0.6314
 
-Elapsed time: 0.0188 seconds.
+Elapsed time: 0.0253 seconds.
 
 END COMMAND #00.0019 - CV tool succeeded.
 BGN COMMAND #00.0020 - CV tool was invoked as follows:
@@ -902,7 +904,7 @@ PC        SDEP  SD on SDEP  Average q2
  4      0.6628      0.0510      0.5650
  5      0.6514      0.0520      0.5796
 
-Elapsed time: 0.0079 seconds.
+Elapsed time: 0.0174 seconds.
 
 END COMMAND #00.0020 - CV tool succeeded.
 BGN COMMAND #00.0021 - SRD tool was invoked as follows:
@@ -925,14 +927,14 @@ Total                  80                            74
 -------------------------------------------------------
 
 
-Elapsed time: 0.0074 seconds.
+Elapsed time: 0.0096 seconds.
 
 END COMMAND #00.0021 - SRD tool succeeded.
 BGN COMMAND #00.0022 - SAVE tool was invoked as follows:
 > save file=binding_after_srd.dat
 
 
-Elapsed time: 0.0010 seconds.
+Elapsed time: 0.0013 seconds.
 
 END COMMAND #00.0022 - SAVE tool succeeded.
 BGN COMMAND #00.0023 - FFDSEL tool was invoked as follows:
@@ -950,14 +952,14 @@ Total               8              59              13
 -----------------------------------------------------
 
 
-Elapsed time: 0.1440 seconds.
+Elapsed time: 0.2489 seconds.
 
 END COMMAND #00.0023 - FFDSEL tool succeeded.
 BGN COMMAND #00.0024 - SAVE tool was invoked as follows:
 > save file=binding_after_ffdsel.dat
 
 
-Elapsed time: 0.0011 seconds.
+Elapsed time: 0.0016 seconds.
 
 END COMMAND #00.0024 - SAVE tool succeeded.
 BGN COMMAND #00.0025 - REMOVE_X_VARS tool was invoked as follows:
@@ -971,7 +973,7 @@ Field       Number of x variables removed
 -----------------------------------------
 
 
-Elapsed time: 0.0049 seconds.
+Elapsed time: 0.0055 seconds.
 
 END COMMAND #00.0025 - REMOVE_X_VARS tool succeeded.
 
@@ -1001,7 +1003,7 @@ PC    var. X %    var. X %    var. Y %    var. Y %        SDEC          r2
  4      4.0435     52.4878      2.2483     97.5096      0.1590      0.9751
  5      6.5842     59.0720      0.5593     98.0689      0.1400      0.9807
 
-Elapsed time: 0.0074 seconds.
+Elapsed time: 0.0080 seconds.
 
 Calculated values for dependent variable  1 (affinity)
 -------------------------------------------------------------------------------------------------------------------------------------------
@@ -1093,7 +1095,7 @@ PC        SDEP          q2
  4      0.4914      0.7622
  5      0.4763      0.7766
 
-Elapsed time: 0.0021 seconds.
+Elapsed time: 0.0026 seconds.
 
 END COMMAND #00.0027 - CV tool succeeded.
 BGN COMMAND #00.0028 - CV tool was invoked as follows:
@@ -1143,7 +1145,7 @@ PC        SDEP          q2
  4      0.5047      0.7492
  5      0.4896      0.7639
 
-Elapsed time: 0.0132 seconds.
+Elapsed time: 0.0185 seconds.
 
 END COMMAND #00.0028 - CV tool succeeded.
 BGN COMMAND #00.0029 - CV tool was invoked as follows:
@@ -1193,7 +1195,7 @@ PC        SDEP  SD on SDEP  Average q2
  4      0.5569      0.0604      0.6912
  5      0.5482      0.0696      0.6995
 
-Elapsed time: 0.0054 seconds.
+Elapsed time: 0.0082 seconds.
 
 END COMMAND #00.0029 - CV tool succeeded.
 BGN COMMAND #00.0030 - PREDICT tool was invoked as follows:
@@ -1233,7 +1235,7 @@ BGN COMMAND #00.0031 - EXPORT tool was invoked as follows:
 Minimum grid value: -1.0930e-02
 Maximum grid value: 9.9395e-03
 
-Elapsed time: 0.0800 seconds.
+Elapsed time: 0.5825 seconds.
 
 END COMMAND #00.0031 - EXPORT tool succeeded.
 BGN COMMAND #00.0032 - EXPORT tool was invoked as follows:
@@ -1242,7 +1244,7 @@ BGN COMMAND #00.0032 - EXPORT tool was invoked as follows:
 Minimum grid value: -1.0930e-02
 Maximum grid value: 9.9395e-03
 
-Elapsed time: 0.1983 seconds.
+Elapsed time: 0.7289 seconds.
 
 END COMMAND #00.0032 - EXPORT tool succeeded.
 BGN COMMAND #00.0033 - EXPORT tool was invoked as follows:
@@ -1251,7 +1253,7 @@ BGN COMMAND #00.0033 - EXPORT tool was invoked as follows:
 Minimum grid value: -1.0930e-02
 Maximum grid value: 9.9395e-03
 
-Elapsed time: 0.2521 seconds.
+Elapsed time: 0.8224 seconds.
 
 END COMMAND #00.0033 - EXPORT tool succeeded.
 BGN COMMAND #00.0034 - LOAD tool was invoked as follows:
@@ -1342,7 +1344,7 @@ Active y variables:           1
 Zero y values:                0 (  0%)
 
 
-Elapsed time: 0.1135 seconds.
+Elapsed time: 0.1339 seconds.
 
 END COMMAND #00.0034 - LOAD tool succeeded.
 
@@ -1372,7 +1374,7 @@ PC    var. X %    var. X %    var. Y %    var. Y %        SDEC          r2
  4      9.4438     59.3040      1.8310     95.4897      0.2140      0.9549
  5      4.2736     63.5776      1.8333     97.3230      0.1649      0.9732
 
-Elapsed time: 0.0082 seconds.
+Elapsed time: 0.0070 seconds.
 
 Calculated values for dependent variable  1 (affinity)
 -------------------------------------------------------------------------------------------------------------------------------------------
@@ -1428,14 +1430,14 @@ Total                      80
 -----------------------------
 
 
-Elapsed time: 0.3909 seconds.
+Elapsed time: 0.7229 seconds.
 
 END COMMAND #00.0036 - UVEPLS tool succeeded.
 BGN COMMAND #00.0037 - SAVE tool was invoked as follows:
 > save file=binding_after_uvepls.dat
 
 
-Elapsed time: 0.0010 seconds.
+Elapsed time: 0.0021 seconds.
 
 END COMMAND #00.0037 - SAVE tool succeeded.
 BGN COMMAND #00.0038 - REMOVE_X_VARS tool was invoked as follows:
@@ -1449,7 +1451,7 @@ Field       Number of x variables removed
 -----------------------------------------
 
 
-Elapsed time: 0.0049 seconds.
+Elapsed time: 0.0044 seconds.
 
 END COMMAND #00.0038 - REMOVE_X_VARS tool succeeded.
 
@@ -1479,7 +1481,7 @@ PC    var. X %    var. X %    var. Y %    var. Y %        SDEC          r2
  4      8.1166     66.9770      1.0450     97.1735      0.1694      0.9717
  5      7.1774     74.1544      0.4858     97.6593      0.1542      0.9766
 
-Elapsed time: 0.0072 seconds.
+Elapsed time: 0.0064 seconds.
 
 Calculated values for dependent variable  1 (affinity)
 -------------------------------------------------------------------------------------------------------------------------------------------
@@ -1571,7 +1573,7 @@ PC        SDEP          q2
  4      0.4086      0.8356
  5      0.3993      0.8430
 
-Elapsed time: 0.0017 seconds.
+Elapsed time: 0.0019 seconds.
 
 END COMMAND #00.0040 - CV tool succeeded.
 BGN COMMAND #00.0041 - CV tool was invoked as follows:
@@ -1621,7 +1623,7 @@ PC        SDEP          q2
  4      0.4153      0.8302
  5      0.4079      0.8362
 
-Elapsed time: 0.0121 seconds.
+Elapsed time: 0.0250 seconds.
 
 END COMMAND #00.0041 - CV tool succeeded.
 BGN COMMAND #00.0042 - CV tool was invoked as follows:
@@ -1671,7 +1673,7 @@ PC        SDEP  SD on SDEP  Average q2
  4      0.4684      0.0564      0.7810
  5      0.4605      0.0558      0.7883
 
-Elapsed time: 0.0055 seconds.
+Elapsed time: 0.0086 seconds.
 
 END COMMAND #00.0042 - CV tool succeeded.
 BGN COMMAND #00.0043 - PREDICT tool was invoked as follows:
@@ -1702,7 +1704,7 @@ PC        SDEP    r2(pred)
  5      0.3700      0.8724
 
 
-Elapsed time: 0.0002 seconds.
+Elapsed time: 0.0003 seconds.
 
 END COMMAND #00.0043 - PREDICT tool succeeded.
 BGN COMMAND #00.0044 - EXPORT tool was invoked as follows:
@@ -1711,7 +1713,7 @@ BGN COMMAND #00.0044 - EXPORT tool was invoked as follows:
 Minimum grid value: -1.1022e-02
 Maximum grid value: 8.4117e-03
 
-Elapsed time: 0.0769 seconds.
+Elapsed time: 0.5807 seconds.
 
 END COMMAND #00.0044 - EXPORT tool succeeded.
 BGN COMMAND #00.0045 - EXPORT tool was invoked as follows:
@@ -1720,7 +1722,7 @@ BGN COMMAND #00.0045 - EXPORT tool was invoked as follows:
 Minimum grid value: -1.1022e-02
 Maximum grid value: 8.4117e-03
 
-Elapsed time: 0.1954 seconds.
+Elapsed time: 0.7253 seconds.
 
 END COMMAND #00.0045 - EXPORT tool succeeded.
 BGN COMMAND #00.0046 - EXPORT tool was invoked as follows:
@@ -1729,11 +1731,11 @@ BGN COMMAND #00.0046 - EXPORT tool was invoked as follows:
 Minimum grid value: -1.1022e-02
 Maximum grid value: 8.4117e-03
 
-Elapsed time: 0.2519 seconds.
+Elapsed time: 0.8142 seconds.
 
 END COMMAND #00.0046 - EXPORT tool succeeded.
 
 
-Job finished on Sun Nov 29 22:09:40 2015
+Job finished on Sun Feb 25 11:15:35 2018
 
 Successful completion.

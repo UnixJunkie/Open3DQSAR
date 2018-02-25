@@ -1070,6 +1070,13 @@ void print_pls_scores(O3Data *od, int options)
       od->mal.temp->base,
       od->mal.temp->max_m,
       od->mel.ipiv);
+    #elif HAVE_LIBLAPACKE
+    info = LAPACKE_dgetrf(LAPACK_COL_MAJOR,
+      od->mal.temp->m,
+      od->mal.temp->m,
+      od->mal.temp->base,
+      od->mal.temp->max_m,
+      od->mel.ipiv);
     #else
     dgetrf_(&(od->mal.temp->m),
       &(od->mal.temp->m),
@@ -1092,6 +1099,12 @@ void print_pls_scores(O3Data *od, int options)
         od->mel.ipiv, &info);
       #elif HAVE_LIBLAPACK_ATLAS
       info = clapack_dgetri(CblasColMajor,
+        od->mal.temp->m,
+        od->mal.temp->base,
+        od->mal.temp->max_m,
+        od->mel.ipiv);
+      #elif HAVE_LIBLAPACKE
+      info = LAPACKE_dgetri(LAPACK_COL_MAJOR,
         od->mal.temp->m,
         od->mal.temp->base,
         od->mal.temp->max_m,

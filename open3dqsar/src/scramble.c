@@ -446,6 +446,13 @@ int scramble(O3Data *od, int pc_num)
     od->mal.fit_temp->base,
     od->mal.fit_temp->max_m,
     od->mel.ipiv);
+  #elif HAVE_LIBLAPACKE
+  info = LAPACKE_dgetrf(LAPACK_COL_MAJOR,
+    od->mal.fit_temp->m,
+    od->mal.fit_temp->m,
+    od->mal.fit_temp->base,
+    od->mal.fit_temp->max_m,
+    od->mel.ipiv);
   #else
   dgetrf_(&(od->mal.fit_temp->m),
     &(od->mal.fit_temp->m),
@@ -468,6 +475,12 @@ int scramble(O3Data *od, int pc_num)
       od->mel.ipiv, &info);
     #elif HAVE_LIBLAPACK_ATLAS
     info = clapack_dgetri(CblasColMajor,
+      od->mal.fit_temp->m,
+      od->mal.fit_temp->base,
+      od->mal.fit_temp->max_m,
+      od->mel.ipiv);
+    #elif HAVE_LIBLAPACKE
+    info = LAPACKE_dgetri(LAPACK_COL_MAJOR,
       od->mal.fit_temp->m,
       od->mal.fit_temp->base,
       od->mal.fit_temp->max_m,

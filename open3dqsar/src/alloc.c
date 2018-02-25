@@ -940,7 +940,7 @@ int alloc_pls(O3Data *od, int x_vars, int pc_num, int model_type)
   if (!(od->mel.ipiv)) {
     return OUT_OF_MEMORY;
   }
-  #if (!defined HAVE_LIBLAPACK_ATLAS) && (!defined HAVE_LIBSUNPERF)
+  #if (!defined HAVE_LIBLAPACK_ATLAS) && (!defined HAVE_LIBLAPACKE) && (!defined HAVE_LIBSUNPERF)
   od->mel.work = realloc(od->mel.work,
     (pc_num + 1) * LWORK_BLOCK_SIZE * sizeof(double));
   if (!(od->mel.work)) {

@@ -98,6 +98,13 @@ DoubleMat *calc_dispersion_matrix(O3Data *od,
     od->mal.temp->base,
     od->mal.temp->max_m,
     od->mel.ipiv);
+  #elif HAVE_LIBLAPACKE
+  info = LAPACKE_dgetrf(LAPACK_COL_MAJOR,
+    od->mal.temp->m,
+    od->mal.temp->m,
+    od->mal.temp->base,
+    od->mal.temp->max_m,
+    od->mel.ipiv);
   #else
   dgetrf_(&(od->mal.temp->m),
     &(od->mal.temp->m),
@@ -120,6 +127,12 @@ DoubleMat *calc_dispersion_matrix(O3Data *od,
       od->mel.ipiv, &info);
     #elif HAVE_LIBLAPACK_ATLAS
     info = clapack_dgetri(CblasColMajor,
+      od->mal.temp->m,
+      od->mal.temp->base,
+      od->mal.temp->max_m,
+      od->mel.ipiv);
+    #elif HAVE_LIBLAPACKE
+    info = LAPACKE_dgetri(LAPACK_COL_MAJOR,
       od->mal.temp->m,
       od->mal.temp->base,
       od->mal.temp->max_m,
